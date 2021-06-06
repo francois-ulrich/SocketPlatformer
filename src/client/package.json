@@ -12,6 +12,9 @@
 		"vite": "^2.3.5"
 	},
 	"dependencies": {
-		"pixi.js": "^6.0.4"
+		"@types/socket.io-client": "^3.0.0",
+		"pixi.js": "^6.0.4",
+		"socket.io": "^4.1.2",
+		"socket.io-client": "^4.1.2"
 	}
 }

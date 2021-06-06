@@ -1,18 +1,21 @@
-// src/server.ts
-const express = require('express');
+import { createServer } from 'http';
+import { Server, Socket } from 'socket.io';
 
-// const app = express();
-// app.set('port', process.env.PORT || 3000);
+const httpServer = createServer();
+const io = new Server(httpServer, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+  },
+});
 
-// const http = require('http').Server(app);
+io.on('connection', (socket: Socket) => {
+  console.log('A user connected');
 
-// // simple '/' endpoint sending a Hello World
-// // response
-// app.get('/', (req: any, res: any) => {
-//   res.send('hello world');
-// });
+  // Whenever someone disconnects this piece of code executed
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+  });
+});
 
-// // start our simple server up on localhost:3000
-// const server = http.listen(3000, () => {
-//   console.log('listening on *:3000');
-// });
+httpServer.listen(3001);

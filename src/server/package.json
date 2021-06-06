@@ -4,11 +4,14 @@
 	"description": "",
 	"main": "index.ts",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"serve": "nodemon ./src/index.ts"
 	},
 	"author": "François Ulrich",
 	"license": "ISC",
-	"dependencies": {},
+	"dependencies": {
+		"socket.io": "^4.1.2"
+	},
 	"devDependencies": {
 		"@types/express": "^4.17.12",
 		"@types/node": "^15.12.1",
@@ -17,5 +20,9 @@
 		"nodemon": "^2.0.7",
 		"npm": "^7.16.0",
 		"typescript": "^4.3.2"
+	},
+	"optionalDependencies": {
+		"bufferutil": "^4.0.3",
+		"utf-8-validate": "^5.0.5"
 	}
 }
