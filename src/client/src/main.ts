@@ -14,7 +14,10 @@ const app = new PIXI.Application({
 document.body.appendChild(app.view);
 
 // Socket stuff
-const socket = io('http://localhost:3001/');
+const socket = io('ws://localhost:5000/');
 
 socket.on('connect', () => {
+  socket.on('test', (data) => {
+    console.log(data);
+  });
 });

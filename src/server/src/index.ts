@@ -4,13 +4,16 @@ import { Server, Socket } from 'socket.io';
 const httpServer = createServer();
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST'],
+    origin: '*',
   },
 });
 
 io.on('connection', (socket: Socket) => {
   console.log('A user connected');
+
+  setInterval(() => {
+    socket.broadcast.emit('test', 'Hello everybody!!');
+  }, 1000);
 
   // Whenever someone disconnects this piece of code executed
   socket.on('disconnect', () => {
@@ -18,4 +21,5 @@ io.on('connection', (socket: Socket) => {
   });
 });
 
-httpServer.listen(3001);
+const port = process.env.PORT || 5000;
+httpServer.listen(port);

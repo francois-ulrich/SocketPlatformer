@@ -5,7 +5,10 @@
 	"main": "index.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"serve": "nodemon ./src/index.ts"
+		"build": "npx tsc",
+		"watch": "npm run build -- -w",
+		"serve": "nodemon ./dist/index.js",
+		"dev": "nodemon ./src/index.ts"
 	},
 	"author": "François Ulrich",
 	"license": "ISC",
