@@ -8,6 +8,7 @@ import { io } from 'socket.io-client';
 const app = new PIXI.Application({
   antialias: true,
   backgroundColor: 0xbababa,
+  resizeTo: window,
 });
 
 // Add the canvas that Pixi automatically created for you to the HTML document
@@ -21,3 +22,5 @@ socket.on('connect', () => {
     console.log(data);
   });
 });
+
+// Test

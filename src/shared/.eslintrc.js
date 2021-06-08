@@ -17,5 +17,6 @@ module.exports = {
   ],
   rules: {
     'no-console': 'off',
+    'linebreak-style': ['error', 'windows'],
   },
 };
