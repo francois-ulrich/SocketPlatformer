@@ -4,8 +4,9 @@ import { World, Entity } from 'super-ecs';
 // import { io } from 'socket.io-client';
 import PositionSystem from './systems/PositionSystem';
 import PositionComponent from './components/PositionComponent';
-import SpriteSystem from './systems/SpriteSystem';
+// import SpriteSystem from './systems/SpriteSystem';
 import SpriteComponent from './components/SpriteComponent';
+// import COMPONENT_NAMES from './components/types'
 
 // Create a Pixi Application
 const app = new PIXI.Application({
@@ -21,17 +22,25 @@ document.body.appendChild(app.view);
 const container = new PIXI.Container();
 app.stage.addChild(container);
 
+// const loader = PIXI.Loader.shared;
+
+// loader
+//   .add('sheet/simon', './src/assets/sprites/simon/sheet.png')
+//   .load(() => init());
+
+
+// Temp: add test entity
 function createPlayerEntity(): Entity {
-  const x = Math.floor(Math.random() * 600);
-  const y = Math.floor(Math.random() * 400);
+  const x = 8;
+  const y = 8;
 
-  const hero = new Entity();
+  const hero: Entity = new Entity();
 
-  const spriteSheetPath = './assets/sprites/simon/sheet.png';
+  const spriteSheetPath: string = './src/assets/sprites/simon/sheet.png';
 
   hero
     .addComponent(new PositionComponent({ x, y }))
-    .addComponent(new SpriteComponent({ spriteSheetPath }));
+    .addComponent(new SpriteComponent({ fileSrc: spriteSheetPath }));
 
   return hero;
 }
@@ -42,7 +51,6 @@ function init(): void {
 
   // Instanciate world
   world.addSystem(new PositionSystem());
-  world.addSystem(new SpriteSystem());
 
   // Instanciate entities
   // entities
