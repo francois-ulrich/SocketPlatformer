@@ -28,7 +28,6 @@ app.stage.addChild(container);
 //   .add('sheet/simon', './src/assets/sprites/simon/sheet.png')
 //   .load(() => init());
 
-
 // Temp: add test entity
 function createPlayerEntity(): Entity {
   const x = 8;
@@ -50,7 +49,7 @@ function init(): void {
   const world = new World();
 
   // Instanciate world
-  world.addSystem(new PositionSystem());
+  world.addSystem(new PositionSystem({ app }));
 
   // Instanciate entities
   // entities
