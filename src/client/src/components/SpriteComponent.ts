@@ -23,7 +23,7 @@ class SpriteComponent implements Component {
     this.object = new PIXI.Sprite(
       new PIXI.Texture(
         texture, // BaseTexture you created
-        new PIXI.Rectangle(0, 0, 64, 64), // Rectangle object is an area defined by its position,
+        new PIXI.Rectangle(0, 0, 16, 32), // Rectangle object is an area defined by its position,
         // as indicated by its top - left corner point(x, y)
         // and by its width and its height.
       ),
