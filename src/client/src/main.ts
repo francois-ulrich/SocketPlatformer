@@ -8,11 +8,17 @@ import PositionComponent from './components/PositionComponent';
 import SpriteComponent from './components/SpriteComponent';
 // import COMPONENT_NAMES from './components/types'
 
+import SheetMetadata from './types/spriteMetadata';
+
+// import { data as sheetData } from './assets/sprites/simon/data';
+import spriteData from './assets/sprites/simon/data';
+
 // Create a Pixi Application
 const app = new PIXI.Application({
   antialias: true,
   backgroundColor: 0xbababa,
   resizeTo: window,
+  resolution: 1,
 });
 
 // Add the canvas that Pixi automatically created for you to the HTML document
@@ -35,11 +41,11 @@ function createPlayerEntity(): Entity {
 
   const hero: Entity = new Entity();
 
-  const spriteSheetPath: string = './src/assets/sprites/simon/sheet.png';
+  const sheet: SheetMetadata = spriteData;
 
   hero
     .addComponent(new PositionComponent({ x, y }))
-    .addComponent(new SpriteComponent({ fileSrc: spriteSheetPath }));
+    .addComponent(new SpriteComponent(sheet));
 
   return hero;
 }
