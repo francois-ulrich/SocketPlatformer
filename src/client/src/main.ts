@@ -5,10 +5,11 @@ import { World, Entity } from 'super-ecs';
 import PositionSystem from './systems/PositionSystem';
 import PositionComponent from './components/PositionComponent';
 // import SpriteSystem from './systems/SpriteSystem';
+import SpriteSystem from './systems/SpriteSystem';
 import SpriteComponent from './components/SpriteComponent';
 // import COMPONENT_NAMES from './components/types'
 
-import SheetMetadata from './types/spriteMetadata';
+import { AnimationMetadata, SpriteMetadata } from './types/spriteMetadata';
 
 // import { data as sheetData } from './assets/sprites/simon/data';
 import spriteData from './assets/sprites/simon/data';
@@ -41,11 +42,11 @@ function createPlayerEntity(): Entity {
 
   const hero: Entity = new Entity();
 
-  const sheet: SheetMetadata = spriteData;
+  const sprite: SpriteMetadata = spriteData;
 
   hero
     .addComponent(new PositionComponent({ x, y }))
-    .addComponent(new SpriteComponent(sheet));
+    .addComponent(new SpriteComponent(sprite));
 
   return hero;
 }
@@ -55,7 +56,9 @@ function init(): void {
   const world = new World();
 
   // Instanciate world
+  world.addSystem(new SpriteSystem({ app }));
   world.addSystem(new PositionSystem({ app }));
+
 
   // Instanciate entities
   // entities

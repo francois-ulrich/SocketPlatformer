@@ -1,13 +1,17 @@
-declare type SpriteMetadata = {
+type AnimationMetadata = {
+  y: number;
+  width: number;
+  height: number;
+  frames: number;
+  frameTime?: number;
+};
+
+type SpriteMetadata = {
   sheet: string;
+  defaultAnimation: string,
   animations: {
-    [index: string]: {
-      y: number;
-      width: number;
-      height: number;
-      frames: number;
-    };
+    [index: string]: AnimationMetadata,
   };
 };
 
-export default SpriteMetadata;
+export { SpriteMetadata, AnimationMetadata };
