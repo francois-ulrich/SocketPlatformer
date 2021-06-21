@@ -33,7 +33,7 @@ class SpriteSystem extends ExtendedSystem {
 
         if (spriteComponent) {
           this.app.stage.addChild(spriteComponent.object);
-          spriteComponent.setAnimation('walk');
+          spriteComponent.setAnimation('idle');
         }
       });
   }
@@ -53,20 +53,20 @@ class SpriteSystem extends ExtendedSystem {
       );
 
       if (spriteComponent) {
-        const {
-          animation,
-          lastFrameUpdateTime,
-          frameTime,
-        } = spriteComponent;
+        // const {
+        //   animation,
+        //   lastFrameUpdateTime,
+        //   frameTime,
+        // } = spriteComponent;
 
-        // Update frame
-        if (animation.frameTime) {
-          const timeSinceLastUpdate: number = Date.now() - lastFrameUpdateTime;
+        // // Update frame
+        // if (animation.frameTime) {
+        //   const timeSinceLastUpdate: number = Date.now() - lastFrameUpdateTime;
 
-          if (timeSinceLastUpdate >= frameTime) {
-            spriteComponent.incrementFrame();
-          }
-        }
+        //   if (timeSinceLastUpdate >= frameTime) {
+        //     spriteComponent.incrementFrame();
+        //   }
+        // }
       }
     });
   }

@@ -45,25 +45,30 @@ class PositionSystem extends ExtendedSystem {
   addedToWorld(world: World): void {
     super.addedToWorld(world);
 
-    // // Add sprite to stage
-    // this.disposeBag
-    //   .completable$(
-    //     world.entityAdded$([
-    //       COMPONENT_NAMES.Position,
-    //       COMPONENT_NAMES.Sprite,
-    //     ]),
-    //   )
-    //   .subscribe((entity) => {
-    //     const spriteComponent = entity.getComponent<SpriteComponent>(
-    //       COMPONENT_NAMES.Sprite,
-    //     );
+    // Add sprite to stage
+    this.disposeBag
+      .completable$(
+        world.entityAdded$([
+          COMPONENT_NAMES.Position,
+          COMPONENT_NAMES.Sprite,
+        ]),
+      )
+      .subscribe((entity) => {
+        const positionComponent = entity.getComponent<PositionComponent>(
+          COMPONENT_NAMES.Position,
+        );
 
-    //     if (spriteComponent) {
-    //       // const { sprite } = spriteComponent;
-    //       // sprite.Sprite.set(SpriteComponent.x, SpriteComponent.y);
+        const spriteComponent = entity.getComponent<SpriteComponent>(
+          COMPONENT_NAMES.Sprite,
+        );
 
-    //     }
-    //   });
+
+        if (spriteComponent && positionComponent) {
+          const { object } = spriteComponent;
+
+          object.position.set(positionComponent.x, positionComponent.y);
+        }
+      });
 
     // this.disposeBag
     //   .completable$(

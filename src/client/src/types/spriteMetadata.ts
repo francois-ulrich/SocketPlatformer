@@ -7,7 +7,7 @@ type AnimationMetadata = {
 };
 
 type SpriteMetadata = {
-  sheet: string;
+  src: string;
   defaultAnimation: string,
   animations: {
     [index: string]: AnimationMetadata,

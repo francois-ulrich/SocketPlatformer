@@ -2,17 +2,25 @@ import './style.css';
 import * as PIXI from 'pixi.js';
 import { World, Entity } from 'super-ecs';
 // import { io } from 'socket.io-client';
-import PositionSystem from './systems/PositionSystem';
+
 import PositionComponent from './components/PositionComponent';
-// import SpriteSystem from './systems/SpriteSystem';
-import SpriteSystem from './systems/SpriteSystem';
 import SpriteComponent from './components/SpriteComponent';
-// import COMPONENT_NAMES from './components/types'
+import VelocityComponent from './components/VelocityComponent';
+import GravityComponent from './components/GravityComponent';
+import MapComponent from './components/MapComponent';
 
-import { AnimationMetadata, SpriteMetadata } from './types/spriteMetadata';
+import SpriteSystem from './systems/SpriteSystem';
+import PositionSystem from './systems/PositionSystem';
+import VelocitySystem from './systems/VelocitySystem';
+import GravitySystem from './systems/GravitySystem';
+import MapSystem from './systems/MapSystem';
 
-// import { data as sheetData } from './assets/sprites/simon/data';
+import { SpriteMetadata } from './types/spriteMetadata';
+
 import spriteData from './assets/sprites/simon/data';
+
+// Test map
+import { map as testMap } from './../assets/maps/test';
 
 // Create a Pixi Application
 const app = new PIXI.Application({
@@ -29,36 +37,39 @@ document.body.appendChild(app.view);
 const container = new PIXI.Container();
 app.stage.addChild(container);
 
-// const loader = PIXI.Loader.shared;
-
-// loader
-//   .add('sheet/simon', './src/assets/sprites/simon/sheet.png')
-//   .load(() => init());
-
 // Temp: add test entity
 function createPlayerEntity(): Entity {
-  const x = 8;
-  const y = 8;
-
   const hero: Entity = new Entity();
 
   const sprite: SpriteMetadata = spriteData;
 
   hero
-    .addComponent(new PositionComponent({ x, y }))
-    .addComponent(new SpriteComponent(sprite));
+    .addComponent(new PositionComponent({ x: 16, y: 16 }))
+    .addComponent(new SpriteComponent(sprite))
+    .addComponent(new VelocityComponent())
+    .addComponent(new GravityComponent());
 
   return hero;
 }
 
-// Init ECS world
 function init(): void {
+  app.stage.scale.x = 2;
+  app.stage.scale.y = 2;
+
+  // Disable interpolation when scaling, will make texture be pixelated
+  PIXI.settings.RESOLUTION = window.devicePixelRatio;
+  PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+  PIXI.settings.RENDER_OPTIONS.antialias = true; // Enable antialiasing
+
+  // Init ECS World
   const world = new World();
 
   // Instanciate world
-  world.addSystem(new SpriteSystem({ app }));
+  world.addSystem(new GravitySystem({ app }));
+  world.addSystem(new VelocitySystem({ app }));
   world.addSystem(new PositionSystem({ app }));
-
+  world.addSystem(new SpriteSystem({ app }));
+  world.addSystem(new MapSystem({ app }));
 
   // Instanciate entities
   // entities
@@ -67,11 +78,17 @@ function init(): void {
     world.addEntity(entity);
   });
 
+  // Create map
+  const testMap = new Entity();
+  testMap.addComponent(new MapComponent({ collision: testMap }));
+
   // Add systems to world
   app.ticker.add((deltaTime) => world.update(deltaTime));
 }
 
 init();
+
+
 // // Socket stuff
 // const socket = io('ws://localhost:5000/');
 
