@@ -1,6 +1,11 @@
 import { World } from 'super-ecs';
 import * as PIXI from 'pixi.js';
 
+import COMPONENT_NAMES from '../components/types';
+
+import MapComponent from '../components/MapComponent';
+import VelocityComponent from '../components/VelocityComponent';
+
 import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
 class CollisionSystem extends ExtendedSystem {
@@ -8,52 +13,35 @@ class CollisionSystem extends ExtendedSystem {
         super({ app });
     }
 
-    // update(delta: number): void {
-    update(): void {
+    update(delta: number): void {
         // Get entities under this system
-        // const entities = this.world.getEntities([
-        //     COMPONENT_NAMES.Collision,
-        // ]);
-    }
+        const mapEntity = this.world.getEntities([
+            COMPONENT_NAMES.Velocity,
+        ])[0];
 
-    addedToWorld(world: World): void {
-        super.addedToWorld(world);
+        if (!mapEntity) {
+            return;
+        }
 
-        // // Add sprite to stage
-        // this.disposeBag
-        //   .completable$(
-        //     world.entityAdded$([
-        //       COMPONENT_NAMES.Collision,
-        //       COMPONENT_NAMES.Sprite,
-        //     ]),
-        //   )
-        //   .subscribe((entity) => {
-        //     const spriteComponent = entity.getComponent<SpriteComponent>(
-        //       COMPONENT_NAMES.Sprite,
-        //     );
+        const entities = this.world.getEntities([
+            COMPONENT_NAMES.Velocity,
+        ]);
 
-        //     if (spriteComponent) {
-        //       // const { sprite } = spriteComponent;
-        //       // sprite.Sprite.set(SpriteComponent.x, SpriteComponent.y);
+        // Get map component
+        const mapComponent = mapEntity.getComponent<MapComponent>(
+            COMPONENT_NAMES.Map,
+        );
 
-        //     }
-        //   });
+        // Loop through all entities
+        entities.forEach((entity) => {
+            const velocityComponent = entity.getComponent<VelocityComponent>(
+                COMPONENT_NAMES.Velocity,
+            );
 
-        // this.disposeBag
-        //   .completable$(
-        //     world.entityRemoved$([
-        //       COMPONENT_NAMES.Collision,
-        //       COMPONENT_NAMES.Sprite,
-        //     ]),
-        //   )
-        //   .subscribe((entity) => {
-        //     const sprite = entity.getComponent(COMPONENT_NAMES.Sprite);
-
-        //     if (sprite) {
-        //       this.app.stage.removeChild(sprite.object);
-        //     }
-        //   });
-        //   }
+            if (mapComponent && velocityComponent) {
+                
+            }
+        });
     }
 }
 

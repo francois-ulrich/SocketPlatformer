@@ -1,6 +1,6 @@
 import { Component } from 'super-ecs';
 import COMPONENT_NAMES from './types';
-import { MapMetadata } from '../../types/mapMetadata';
+import { MapMetadata } from '../types/mapMetadata';
 
 type MapComponentMetadata = {
     collision: MapMetadata,

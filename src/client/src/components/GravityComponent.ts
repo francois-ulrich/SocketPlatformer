@@ -9,7 +9,7 @@ class GravityComponent implements Component {
     enabled: boolean;
 
     constructor() {
-        this.force = 0.1;
+        this.force = 1;
         this.enabled = false;
     }
 }

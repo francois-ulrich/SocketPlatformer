@@ -1,57 +1,65 @@
 import { World } from 'super-ecs';
-// import * as PIXI from 'pixi.js';
+import { CompositeTilemap } from '@pixi/tilemap';
 
 import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
 import MapComponent from '../components/MapComponent';
 
+import solidTile from '../assets/tilemaps/solid.png';
+
 class MapSystem extends ExtendedSystem {
-    constructor({ app }: ExtendedSystemMetadata) {
-        super({ app });
-    }
+  constructor({ app }: ExtendedSystemMetadata) {
+    super({ app });
+  }
 
-    // update(delta: number): void {
-    update(): void {
-        // Get entities under this system
-        const entities = this.world.getEntities([
-            COMPONENT_NAMES.Map,
-        ]);
+  addedToWorld(world: World): void {
+    super.addedToWorld(world);
 
-        // Exit if no entities found
-        if (entities.length === 0) {
-            return;
-        }
+    // Add sprite to stage
+    this.disposeBag
+      .completable$(
+        world.entityAdded$([
+          COMPONENT_NAMES.Map,
+        ]),
+      )
+      .subscribe((entity) => {
+        const mapComponent = entity.getComponent<MapComponent>(
+          COMPONENT_NAMES.Map,
+        );
 
-        // Loop through all entities
-        entities.forEach((entity) => {
-            const mapComponent = entity.getComponent<MapComponent>(
-                COMPONENT_NAMES.Map,
-            );
-        });
-    }
+        if (mapComponent) {
+          const { collision } = mapComponent;
+          const size = 16;
 
-    addedToWorld(world: World): void {
-        super.addedToWorld(world);
+          const tilemap = new CompositeTilemap();
 
-        // Add sprite to stage
-        this.disposeBag
-            .completable$(
-                world.entityAdded$([
-                    COMPONENT_NAMES.Map,
-                    COMPONENT_NAMES.Sprite,
-                ]),
-            )
-            .subscribe((entity) => {
-                const mapComponent = entity.getComponent<MapComponent>(
-                    COMPONENT_NAMES.Map,
+          this.app.stage.addChild(tilemap);
+
+          // Calculate the dimensions of the tilemap to build
+          const tilemapWidth = collision[0].length;
+          const tilemapHeight = collision.length;
+
+          for (let x = 0; x < tilemapWidth; x++) {
+            for (let y = 0; y < tilemapHeight; y++) {
+              const collVal = collision[y][x];
+
+              if (collVal == 1) {
+                tilemap.tile(
+                  solidTile,
+                  x * size,
+                  y * size,
+                  {
+                    tileWidth: size,
+                    tileHeight: size,
+                  },
                 );
-
-                if (mapComponent) {
-                    // Draw the map
-                }
-            });
-    }
+              }
+            }
+          }
+        }
+      });
+  }
 }
 
 export default MapSystem;

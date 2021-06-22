@@ -17,6 +17,7 @@
 		"vite": "^2.3.5"
 	},
 	"dependencies": {
+		"@pixi/tilemap": "^3.2.1",
 		"pixi.js": "^6.0.4",
 		"socket.io-client": "^4.1.2",
 		"super-ecs": "^1.4.0"

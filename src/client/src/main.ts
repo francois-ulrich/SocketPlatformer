@@ -8,19 +8,24 @@ import SpriteComponent from './components/SpriteComponent';
 import VelocityComponent from './components/VelocityComponent';
 import GravityComponent from './components/GravityComponent';
 import MapComponent from './components/MapComponent';
+import CollisionComponent from './components/CollisionComponent';
+import PlayerComponent from './components/PlayerComponent';
+// import EntityComponent from './components/EntityComponent';
 
 import SpriteSystem from './systems/SpriteSystem';
 import PositionSystem from './systems/PositionSystem';
 import VelocitySystem from './systems/VelocitySystem';
 import GravitySystem from './systems/GravitySystem';
 import MapSystem from './systems/MapSystem';
+import PlayerSystem from './systems/PlayerSystem';
+import EntitySystem from './systems/EntitySystem';
 
 import { SpriteMetadata } from './types/spriteMetadata';
 
 import spriteData from './assets/sprites/simon/data';
 
 // Test map
-import { map as testMap } from './../assets/maps/test';
+import map from './assets/maps/test';
 
 // Create a Pixi Application
 const app = new PIXI.Application({
@@ -47,10 +52,14 @@ function createPlayerEntity(): Entity {
     .addComponent(new PositionComponent({ x: 16, y: 16 }))
     .addComponent(new SpriteComponent(sprite))
     .addComponent(new VelocityComponent())
-    .addComponent(new GravityComponent());
+    .addComponent(new GravityComponent())
+    .addComponent(new CollisionComponent({ width: 16, height: 32 }))
+    .addComponent(new PlayerComponent());
 
   return hero;
 }
+
+// Map instanciation
 
 function init(): void {
   app.stage.scale.x = 2;
@@ -65,11 +74,13 @@ function init(): void {
   const world = new World();
 
   // Instanciate world
-  world.addSystem(new GravitySystem({ app }));
-  world.addSystem(new VelocitySystem({ app }));
-  world.addSystem(new PositionSystem({ app }));
-  world.addSystem(new SpriteSystem({ app }));
-  world.addSystem(new MapSystem({ app }));
+  world.addSystem(new GravitySystem({ app }))
+    .addSystem(new VelocitySystem({ app }))
+    .addSystem(new PositionSystem({ app }))
+    .addSystem(new SpriteSystem({ app }))
+    .addSystem(new MapSystem({ app }))
+    .addSystem(new EntitySystem({ app }))
+    .addSystem(new PlayerSystem({ app }));
 
   // Instanciate entities
   // entities
@@ -80,7 +91,8 @@ function init(): void {
 
   // Create map
   const testMap = new Entity();
-  testMap.addComponent(new MapComponent({ collision: testMap }));
+  testMap.addComponent(new MapComponent({ collision: map }));
+  world.addEntity(testMap);
 
   // Add systems to world
   app.ticker.add((deltaTime) => world.update(deltaTime));

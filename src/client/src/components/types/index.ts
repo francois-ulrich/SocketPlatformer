@@ -4,6 +4,9 @@ const COMPONENT_NAMES = {
   Map: Symbol('Map'),
   Velocity: Symbol('Velocity'),
   Gravity: Symbol('Gravity'),
+  Collision: Symbol('Collision'),
+  Entity: Symbol('Entity'),
+  Player: Symbol('Player'),
 };
 
 export default COMPONENT_NAMES;
