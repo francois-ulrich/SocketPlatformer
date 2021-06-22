@@ -13,12 +13,12 @@ class PlayerComponent implements Component {
     }
 
     constructor() {
-        this.input = {
-            left: false,
-            right: false,
-            up: false,
-            down: false,
-        }
+      this.input = {
+        left: false,
+        right: false,
+        up: false,
+        down: false,
+      };
     }
 }
 

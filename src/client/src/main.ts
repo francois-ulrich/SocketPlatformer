@@ -10,7 +10,7 @@ import GravityComponent from './components/GravityComponent';
 import MapComponent from './components/MapComponent';
 import CollisionComponent from './components/CollisionComponent';
 import PlayerComponent from './components/PlayerComponent';
-// import EntityComponent from './components/EntityComponent';
+import EntityComponent from './components/EntityComponent';
 
 import SpriteSystem from './systems/SpriteSystem';
 import PositionSystem from './systems/PositionSystem';
@@ -54,7 +54,8 @@ function createPlayerEntity(): Entity {
     .addComponent(new VelocityComponent())
     .addComponent(new GravityComponent())
     .addComponent(new CollisionComponent({ width: 16, height: 32 }))
-    .addComponent(new PlayerComponent());
+    .addComponent(new PlayerComponent())
+    .addComponent(new EntityComponent());
 
   return hero;
 }
@@ -74,13 +75,13 @@ function init(): void {
   const world = new World();
 
   // Instanciate world
-  world.addSystem(new GravitySystem({ app }))
+  world.addSystem(new PlayerSystem({ app }))
+    .addSystem(new GravitySystem({ app }))
     .addSystem(new VelocitySystem({ app }))
     .addSystem(new PositionSystem({ app }))
     .addSystem(new SpriteSystem({ app }))
     .addSystem(new MapSystem({ app }))
-    .addSystem(new EntitySystem({ app }))
-    .addSystem(new PlayerSystem({ app }));
+    .addSystem(new EntitySystem({ app }));
 
   // Instanciate entities
   // entities
@@ -99,7 +100,6 @@ function init(): void {
 }
 
 init();
-
 
 // // Socket stuff
 // const socket = io('ws://localhost:5000/');

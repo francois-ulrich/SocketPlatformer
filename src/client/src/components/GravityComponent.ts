@@ -6,11 +6,12 @@ class GravityComponent implements Component {
     name = COMPONENT_NAMES.Gravity;
 
     force: number;
+
     enabled: boolean;
 
     constructor() {
-        this.force = 1;
-        this.enabled = false;
+      this.force = 1;
+      this.enabled = false;
     }
 }
 

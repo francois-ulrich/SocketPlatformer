@@ -55,9 +55,9 @@ class SpriteComponent implements Component {
   setAnimation(animationName: string) {
     this.object.textures = this.sheet[animationName];
 
-    const animSpeed = this.sprite.animations[animationName].frameTime
+    const animSpeed = this.sprite.animations[animationName].frameTime;
 
-    this.object.animationSpeed = animSpeed ? animSpeed : 1;
+    this.object.animationSpeed = animSpeed || 1;
     this.object.play();
   }
 }

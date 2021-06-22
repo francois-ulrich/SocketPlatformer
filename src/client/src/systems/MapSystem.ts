@@ -40,8 +40,8 @@ class MapSystem extends ExtendedSystem {
           const tilemapWidth = collision[0].length;
           const tilemapHeight = collision.length;
 
-          for (let x = 0; x < tilemapWidth; x++) {
-            for (let y = 0; y < tilemapHeight; y++) {
+          for (let x = 0; x < tilemapWidth; x += 1) {
+            for (let y = 0; y < tilemapHeight; y += 1) {
               const collVal = collision[y][x];
 
               if (collVal == 1) {
