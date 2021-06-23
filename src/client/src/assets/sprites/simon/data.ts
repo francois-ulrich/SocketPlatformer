@@ -16,7 +16,7 @@ const spriteData: SpriteMetadata = {
       width: 16,
       height: 32,
       frames: 4,
-      frameTime: 0.1,
+      frameTime: 0.15,
     },
   },
 };

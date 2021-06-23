@@ -24,7 +24,7 @@ class EntitySystem extends ExtendedSystem {
       COMPONENT_NAMES.Position,
       COMPONENT_NAMES.Velocity,
       COMPONENT_NAMES.Gravity,
-      COMPONENT_NAMES.Sprite,
+      // COMPONENT_NAMES.Sprite,
     ]);
 
     // Exit if no entities found
@@ -62,19 +62,33 @@ class EntitySystem extends ExtendedSystem {
         // console.log("player stuff");
       }
 
-      if (
-        entityComponent
-        && spriteComponent
-        && positionComponent
-        && velocityComponent
-        && gravityComponent
-      ) {
+      // if (
+      //   entityComponent
+      //   && velocityComponent
+      // ) {
+      //   // // Set animation
+      //   // spriteComponent.setAnimation(Math.abs(xSpeed) > 0 ? "walk" : "idle");
+
+      //   // Set sprite scale
+      //   const xSpeedSign = Math.sign(xSpeed);
+      //   if (xSpeedSign != 0) {
+      //     spriteComponent.setScale({ x: xSpeedSign })
+      //     // console.log(xSpeedSign);
+      //   }
+      // }
+
+      if (velocityComponent && entityComponent) {
+        let { xSpeed } = velocityComponent;
+        const { maxXSpeed } = entityComponent;
+
+        // console.log(Math.abs(xSpeed), maxXSpeed);
+
         // Limit xSpeed
-        if (Math.abs(velocityComponent.xSpeed) > entityComponent.maxXSpeed) {
-          velocityComponent.xSpeed = entityComponent.maxXSpeed
-            * Math.sign(velocityComponent.xSpeed);
+        if (Math.abs(xSpeed) > maxXSpeed) {
+          velocityComponent.xSpeed = maxXSpeed * Math.sign(xSpeed);
         }
       }
+
     });
   }
 

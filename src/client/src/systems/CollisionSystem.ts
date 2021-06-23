@@ -5,6 +5,8 @@ import COMPONENT_NAMES from '../components/types';
 
 import MapComponent from '../components/MapComponent';
 import VelocityComponent from '../components/VelocityComponent';
+import CollisionComponent from '../components/CollisionComponent';
+import PositionComponent from '../components/PositionComponent';
 
 import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
@@ -16,7 +18,7 @@ class CollisionSystem extends ExtendedSystem {
     update(delta: number): void {
         // Get entities under this system
         const mapEntity = this.world.getEntities([
-            COMPONENT_NAMES.Velocity,
+            COMPONENT_NAMES.Map,
         ])[0];
 
         if (!mapEntity) {
@@ -25,6 +27,8 @@ class CollisionSystem extends ExtendedSystem {
 
         const entities = this.world.getEntities([
             COMPONENT_NAMES.Velocity,
+            COMPONENT_NAMES.Position,
+            COMPONENT_NAMES.Collision,
         ]);
 
         // Get map component
@@ -38,10 +42,45 @@ class CollisionSystem extends ExtendedSystem {
                 COMPONENT_NAMES.Velocity,
             );
 
-            if (mapComponent && velocityComponent) {
-                
+            const positionComponent = entity.getComponent<PositionComponent>(
+                COMPONENT_NAMES.Position,
+            );
+
+            const collisionComponent = entity.getComponent<CollisionComponent>(
+                COMPONENT_NAMES.Collision,
+            );
+
+            if (positionComponent
+                && collisionComponent
+                && velocityComponent) {
+                const { x, y } = positionComponent;
+
+                collisionComponent.debugRect.x = x;
+                collisionComponent.debugRect.y = y;
             }
         });
+    }
+
+    addedToWorld(world: World): void {
+        super.addedToWorld(world);
+
+        // Add sprite to stage
+        this.disposeBag
+            .completable$(
+                world.entityAdded$([
+                    COMPONENT_NAMES.Collision,
+                ]),
+            )
+            .subscribe((entity) => {
+                const collisionComponent = entity.getComponent<CollisionComponent>(
+                    COMPONENT_NAMES.Collision,
+                );
+
+                if (collisionComponent) {
+                    this.app.stage.addChild(collisionComponent.debugRect);
+                }
+            });
+
     }
 }
 

@@ -7,6 +7,11 @@ type SheetMetadata = {
   [index: string]: Array<PIXI.Texture>,
 }
 
+type setScaleMetadata = {
+  x?: number | null,
+  y?: number | null,
+}
+
 class SpriteComponent implements Component {
   public name = COMPONENT_NAMES.Sprite;
 
@@ -19,6 +24,8 @@ class SpriteComponent implements Component {
   public frame: number;
 
   public sheet: SheetMetadata;
+
+  public currentAnimationName: string;
 
   constructor(sprite: SpriteMetadata) {
     this.sprite = sprite;
@@ -50,15 +57,34 @@ class SpriteComponent implements Component {
     }
 
     this.object = new PIXI.AnimatedSprite(this.sheet.idle);
+
+    this.currentAnimationName = "idle";
   }
 
   setAnimation(animationName: string) {
-    this.object.textures = this.sheet[animationName];
+    // Update sprite anchor point
+    this.object.anchor.set(0.5, 0.5);
 
-    const animSpeed = this.sprite.animations[animationName].frameTime;
+    if (this.currentAnimationName != animationName) {
+      this.currentAnimationName = animationName
 
-    this.object.animationSpeed = animSpeed || 1;
-    this.object.play();
+      this.object.textures = this.sheet[animationName];
+
+      const animSpeed = this.sprite.animations[animationName].frameTime;
+
+      this.object.animationSpeed = animSpeed || 1;
+      this.object.play();
+    }
+  }
+
+  setScale({ x = null, y = null }: setScaleMetadata) {
+    if (x) {
+      this.object.scale.x = x;
+    }
+
+    if (y) {
+      this.object.scale.y = y;
+    }
   }
 }
 

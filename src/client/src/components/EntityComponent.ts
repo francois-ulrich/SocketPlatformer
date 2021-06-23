@@ -1,5 +1,6 @@
 import { Component } from 'super-ecs';
 
+
 import COMPONENT_NAMES from './types';
 
 class EntityComponent implements Component {

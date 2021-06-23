@@ -19,6 +19,7 @@ import GravitySystem from './systems/GravitySystem';
 import MapSystem from './systems/MapSystem';
 import PlayerSystem from './systems/PlayerSystem';
 import EntitySystem from './systems/EntitySystem';
+import CollisionSystem from './systems/CollisionSystem';
 
 import { SpriteMetadata } from './types/spriteMetadata';
 
@@ -49,13 +50,13 @@ function createPlayerEntity(): Entity {
   const sprite: SpriteMetadata = spriteData;
 
   hero
-    .addComponent(new PositionComponent({ x: 16, y: 16 }))
-    .addComponent(new SpriteComponent(sprite))
-    .addComponent(new VelocityComponent())
+    .addComponent(new PositionComponent({ x: 0, y: 16 }))
+    // .addComponent(new SpriteComponent(sprite))
     .addComponent(new GravityComponent())
     .addComponent(new CollisionComponent({ width: 16, height: 32 }))
     .addComponent(new PlayerComponent())
-    .addComponent(new EntityComponent());
+    .addComponent(new EntityComponent())
+    .addComponent(new VelocityComponent());
 
   return hero;
 }
@@ -76,12 +77,14 @@ function init(): void {
 
   // Instanciate world
   world.addSystem(new PlayerSystem({ app }))
+
+    .addSystem(new MapSystem({ app }))
+    .addSystem(new EntitySystem({ app }))
     .addSystem(new GravitySystem({ app }))
+    .addSystem(new CollisionSystem({ app }))
     .addSystem(new VelocitySystem({ app }))
     .addSystem(new PositionSystem({ app }))
-    .addSystem(new SpriteSystem({ app }))
-    .addSystem(new MapSystem({ app }))
-    .addSystem(new EntitySystem({ app }));
+    .addSystem(new SpriteSystem({ app }));
 
   // Instanciate entities
   // entities
