@@ -1,3 +1,3 @@
 type MapMetadata = Array<Array<number>>;
 
-export { MapMetadata };
+export default MapMetadata;

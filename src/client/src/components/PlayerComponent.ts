@@ -2,24 +2,28 @@ import { Component } from 'super-ecs';
 
 import COMPONENT_NAMES from './types';
 
+type InputMap = {
+  [key: string]: boolean
+}
+
 class PlayerComponent implements Component {
-    name = COMPONENT_NAMES.Player;
+  name = COMPONENT_NAMES.Player;
 
-    public input: {
-        left: Boolean,
-        right: Boolean,
-        up: Boolean,
-        down: Boolean,
-    }
+  public input: InputMap;
 
-    constructor() {
-      this.input = {
-        left: false,
-        right: false,
-        up: false,
-        down: false,
-      };
-    }
+  public inputPressed: InputMap;
+
+  constructor() {
+    this.input = {
+      left: false,
+      right: false,
+      up: false,
+      down: false,
+      jump: false,
+    };
+
+    this.inputPressed = { ...this.input };
+  }
 }
 
 export default PlayerComponent;

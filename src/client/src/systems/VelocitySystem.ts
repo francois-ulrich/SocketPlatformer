@@ -1,10 +1,9 @@
-import { World } from 'super-ecs';
-
 import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
 import VelocityComponent from '../components/VelocityComponent';
 import PositionComponent from '../components/PositionComponent';
+import CollisionComponent from '../components/CollisionComponent';
 
 class VelocitySystem extends ExtendedSystem {
   constructor({ app }: ExtendedSystemMetadata) {
@@ -33,7 +32,13 @@ class VelocitySystem extends ExtendedSystem {
         COMPONENT_NAMES.Position,
       );
 
-      if (positionComponent && velocityComponent) {
+      const collisionComponent = entity.getComponent<CollisionComponent>(
+        COMPONENT_NAMES.Position,
+      );
+
+      if (positionComponent
+        && velocityComponent
+        && !collisionComponent) {
         positionComponent.x += velocityComponent.xSpeed * delta;
         positionComponent.y += velocityComponent.ySpeed * delta;
       }

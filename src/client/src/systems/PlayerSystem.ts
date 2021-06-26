@@ -4,6 +4,8 @@ import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 import COMPONENT_NAMES from '../components/types';
 import PlayerComponent from '../components/PlayerComponent';
 import VelocityComponent from '../components/VelocityComponent';
+import EntityComponent from '../components/EntityComponent';
+import GravityComponent from '../components/GravityComponent';
 
 class PlayerSystem extends ExtendedSystem {
   constructor({ app }: ExtendedSystemMetadata) {
@@ -16,6 +18,8 @@ class PlayerSystem extends ExtendedSystem {
     const entities = this.world.getEntities([
       COMPONENT_NAMES.Player,
       COMPONENT_NAMES.Velocity,
+      COMPONENT_NAMES.Gravity,
+      COMPONENT_NAMES.Entity,
     ]);
 
     // Exit if no entities found
@@ -29,15 +33,28 @@ class PlayerSystem extends ExtendedSystem {
         COMPONENT_NAMES.Player,
       );
 
+      const entityComponent = entity.getComponent<EntityComponent>(
+        COMPONENT_NAMES.Entity,
+      );
+
       const velocityComponent = entity.getComponent<VelocityComponent>(
         COMPONENT_NAMES.Velocity,
       );
 
+      const gravityComponent = entity.getComponent<GravityComponent>(
+        COMPONENT_NAMES.Gravity,
+      );
+
+      // Player movement
       const speedIncr = 0.2;
 
       if (velocityComponent
+        && entityComponent
+        && gravityComponent
         && playerComponent) {
-        if (!playerComponent.input.right && !playerComponent.input.left) {
+        // Stops if pressing left and right / not pressing any of the two buttons
+        if ((!playerComponent.input.right && !playerComponent.input.left)
+          || (playerComponent.input.right && playerComponent.input.left)) {
           if (velocityComponent.xSpeed > 0) {
             velocityComponent.xSpeed -= speedIncr;
           }
@@ -49,14 +66,27 @@ class PlayerSystem extends ExtendedSystem {
           if (Math.abs(velocityComponent.xSpeed) < speedIncr) {
             velocityComponent.xSpeed = 0;
           }
+        } else {
+          // Moving right
+          if (playerComponent.input.right) {
+            velocityComponent.xSpeed += speedIncr;
+          }
+          // Moving left
+          if (playerComponent.input.left) {
+            velocityComponent.xSpeed -= speedIncr;
+          }
         }
 
-        if (playerComponent.input.right) {
-          velocityComponent.xSpeed += speedIncr;
+        // Jump
+        if (playerComponent.inputPressed.jump && entityComponent.onFloor) {
+          velocityComponent.ySpeed = -entityComponent.jumpForce;
+          gravityComponent.enabled = true;
+          entityComponent.onFloor = false;
         }
 
-        if (playerComponent.input.left) {
-          velocityComponent.xSpeed -= speedIncr;
+        // Reset all input pressed values
+        for (const key in playerComponent.inputPressed) {
+          playerComponent.inputPressed[key] = false;
         }
       }
     });
@@ -77,30 +107,53 @@ class PlayerSystem extends ExtendedSystem {
           COMPONENT_NAMES.Player,
         );
 
+        const usedKeys = ['ArrowUp', 'ArrowDown', 'ArrowRight', 'ArrowLeft', 'Space'];
+
         if (playerComponent) {
           // Event listener for key press
           document.addEventListener('keydown', (e: KeyboardEvent) => {
-            if (['ArrowRight', 'ArrowLeft'].includes(e.key)) {
+            // Prevent default browser behavior for key press
+            if (usedKeys.includes(e.key)) {
               // Prevent default browser behavior for key press
               e.preventDefault();
             }
 
-            playerComponent.input.right = e.key === 'ArrowRight';
-            playerComponent.input.left = e.key === 'ArrowLeft';
+            switch (e.code) {
+              case 'ArrowRight':
+                playerComponent.input.right = true;
+                playerComponent.inputPressed.right = playerComponent.input.right;
+                break;
+              case 'ArrowLeft':
+                playerComponent.input.left = true;
+                playerComponent.inputPressed.left = playerComponent.input.left;
+                break;
+              case 'Space':
+                playerComponent.input.jump = true;
+                playerComponent.inputPressed.jump = playerComponent.input.jump;
+                break;
+              default:
+                break;
+            }
           });
 
           // Event listener for key press
           document.addEventListener('keyup', (e: KeyboardEvent) => {
             // Prevent default browser behavior for key press
-
-            if (playerComponent.input.right && e.key === 'ArrowRight') {
+            if (usedKeys.includes(e.code)) {
+              // Prevent default browser behavior for key press
               e.preventDefault();
+            }
+
+            if (playerComponent.input.right && e.code === 'ArrowRight') {
               playerComponent.input.right = false;
             }
 
-            if (playerComponent.input.left && e.key === 'ArrowLeft') {
-              e.preventDefault();
+            if (playerComponent.input.left && e.code === 'ArrowLeft') {
               playerComponent.input.left = false;
+            }
+
+            if (playerComponent.input.jump && e.code === 'Space') {
+              playerComponent.input.jump = false;
             }
           });
         }

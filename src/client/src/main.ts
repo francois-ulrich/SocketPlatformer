@@ -50,22 +50,22 @@ function createPlayerEntity(): Entity {
   const sprite: SpriteMetadata = spriteData;
 
   hero
-    .addComponent(new PositionComponent({ x: 0, y: 16 }))
-    // .addComponent(new SpriteComponent(sprite))
-    .addComponent(new GravityComponent())
-    .addComponent(new CollisionComponent({ width: 16, height: 32 }))
     .addComponent(new PlayerComponent())
+    .addComponent(new GravityComponent())
+    .addComponent(new VelocityComponent())
+    .addComponent(new CollisionComponent({ width: 16, height: 32 }))
+    .addComponent(new PositionComponent({ x: 32, y: 32 }))
     .addComponent(new EntityComponent())
-    .addComponent(new VelocityComponent());
-
+    .addComponent(new SpriteComponent(sprite));
   return hero;
 }
 
 // Map instanciation
 
 function init(): void {
-  app.stage.scale.x = 2;
-  app.stage.scale.y = 2;
+  const stageScale = 2;
+  app.stage.scale.x = stageScale;
+  app.stage.scale.y = stageScale;
 
   // Disable interpolation when scaling, will make texture be pixelated
   PIXI.settings.RESOLUTION = window.devicePixelRatio;

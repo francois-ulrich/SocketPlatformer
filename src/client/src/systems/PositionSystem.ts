@@ -6,6 +6,7 @@ import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 import COMPONENT_NAMES from '../components/types';
 import PositionComponent from '../components/PositionComponent';
 import SpriteComponent from '../components/SpriteComponent';
+import CollisionComponent from '../components/CollisionComponent';
 
 class PositionSystem extends ExtendedSystem {
   constructor({ app }: ExtendedSystemMetadata) {
@@ -35,9 +36,21 @@ class PositionSystem extends ExtendedSystem {
         COMPONENT_NAMES.Sprite,
       );
 
-      if (positionComponent && spriteComponent) {
-        const { object } = spriteComponent;
-        object.position.set(positionComponent.x, positionComponent.y);
+      const collisionComponent = entity.getComponent<CollisionComponent>(
+        COMPONENT_NAMES.Collision,
+      );
+
+      if (positionComponent) {
+        if (spriteComponent) {
+          const { object } = spriteComponent;
+          object.position.set(positionComponent.x, positionComponent.y);
+        }
+
+        if (collisionComponent) {
+          // Update debug rectangle position
+          collisionComponent.debugRect.x = collisionComponent.collisionBox.left;
+          collisionComponent.debugRect.y = collisionComponent.collisionBox.top;
+        }
       }
     });
   }
@@ -61,7 +74,6 @@ class PositionSystem extends ExtendedSystem {
         const spriteComponent = entity.getComponent<SpriteComponent>(
           COMPONENT_NAMES.Sprite,
         );
-
 
         if (spriteComponent && positionComponent) {
           const { object } = spriteComponent;

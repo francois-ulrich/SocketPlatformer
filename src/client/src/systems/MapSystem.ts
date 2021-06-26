@@ -44,7 +44,7 @@ class MapSystem extends ExtendedSystem {
             for (let y = 0; y < tilemapHeight; y += 1) {
               const collVal = collision[y][x];
 
-              if (collVal == 1) {
+              if (collVal === 1) {
                 tilemap.tile(
                   solidTile,
                   x * size,

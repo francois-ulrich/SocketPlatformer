@@ -47,26 +47,35 @@ class SpriteComponent implements Component {
 
       const newAnimation = [];
 
-      for (let i = 0; i < currentAnim.frames; i++) {
+      for (let i = 0; i < currentAnim.frames; i += 1) {
         const frameX = i * currentAnim.width;
 
-        newAnimation.push(new PIXI.Texture(this.sheetBaseTexture, new PIXI.Rectangle(frameX, currentAnim.y, currentAnim.width, currentAnim.height)));
+        newAnimation.push(
+          new PIXI.Texture(
+            this.sheetBaseTexture,
+            new PIXI.Rectangle(frameX, currentAnim.y, currentAnim.width, currentAnim.height),
+          ),
+        );
       }
 
       this.sheet[animName] = newAnimation;
     }
 
+    // for (const [key, value] of Object.entries(this.sprite.animations)) {
+    //   console.log(`${key}: ${value}`);
+    // }
+
     this.object = new PIXI.AnimatedSprite(this.sheet.idle);
 
-    this.currentAnimationName = "idle";
+    this.currentAnimationName = 'idle';
   }
 
-  setAnimation(animationName: string) {
+  setAnimation(animationName: string): void {
     // Update sprite anchor point
     this.object.anchor.set(0.5, 0.5);
 
-    if (this.currentAnimationName != animationName) {
-      this.currentAnimationName = animationName
+    if (this.currentAnimationName !== animationName) {
+      this.currentAnimationName = animationName;
 
       this.object.textures = this.sheet[animationName];
 
@@ -77,7 +86,7 @@ class SpriteComponent implements Component {
     }
   }
 
-  setScale({ x = null, y = null }: setScaleMetadata) {
+  setScale({ x = null, y = null }: setScaleMetadata): void {
     if (x) {
       this.object.scale.x = x;
     }

@@ -6,6 +6,7 @@ import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 import COMPONENT_NAMES from '../components/types';
 // import PositionComponent from '../components/PositionComponent';
 import SpriteComponent from '../components/SpriteComponent';
+import CollisionComponent from '../components/CollisionComponent';
 
 class SpriteSystem extends ExtendedSystem {
   app: PIXI.Application;
@@ -27,48 +28,22 @@ class SpriteSystem extends ExtendedSystem {
         ]),
       )
       .subscribe((entity) => {
+        const collisionComponent = entity.getComponent<CollisionComponent>(
+          COMPONENT_NAMES.Collision,
+        );
+
+        if (collisionComponent) {
+          this.app.stage.addChild(collisionComponent.debugRect);
+        }
+
         const spriteComponent = entity.getComponent<SpriteComponent>(
           COMPONENT_NAMES.Sprite,
         );
 
         if (spriteComponent) {
           this.app.stage.addChild(spriteComponent.object);
-          spriteComponent.setAnimation('idle');
         }
       });
-  }
-
-  // update(delta: number): void {
-  update(): void {
-    const entities = this.world.getEntities([
-      COMPONENT_NAMES.Sprite,
-    ]);
-    if (entities.length === 0) {
-      return;
-    }
-
-    entities.forEach((entity) => {
-      const spriteComponent = entity.getComponent<SpriteComponent>(
-        COMPONENT_NAMES.Sprite,
-      );
-
-      if (spriteComponent) {
-        // const {
-        //   animation,
-        //   lastFrameUpdateTime,
-        //   frameTime,
-        // } = spriteComponent;
-
-        // // Update frame
-        // if (animation.frameTime) {
-        //   const timeSinceLastUpdate: number = Date.now() - lastFrameUpdateTime;
-
-        //   if (timeSinceLastUpdate >= frameTime) {
-        //     spriteComponent.incrementFrame();
-        //   }
-        // }
-      }
-    });
   }
 }
 

@@ -1,15 +1,14 @@
 import { World } from 'super-ecs';
-// import * as PIXI from 'pixi.js';
 
 import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
 import SpriteComponent from '../components/SpriteComponent';
 import EntityComponent from '../components/EntityComponent';
-import PositionComponent from '../components/PositionComponent';
+import CollisionComponent from '../components/CollisionComponent';
 import VelocityComponent from '../components/VelocityComponent';
 import GravityComponent from '../components/GravityComponent';
-import PlayerComponent from '../components/PlayerComponent';
+import MapComponent from '../components/MapComponent';
 
 class EntitySystem extends ExtendedSystem {
   constructor({ app }: ExtendedSystemMetadata) {
@@ -42,8 +41,8 @@ class EntitySystem extends ExtendedSystem {
         COMPONENT_NAMES.Sprite,
       );
 
-      const positionComponent = entity.getComponent<PositionComponent>(
-        COMPONENT_NAMES.Position,
+      const collisionComponent = entity.getComponent<CollisionComponent>(
+        COMPONENT_NAMES.Collision,
       );
 
       const velocityComponent = entity.getComponent<VelocityComponent>(
@@ -54,34 +53,9 @@ class EntitySystem extends ExtendedSystem {
         COMPONENT_NAMES.Gravity,
       );
 
-      const playerComponent = entity.getComponent<PlayerComponent>(
-        COMPONENT_NAMES.Player,
-      );
-
-      if (playerComponent) {
-        // console.log("player stuff");
-      }
-
-      // if (
-      //   entityComponent
-      //   && velocityComponent
-      // ) {
-      //   // // Set animation
-      //   // spriteComponent.setAnimation(Math.abs(xSpeed) > 0 ? "walk" : "idle");
-
-      //   // Set sprite scale
-      //   const xSpeedSign = Math.sign(xSpeed);
-      //   if (xSpeedSign != 0) {
-      //     spriteComponent.setScale({ x: xSpeedSign })
-      //     // console.log(xSpeedSign);
-      //   }
-      // }
-
       if (velocityComponent && entityComponent) {
-        let { xSpeed } = velocityComponent;
+        const { xSpeed } = velocityComponent;
         const { maxXSpeed } = entityComponent;
-
-        // console.log(Math.abs(xSpeed), maxXSpeed);
 
         // Limit xSpeed
         if (Math.abs(xSpeed) > maxXSpeed) {
@@ -89,34 +63,84 @@ class EntitySystem extends ExtendedSystem {
         }
       }
 
+      // Get map entity
+      const mapEntity = this.world.getEntities([
+        COMPONENT_NAMES.Map,
+      ])[0];
+
+      if (!mapEntity) {
+        return;
+      }
+
+      // Get map component
+      const mapComponent = mapEntity.getComponent<MapComponent>(
+        COMPONENT_NAMES.Map,
+      );
+
+      if (entityComponent) {
+        // Fall if no floor under entity
+        if (mapComponent
+          && gravityComponent
+          && collisionComponent) {
+          const {
+            collisionBox: {
+              bottom,
+              left,
+              right,
+            },
+          } = collisionComponent;
+
+          const { onFloor } = entityComponent;
+
+          // Check for floor under entity
+          entityComponent.onFloor = (mapComponent.getCollision({ x: left, y: bottom }) === 1
+            || mapComponent.getCollision({ x: right - 1, y: bottom }) === 1);
+
+          // If not on floor, make the entity fall
+          if (!onFloor && !gravityComponent.enabled) {
+            gravityComponent.enabled = true;
+          }
+        }
+
+        // Sprite update
+        if (spriteComponent
+          && velocityComponent) {
+          switch (entityComponent.state) {
+            default:
+              if (Math.abs(velocityComponent.xSpeed) > 0) {
+                spriteComponent.setAnimation('walk');
+                spriteComponent.setScale({ x: Math.sign(velocityComponent.xSpeed) });
+              } else {
+                spriteComponent.setAnimation('idle');
+              }
+              break;
+          }
+        }
+      }
     });
   }
 
-  // addedToWorld(world: World): void {
-  //     super.addedToWorld(world);
+  addedToWorld(world: World): void {
+    super.addedToWorld(world);
 
-  //     // Add sprite to stage
-  //     this.disposeBag
-  //         .completable$(
-  //             world.entityAdded$([
-  //                 COMPONENT_NAMES.Entity,
-  //                 COMPONENT_NAMES.Sprite,
-  //             ]),
-  //         )
-  //         .subscribe((entity) => {
-  //             // const EntityComponent = entity.getComponent<EntityComponent>(
-  //             //     COMPONENT_NAMES.Entity,
-  //             // );
+    // Add sprite to stage
+    this.disposeBag
+      .completable$(
+        world.entityAdded$([
+          COMPONENT_NAMES.Entity,
+          COMPONENT_NAMES.Sprite,
+        ]),
+      )
+      .subscribe((entity) => {
+        const spriteComponent = entity.getComponent<SpriteComponent>(
+          COMPONENT_NAMES.Sprite,
+        );
 
-  //             // const spriteComponent = entity.getComponent<SpriteComponent>(
-  //             //     COMPONENT_NAMES.Sprite,
-  //             // );
-
-  //             // if (spriteComponent && EntityComponent) {
-  //             // }
-  //         });
-
-  // }
+        if (spriteComponent && EntityComponent) {
+          spriteComponent.setAnimation('idle');
+        }
+      });
+  }
 }
 
 export default EntitySystem;

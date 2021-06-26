@@ -6,6 +6,7 @@ class VelocityComponent implements Component {
   name = COMPONENT_NAMES.Velocity;
 
   xSpeed: number;
+
   ySpeed: number;
 
   constructor() {
