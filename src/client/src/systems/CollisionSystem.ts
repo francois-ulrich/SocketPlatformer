@@ -108,10 +108,10 @@ class CollisionSystem extends ExtendedSystem {
           // If one of them is a solid, stops
           if (colls.includes(1)) {
             if (xSpeed > 0) {
-              positionComponent.x = (mapComponent.getTilePosition({ x: (right + xSpeed) }).x)
+              positionComponent.x = (MapComponent.getTilePosition({ x: (right + xSpeed) }).x)
                     * TILE_SIZE - width / 2;
             } else {
-              positionComponent.x = (mapComponent.getTilePosition({ x: (left - xSpeed) }).x)
+              positionComponent.x = (MapComponent.getTilePosition({ x: (left - xSpeed) }).x)
                     * TILE_SIZE + width / 2;
             }
 
@@ -143,10 +143,10 @@ class CollisionSystem extends ExtendedSystem {
           // If one of them is a solid, stops
           if (colls.includes(1)) {
             if (ySpeed > 0) {
-              positionComponent.y = (mapComponent.getTilePosition({ y: (bottom + ySpeed) }).y)
+              positionComponent.y = (MapComponent.getTilePosition({ y: (bottom + ySpeed) }).y)
                     * TILE_SIZE - height / 2;
             } else {
-              positionComponent.y = (mapComponent.getTilePosition({ y: (top - ySpeed) }).y)
+              positionComponent.y = (MapComponent.getTilePosition({ y: (top - ySpeed) }).y)
                     * TILE_SIZE + height / 2;
             }
 

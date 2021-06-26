@@ -42,14 +42,11 @@ class SpriteComponent implements Component {
     this.sheet = {};
 
     // Init sheet
-    for (const animName in this.sprite.animations) {
+    Object.keys(this.sprite.animations).forEach((animName) => {
       const currentAnim = this.sprite.animations[animName];
-
       const newAnimation = [];
-
       for (let i = 0; i < currentAnim.frames; i += 1) {
         const frameX = i * currentAnim.width;
-
         newAnimation.push(
           new PIXI.Texture(
             this.sheetBaseTexture,
@@ -57,9 +54,27 @@ class SpriteComponent implements Component {
           ),
         );
       }
-
       this.sheet[animName] = newAnimation;
-    }
+    });
+
+    // for (const animName in ) {
+    //   const currentAnim = this.sprite.animations[animName];
+
+    //   const newAnimation = [];
+
+    //   for (let i = 0; i < currentAnim.frames; i += 1) {
+    //     const frameX = i * currentAnim.width;
+
+    //     newAnimation.push(
+    //       new PIXI.Texture(
+    //         this.sheetBaseTexture,
+    //         new PIXI.Rectangle(frameX, currentAnim.y, currentAnim.width, currentAnim.height),
+    //       ),
+    //     );
+    //   }
+
+    //   this.sheet[animName] = newAnimation;
+    // }
 
     // for (const [key, value] of Object.entries(this.sprite.animations)) {
     //   console.log(`${key}: ${value}`);

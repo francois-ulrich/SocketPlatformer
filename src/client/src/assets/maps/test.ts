@@ -1,4 +1,4 @@
-import MapMetadata from '../../types/MapMetadata';
+import MapMetadata from '../../types/mapMetadata';
 
 const map: MapMetadata = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],

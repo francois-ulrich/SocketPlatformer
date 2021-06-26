@@ -36,7 +36,7 @@ class MapComponent implements Component {
     }
 
     getCollision({ x, y }: PositionMetadata): number {
-      const collPosition = this.getTilePosition({ x, y });
+      const collPosition = MapComponent.getTilePosition({ x, y });
 
       const { x: collX, y: collY } = collPosition;
 
@@ -53,15 +53,15 @@ class MapComponent implements Component {
       return this.collision[collPosition.y][collPosition.x];
     }
 
-    getTilePosition({ x = 0, y = 0 }: OptionalPositionMetadata): PositionMetadata {
+    static getTilePosition({ x = 0, y = 0 }: OptionalPositionMetadata): PositionMetadata {
       return {
         x: Math.floor(x / TILE_SIZE),
         y: Math.floor(y / TILE_SIZE),
       };
     }
 
-    getTilePositionInWorld({ x = 0, y = 0 }: OptionalPositionMetadata): PositionMetadata {
-      const result: PositionMetadata = this.getTilePosition({ x, y });
+    static getTilePositionInWorld({ x = 0, y = 0 }: OptionalPositionMetadata): PositionMetadata {
+      const result: PositionMetadata = MapComponent.getTilePosition({ x, y });
 
       if (result.x != null) { result.x *= TILE_SIZE; }
 

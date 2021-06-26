@@ -85,9 +85,9 @@ class PlayerSystem extends ExtendedSystem {
         }
 
         // Reset all input pressed values
-        for (const key in playerComponent.inputPressed) {
-          playerComponent.inputPressed[key] = false;
-        }
+        Object.keys(playerComponent.inputPressed).forEach((keyCode) => {
+          playerComponent.inputPressed[keyCode] = false;
+        });
       }
     });
   }
