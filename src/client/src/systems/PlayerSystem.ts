@@ -113,7 +113,7 @@ class PlayerSystem extends ExtendedSystem {
           // Event listener for key press
           document.addEventListener('keydown', (e: KeyboardEvent) => {
             // Prevent default browser behavior for key press
-            if (usedKeys.includes(e.key)) {
+            if (usedKeys.includes(e.code)) {
               // Prevent default browser behavior for key press
               e.preventDefault();
             }

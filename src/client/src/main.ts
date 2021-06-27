@@ -76,15 +76,15 @@ function init(): void {
   const world = new World();
 
   // Instanciate world
-  world.addSystem(new PlayerSystem({ app }))
-
-    .addSystem(new MapSystem({ app }))
-    .addSystem(new EntitySystem({ app }))
-    .addSystem(new GravitySystem({ app }))
+  world
     .addSystem(new CollisionSystem({ app }))
     .addSystem(new VelocitySystem({ app }))
     .addSystem(new PositionSystem({ app }))
-    .addSystem(new SpriteSystem({ app }));
+    .addSystem(new PlayerSystem({ app }))
+    .addSystem(new MapSystem({ app }))
+    .addSystem(new EntitySystem({ app }))
+    .addSystem(new GravitySystem({ app }));
+  // .addSystem(new SpriteSystem({ app }));
 
   // Instanciate entities
   // entities
