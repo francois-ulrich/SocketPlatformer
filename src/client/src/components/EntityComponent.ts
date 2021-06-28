@@ -17,6 +17,12 @@ class EntityComponent implements Component {
 
   state: number;
 
+  direction: number; // 1: faces right, -1: faces left
+
+  speedIncr: number;
+
+  dirChangeMidAir: boolean;
+
   constructor() {
     this.state = 0;
 
@@ -24,7 +30,10 @@ class EntityComponent implements Component {
     this.inputLeft = false;
     this.maxXSpeed = 1;
     this.onFloor = true;
-    this.jumpForce = 5;
+    this.jumpForce = 3.8;
+    this.direction = 1;
+    this.speedIncr = 0.2;
+    this.dirChangeMidAir = true;
   }
 }
 

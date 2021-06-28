@@ -46,35 +46,54 @@ class PlayerSystem extends ExtendedSystem {
       );
 
       // Player movement
-      const speedIncr = 0.2;
-
       if (velocityComponent
         && entityComponent
         && gravityComponent
         && playerComponent) {
+        const { onFloor, speedIncr } = entityComponent;
+
         // Stops if pressing left and right / not pressing any of the two buttons
-        if ((!playerComponent.input.right && !playerComponent.input.left)
-          || (playerComponent.input.right && playerComponent.input.left)) {
-          if (velocityComponent.xSpeed > 0) {
-            velocityComponent.xSpeed -= speedIncr;
-          }
 
-          if (velocityComponent.xSpeed < 0) {
-            velocityComponent.xSpeed += speedIncr;
-          }
-
-          if (Math.abs(velocityComponent.xSpeed) < speedIncr) {
-            velocityComponent.xSpeed = 0;
-          }
-        } else {
+        // Set direction
+        if ((entityComponent.dirChangeMidAir || (velocityComponent.xSpeed === 0))
+          && !(playerComponent.input.right && playerComponent.input.left)) {
           // Moving right
           if (playerComponent.input.right) {
-            velocityComponent.xSpeed += speedIncr;
+            entityComponent.direction = 1;
           }
           // Moving left
           if (playerComponent.input.left) {
-            velocityComponent.xSpeed -= speedIncr;
+            entityComponent.direction = -1;
           }
+        }
+
+        if (onFloor) {
+          if ((!playerComponent.input.right && !playerComponent.input.left)
+            || (playerComponent.input.right && playerComponent.input.left)) {
+            if (velocityComponent.xSpeed > 0) {
+              velocityComponent.xSpeed -= speedIncr;
+            }
+
+            if (velocityComponent.xSpeed < 0) {
+              velocityComponent.xSpeed += speedIncr;
+            }
+
+            if (Math.abs(velocityComponent.xSpeed) < speedIncr) {
+              velocityComponent.xSpeed = 0;
+            }
+          } else {
+            // Moving right
+            if (playerComponent.input.right) {
+              velocityComponent.xSpeed += speedIncr;
+            }
+            // Moving left
+            if (playerComponent.input.left) {
+              velocityComponent.xSpeed -= speedIncr;
+            }
+          }
+        } else if (playerComponent.input.right
+            || playerComponent.input.left) {
+          velocityComponent.xSpeed += speedIncr * entityComponent.direction;
         }
 
         // Jump

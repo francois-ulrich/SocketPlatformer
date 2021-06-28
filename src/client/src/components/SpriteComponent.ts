@@ -37,7 +37,7 @@ class SpriteComponent implements Component {
     this.sheetBaseTexture = PIXI.BaseTexture.from(this.sprite.src);
 
     // Disable interpolation when scaling, will make texture be pixelated
-    this.frame = 0;
+    this.frame = 1;
 
     this.sheet = {};
 
@@ -45,7 +45,7 @@ class SpriteComponent implements Component {
     Object.keys(this.sprite.animations).forEach((animName) => {
       const currentAnim = this.sprite.animations[animName];
       const newAnimation = [];
-      for (let i = 0; i < currentAnim.frames; i += 1) {
+      for (let i = 0; i < (currentAnim.frames || 1); i += 1) {
         const frameX = i * currentAnim.width;
         newAnimation.push(
           new PIXI.Texture(
@@ -57,35 +57,14 @@ class SpriteComponent implements Component {
       this.sheet[animName] = newAnimation;
     });
 
-    // for (const animName in ) {
-    //   const currentAnim = this.sprite.animations[animName];
-
-    //   const newAnimation = [];
-
-    //   for (let i = 0; i < currentAnim.frames; i += 1) {
-    //     const frameX = i * currentAnim.width;
-
-    //     newAnimation.push(
-    //       new PIXI.Texture(
-    //         this.sheetBaseTexture,
-    //         new PIXI.Rectangle(frameX, currentAnim.y, currentAnim.width, currentAnim.height),
-    //       ),
-    //     );
-    //   }
-
-    //   this.sheet[animName] = newAnimation;
-    // }
-
-    // for (const [key, value] of Object.entries(this.sprite.animations)) {
-    //   console.log(`${key}: ${value}`);
-    // }
-
     this.object = new PIXI.AnimatedSprite(this.sheet.idle);
 
     this.currentAnimationName = 'idle';
   }
 
   setAnimation(animationName: string): void {
+    const { frameTime, loop } = this.sprite.animations[animationName];
+
     // Update sprite anchor point
     this.object.anchor.set(0.5, 0.5);
 
@@ -94,10 +73,11 @@ class SpriteComponent implements Component {
 
       this.object.textures = this.sheet[animationName];
 
-      const animSpeed = this.sprite.animations[animationName].frameTime;
-
-      this.object.animationSpeed = animSpeed || 1;
+      this.object.animationSpeed = frameTime || 1;
       this.object.play();
+
+      // Set loop
+      this.object.loop = loop !== undefined ? loop : true;
     }
   }
 

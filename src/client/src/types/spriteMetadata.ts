@@ -2,8 +2,9 @@ type AnimationMetadata = {
   y: number;
   width: number;
   height: number;
-  frames: number;
+  frames?: number;
   frameTime?: number;
+  loop?: boolean;
 };
 
 type SpriteMetadata = {

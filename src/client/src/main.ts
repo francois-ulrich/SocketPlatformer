@@ -63,7 +63,7 @@ function createPlayerEntity(): Entity {
 // Map instanciation
 
 function init(): void {
-  const stageScale = 2;
+  const stageScale = 3;
   app.stage.scale.x = stageScale;
   app.stage.scale.y = stageScale;
 
@@ -83,8 +83,8 @@ function init(): void {
     .addSystem(new PlayerSystem({ app }))
     .addSystem(new MapSystem({ app }))
     .addSystem(new EntitySystem({ app }))
-    .addSystem(new GravitySystem({ app }));
-  // .addSystem(new SpriteSystem({ app }));
+    .addSystem(new GravitySystem({ app }))
+    .addSystem(new SpriteSystem({ app }));
 
   // Instanciate entities
   // entities

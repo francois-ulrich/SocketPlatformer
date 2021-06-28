@@ -3,42 +3,45 @@ import * as PIXI from 'pixi.js';
 
 import COMPONENT_NAMES from './types';
 
+import { PositionMetadata } from '../types/positionMetadata';
+
 type CollisionComponentMetadata = {
-    width: number;
-    height: number;
+  width: number;
+  height: number;
 }
 
 type CollisionBox = {
-    top: number,
-    bottom: number,
-    left: number,
-    right: number,
+  top: number,
+  bottom: number,
+  left: number,
+  right: number,
 }
 
 class CollisionComponent implements Component {
-    name = COMPONENT_NAMES.Collision;
+  name = COMPONENT_NAMES.Collision;
 
-    width: number;
+  width: number;
 
-    height: number;
+  height: number;
 
-    debugRect: PIXI.Graphics;
+  debugRect: PIXI.Graphics;
 
-    collisionBox: CollisionBox;
+  constructor({ width = 16, height = 32 }: CollisionComponentMetadata) {
+    this.width = width;
+    this.height = height;
+    this.debugRect = new PIXI.Graphics();
+    this.debugRect.beginFill(0x0000FF);
+    this.debugRect.drawRect(0, 0, width, height);
+  }
 
-    constructor({ width = 16, height = 32 }: CollisionComponentMetadata) {
-      this.width = width;
-      this.height = height;
-      this.debugRect = new PIXI.Graphics();
-      this.debugRect.beginFill(0x0000FF);
-      this.debugRect.drawRect(0, 0, width, height);
-      this.collisionBox = {
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-      };
-    }
+  getCollisionBox({ x, y }: PositionMetadata): CollisionBox {
+    return {
+      top: y - this.height / 2,
+      bottom: y + this.height / 2,
+      left: x - this.width / 2,
+      right: x + this.width / 2,
+    };
+  }
 }
 
 export default CollisionComponent;

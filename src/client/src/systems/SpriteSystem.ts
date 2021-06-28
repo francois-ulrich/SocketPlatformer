@@ -4,9 +4,7 @@ import * as PIXI from 'pixi.js';
 import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
-// import PositionComponent from '../components/PositionComponent';
 import SpriteComponent from '../components/SpriteComponent';
-import CollisionComponent from '../components/CollisionComponent';
 
 class SpriteSystem extends ExtendedSystem {
   app: PIXI.Application;
@@ -28,14 +26,6 @@ class SpriteSystem extends ExtendedSystem {
         ]),
       )
       .subscribe((entity) => {
-        const collisionComponent = entity.getComponent<CollisionComponent>(
-          COMPONENT_NAMES.Collision,
-        );
-
-        if (collisionComponent) {
-          this.app.stage.addChild(collisionComponent.debugRect);
-        }
-
         const spriteComponent = entity.getComponent<SpriteComponent>(
           COMPONENT_NAMES.Sprite,
         );

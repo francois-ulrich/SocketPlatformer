@@ -4,7 +4,8 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && vite build",
-		"serve": "vite preview"
+		"serve": "vite preview",
+		"lint": "tsc --noEmit && eslint src/**/*.ts{,x}"
 	},
 	"devDependencies": {
 		"@types/socket.io-client": "^3.0.0",

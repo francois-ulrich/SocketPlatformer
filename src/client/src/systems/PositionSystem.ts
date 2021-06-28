@@ -46,10 +46,12 @@ class PositionSystem extends ExtendedSystem {
           object.position.set(positionComponent.x, positionComponent.y);
         }
 
+        const { x, y } = positionComponent;
+
         if (collisionComponent) {
           // Update debug rectangle position
-          collisionComponent.debugRect.x = collisionComponent.collisionBox.left;
-          collisionComponent.debugRect.y = collisionComponent.collisionBox.top;
+          collisionComponent.debugRect.x = collisionComponent.getCollisionBox({ x, y }).left;
+          collisionComponent.debugRect.y = collisionComponent.getCollisionBox({ x, y }).top;
         }
       }
     });

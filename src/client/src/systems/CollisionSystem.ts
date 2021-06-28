@@ -1,5 +1,3 @@
-import { World } from 'super-ecs';
-
 import COMPONENT_NAMES from '../components/types';
 import MapComponent from '../components/MapComponent';
 import VelocityComponent from '../components/VelocityComponent';
@@ -35,24 +33,6 @@ class CollisionSystem extends ExtendedSystem {
         COMPONENT_NAMES.Collision,
       );
 
-      if (positionComponent
-                && collisionComponent
-                && velocityComponent) {
-        const { x, y } = positionComponent;
-        const { width, height } = collisionComponent;
-
-        // Collision box coordinates update
-        const halfWidth = width / 2;
-        const halfHeight = height / 2;
-
-        collisionComponent.collisionBox = {
-          top: y - halfHeight,
-          bottom: y + halfHeight,
-          left: x - halfWidth,
-          right: x + halfWidth,
-        };
-      }
-
       // Collision checking
 
       // Get map entity
@@ -70,26 +50,31 @@ class CollisionSystem extends ExtendedSystem {
       );
 
       if (mapComponent
-                && positionComponent
-                && collisionComponent
-                && velocityComponent) {
+        && positionComponent
+        && collisionComponent
+        && velocityComponent) {
         const {
-          collisionBox: {
-            top,
-            bottom,
-            left,
-            right,
-          },
+          // collisionBox: {
+          //   top,
+          //   bottom,
+          //   left,
+          //   right,
+          // },
           width,
           height,
         } = collisionComponent;
 
         const { xSpeed, ySpeed } = velocityComponent;
 
+        let collisionBox = collisionComponent.getCollisionBox({
+          x: positionComponent.x,
+          y: positionComponent.y,
+        });
+
         // Horizontal collision
         if (Math.abs(xSpeed) > 0) {
           // Get coll check X
-          const checkX = (xSpeed > 0 ? right : left) + xSpeed;
+          const checkX = (xSpeed > 0 ? collisionBox.right : collisionBox.left) + xSpeed;
 
           // Create collisions array
           const colls: Array<number> = [];
@@ -101,30 +86,41 @@ class CollisionSystem extends ExtendedSystem {
 
           // Check every collisions
           for (let i = 0; i < collsNb; i += 1) {
-            const checkY = (top + i * gap) - (i === collsNb - 1 ? 1 : 0);
+            const checkY = (collisionBox.top + i * gap) - (i === collsNb - 1 ? 1 : 0);
             colls.push(mapComponent.getCollision({ x: checkX, y: checkY }));
           }
 
           // If one of them is a solid, stops
           if (colls.includes(1)) {
             if (xSpeed > 0) {
-              positionComponent.x = (MapComponent.getTilePosition({ x: (right + xSpeed) }).x)
-                    * TILE_SIZE - width / 2;
+              positionComponent.x = (MapComponent.getTilePosition({
+                x: (collisionBox.right + xSpeed),
+              }).x)
+                * TILE_SIZE - width / 2;
             } else {
-              positionComponent.x = (MapComponent.getTilePosition({ x: (left - xSpeed) }).x)
-                    * TILE_SIZE + width / 2;
+              positionComponent.x = (MapComponent.getTilePosition({
+                x: (collisionBox.left - xSpeed),
+              }).x)
+                * TILE_SIZE + width / 2;
             }
 
             velocityComponent.xSpeed = 0;
           }
         }
 
+        // Update X position
         positionComponent.x += velocityComponent.xSpeed * delta;
+
+        // Update collision box values
+        collisionBox = collisionComponent.getCollisionBox({
+          x: positionComponent.x,
+          y: positionComponent.y,
+        });
 
         // Vertical collision
         if (Math.abs(ySpeed) > 0) {
           // Get coll check X
-          const checkY = (ySpeed > 0 ? bottom : top) + ySpeed;
+          const checkY = (ySpeed > 0 ? collisionBox.bottom : collisionBox.top) + ySpeed;
           const gap = (height / Math.ceil(height / TILE_SIZE));
 
           // Create collisions array
@@ -136,18 +132,22 @@ class CollisionSystem extends ExtendedSystem {
 
           // Check every collisions
           for (let i = 0; i < collsNb; i += 1) {
-            const checkX = (left + i * gap) - (i === collsNb - 1 ? 1 : 0);
+            const checkX = (collisionBox.left + i * gap) - (i === collsNb - 1 ? 1 : 0);
             colls.push(mapComponent.getCollision({ x: checkX, y: checkY }));
           }
 
           // If one of them is a solid, stops
           if (colls.includes(1)) {
             if (ySpeed > 0) {
-              positionComponent.y = (MapComponent.getTilePosition({ y: (bottom + ySpeed) }).y)
-                    * TILE_SIZE - height / 2;
+              positionComponent.y = (MapComponent.getTilePosition({
+                y: (collisionBox.bottom + ySpeed),
+              }).y)
+                * TILE_SIZE - height / 2;
             } else {
-              positionComponent.y = (MapComponent.getTilePosition({ y: (top - ySpeed) }).y)
-                    * TILE_SIZE + height / 2;
+              positionComponent.y = (MapComponent.getTilePosition({
+                y: (collisionBox.top - ySpeed),
+              }).y)
+                * TILE_SIZE + height / 2;
             }
 
             velocityComponent.ySpeed = 0;
@@ -159,26 +159,26 @@ class CollisionSystem extends ExtendedSystem {
     });
   }
 
-  addedToWorld(world: World): void {
-    super.addedToWorld(world);
+  // addedToWorld(world: World): void {
+  //   super.addedToWorld(world);
 
-    // Add sprite to stage
-    this.disposeBag
-      .completable$(
-        world.entityAdded$([
-          COMPONENT_NAMES.Collision,
-        ]),
-      )
-      .subscribe((entity) => {
-        const collisionComponent = entity.getComponent<CollisionComponent>(
-          COMPONENT_NAMES.Collision,
-        );
+  //   // Add sprite to stage
+  //   this.disposeBag
+  //     .completable$(
+  //       world.entityAdded$([
+  //         COMPONENT_NAMES.Collision,
+  //       ]),
+  //     )
+  //     .subscribe((entity) => {
+  //       const collisionComponent = entity.getComponent<CollisionComponent>(
+  //         COMPONENT_NAMES.Collision,
+  //       );
 
-        if (collisionComponent) {
-          this.app.stage.addChild(collisionComponent.debugRect);
-        }
-      });
-  }
+  //       if (collisionComponent) {
+  //         this.app.stage.addChild(collisionComponent.debugRect);
+  //       }
+  //     });
+  // }
 }
 
 export default CollisionSystem;

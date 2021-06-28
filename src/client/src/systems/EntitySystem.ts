@@ -9,6 +9,7 @@ import CollisionComponent from '../components/CollisionComponent';
 import VelocityComponent from '../components/VelocityComponent';
 import GravityComponent from '../components/GravityComponent';
 import MapComponent from '../components/MapComponent';
+import PositionComponent from '../components/PositionComponent';
 
 class EntitySystem extends ExtendedSystem {
   constructor({ app }: ExtendedSystemMetadata) {
@@ -23,7 +24,6 @@ class EntitySystem extends ExtendedSystem {
       COMPONENT_NAMES.Position,
       COMPONENT_NAMES.Velocity,
       COMPONENT_NAMES.Gravity,
-      // COMPONENT_NAMES.Sprite,
     ]);
 
     // Exit if no entities found
@@ -53,6 +53,10 @@ class EntitySystem extends ExtendedSystem {
         COMPONENT_NAMES.Gravity,
       );
 
+      const positionComponent = entity.getComponent<PositionComponent>(
+        COMPONENT_NAMES.Position,
+      );
+
       if (velocityComponent && entityComponent) {
         const { xSpeed } = velocityComponent;
         const { maxXSpeed } = entityComponent;
@@ -78,28 +82,44 @@ class EntitySystem extends ExtendedSystem {
       );
 
       if (entityComponent) {
-        // Fall if no floor under entity
-        if (mapComponent
-          && gravityComponent
-          && collisionComponent) {
-          const {
-            collisionBox: {
-              bottom,
-              left,
-              right,
-            },
-          } = collisionComponent;
+        const { onFloor } = entityComponent;
 
-          const { onFloor } = entityComponent;
+        // Fall if no floor under entity
+        if (
+          mapComponent
+          && gravityComponent
+          && velocityComponent
+          && collisionComponent
+          && positionComponent
+        ) {
+          const { bottom, left, right } = collisionComponent.getCollisionBox({
+            x: positionComponent.x,
+            y: positionComponent.y,
+          });
 
           // Check for floor under entity
-          entityComponent.onFloor = (mapComponent.getCollision({ x: left, y: bottom }) === 1
-            || mapComponent.getCollision({ x: right - 1, y: bottom }) === 1);
+          entityComponent.onFloor = mapComponent.getCollision({ x: left, y: bottom }) === 1
+            || mapComponent.getCollision({ x: right - 1, y: bottom }) === 1;
 
           // If not on floor, make the entity fall
           if (!onFloor && !gravityComponent.enabled) {
             gravityComponent.enabled = true;
+
+            if (velocityComponent) {
+              if (velocityComponent.ySpeed === 0) {
+                velocityComponent.xSpeed = 0;
+              }
+            }
           }
+        }
+
+        // Jump
+        if (velocityComponent) {
+          // const { xSpeed } = velocityComponent;
+
+          // if (!onFloor && xSpeed != 0) {
+          //   velocityComponent.xSpeed += speedIncr * direction;
+          // }
         }
 
         // Sprite update
@@ -107,12 +127,18 @@ class EntitySystem extends ExtendedSystem {
           && velocityComponent) {
           switch (entityComponent.state) {
             default:
-              if (Math.abs(velocityComponent.xSpeed) > 0) {
-                spriteComponent.setAnimation('walk');
-                spriteComponent.setScale({ x: Math.sign(velocityComponent.xSpeed) });
+              if (onFloor) {
+                if (Math.abs(velocityComponent.xSpeed) > 0) {
+                  spriteComponent.setAnimation('walk');
+                  spriteComponent.setScale({ x: Math.sign(velocityComponent.xSpeed) });
+                } else {
+                  spriteComponent.setAnimation('idle');
+                }
               } else {
-                spriteComponent.setAnimation('idle');
+                spriteComponent.setAnimation('jump');
+                spriteComponent.setScale({ x: Math.sign(entityComponent.direction) });
               }
+
               break;
           }
         }

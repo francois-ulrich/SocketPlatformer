@@ -2,10 +2,7 @@ import { Component } from 'super-ecs';
 
 import COMPONENT_NAMES from './types';
 
-type PositionMetadata = {
-  x: number;
-  y: number;
-}
+import { PositionMetadata } from '../types/positionMetadata';
 
 class PositionComponent implements Component {
   name = COMPONENT_NAMES.Position;
