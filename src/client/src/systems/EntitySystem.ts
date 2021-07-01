@@ -68,9 +68,9 @@ class EntitySystem extends ExtendedSystem {
       }
 
       // Get map entity
-      const mapEntity = this.world.getEntities([
+      const [mapEntity] = this.world.getEntities([
         COMPONENT_NAMES.Map,
-      ])[0];
+      ]);
 
       if (!mapEntity) {
         return;

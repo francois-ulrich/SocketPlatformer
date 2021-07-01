@@ -3,9 +3,6 @@ type PositionMetadata = {
     y: number;
 }
 
-type OptionalPositionMetadata = {
-    x?: number,
-    y?: number,
-}
+type OptionalPositionMetadata = Partial<PositionMetadata>;
 
 export { PositionMetadata, OptionalPositionMetadata };

@@ -11,9 +11,23 @@ class PositionComponent implements Component {
 
   y: number;
 
+  xFraction: number;
+
+  yFraction: number;
+
   constructor({ x = 0, y = 0 }: PositionMetadata) {
     this.x = x;
     this.y = y;
+    this.xFraction = 0;
+    this.yFraction = 0;
+  }
+
+  moveX(val: number): void {
+    this.x += val;
+  }
+
+  moveY(val: number): void {
+    this.y += val;
   }
 }
 

@@ -33,14 +33,14 @@ class VelocitySystem extends ExtendedSystem {
       );
 
       const collisionComponent = entity.getComponent<CollisionComponent>(
-        COMPONENT_NAMES.Position,
+        COMPONENT_NAMES.Collision,
       );
 
       if (positionComponent
         && velocityComponent
         && !collisionComponent) {
-        positionComponent.x += velocityComponent.xSpeed * delta;
-        positionComponent.y += velocityComponent.ySpeed * delta;
+        positionComponent.moveX(velocityComponent.xSpeed * delta);
+        positionComponent.moveY(velocityComponent.ySpeed * delta);
       }
     });
   }

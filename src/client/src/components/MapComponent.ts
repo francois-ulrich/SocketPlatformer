@@ -28,6 +28,7 @@ class MapComponent implements Component {
   }
 
   getCollision({ x, y }: PositionMetadata): number {
+    // TODO: Mettre pas d'objet pour les arguments
     const collPosition = MapComponent.getTilePosition({ x, y });
 
     const { x: collX, y: collY } = collPosition;
@@ -38,26 +39,36 @@ class MapComponent implements Component {
       || collX > this.getWidth() - 1
       || collY > this.getHeight() - 1
     ) {
-      // console.log(x, y);
       return 0;
     }
 
     return this.collision[collPosition.y][collPosition.x];
   }
 
-  static getTilePosition({ x = 0, y = 0 }: OptionalPositionMetadata): PositionMetadata {
+  static getTilePosition({
+    x = 0,
+    y = 0,
+  }: OptionalPositionMetadata): PositionMetadata {
     return {
       x: Math.floor(x / TILE_SIZE),
       y: Math.floor(y / TILE_SIZE),
     };
   }
 
-  static getTilePositionInWorld({ x = 0, y = 0 }: OptionalPositionMetadata): PositionMetadata {
+  // TODO: Plutot faire une pethode séparée pour X ou Y
+  static getTilePositionInWorld({
+    x = 0,
+    y = 0,
+  }: OptionalPositionMetadata): PositionMetadata {
     const result: PositionMetadata = MapComponent.getTilePosition({ x, y });
 
-    if (result.x != null) { result.x *= TILE_SIZE; }
+    if (result.x != null) {
+      result.x *= TILE_SIZE;
+    }
 
-    if (result.y != null) { result.y *= TILE_SIZE; }
+    if (result.y != null) {
+      result.y *= TILE_SIZE;
+    }
 
     return result;
   }

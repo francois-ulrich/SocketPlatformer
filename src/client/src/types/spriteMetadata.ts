@@ -9,10 +9,8 @@ type AnimationMetadata = {
 
 type SpriteMetadata = {
   src: string;
-  defaultAnimation: string,
-  animations: {
-    [index: string]: AnimationMetadata,
-  };
+  defaultAnimation: string;
+  animations: Record<string, AnimationMetadata>;
 };
 
 export { SpriteMetadata, AnimationMetadata };

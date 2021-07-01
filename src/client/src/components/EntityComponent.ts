@@ -2,6 +2,7 @@ import { Component } from 'super-ecs';
 
 import COMPONENT_NAMES from './types';
 
+// TODO: Changer nom
 class EntityComponent implements Component {
   name = COMPONENT_NAMES.Entity;
 

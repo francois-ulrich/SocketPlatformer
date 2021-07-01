@@ -49,17 +49,13 @@ class CollisionSystem extends ExtendedSystem {
         COMPONENT_NAMES.Map,
       );
 
+      // TODO: Changer système, calculer d'abord les distances X / Y
+      // puis updater la position selon les collisions
       if (mapComponent
         && positionComponent
         && collisionComponent
         && velocityComponent) {
         const {
-          // collisionBox: {
-          //   top,
-          //   bottom,
-          //   left,
-          //   right,
-          // },
           width,
           height,
         } = collisionComponent;
@@ -109,7 +105,7 @@ class CollisionSystem extends ExtendedSystem {
         }
 
         // Update X position
-        positionComponent.x += velocityComponent.xSpeed * delta;
+        positionComponent.moveX(velocityComponent.xSpeed * delta);
 
         // Update collision box values
         collisionBox = collisionComponent.getCollisionBox({
@@ -154,7 +150,7 @@ class CollisionSystem extends ExtendedSystem {
           }
         }
 
-        positionComponent.y += velocityComponent.ySpeed * delta;
+        positionComponent.moveY(velocityComponent.ySpeed * delta);
       }
     });
   }
