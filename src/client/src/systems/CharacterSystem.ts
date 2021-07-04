@@ -10,6 +10,7 @@ import VelocityComponent from '../components/VelocityComponent';
 import GravityComponent from '../components/GravityComponent';
 import MapComponent from '../components/MapComponent';
 import PositionComponent from '../components/PositionComponent';
+import PlayerComponent from '../components/PlayerComponent';
 
 class CharacterSystem extends ExtendedSystem {
   constructor({ app }: ExtendedSystemMetadata) {
@@ -54,6 +55,10 @@ class CharacterSystem extends ExtendedSystem {
         COMPONENT_NAMES.Position,
       );
 
+      const playerComponent = entity.getComponent<PlayerComponent>(
+        COMPONENT_NAMES.Player,
+      );
+
       // Get map entity
       const [mapEntity] = this.world.getEntities([
         COMPONENT_NAMES.Map,
@@ -63,13 +68,91 @@ class CharacterSystem extends ExtendedSystem {
         return;
       }
 
+      if (characterComponent) {
+        // User input
+        if (playerComponent) {
+          characterComponent.input = playerComponent.input;
+          characterComponent.inputPressed = playerComponent.inputPressed;
+
+          // console.log(characterComponent.input);
+          // console.log(characterComponent.inputPressed);
+        }
+
+        // Character input
+        // Player movement
+        if (velocityComponent) {
+          const { onFloor, speedIncr } = characterComponent;
+
+          // Stops if pressing left and right / not pressing any of the two buttons
+
+          // Set direction
+          if (
+            (characterComponent.dirChangeMidAir
+              || velocityComponent.xSpeed === 0)
+            && !(characterComponent.input.right && characterComponent.input.left)
+          ) {
+            // Moving right
+            if (characterComponent.input.right) {
+              characterComponent.direction = 1;
+            }
+            // Moving left
+            if (characterComponent.input.left) {
+              characterComponent.direction = -1;
+            }
+          }
+
+          // Jump
+          if (
+            characterComponent.inputPressed.jump
+            && characterComponent.onFloor
+          ) {
+            velocityComponent.ySpeed = -characterComponent.jumpForce;
+
+            // Add gravity component
+            entity.addComponent(new GravityComponent());
+            characterComponent.onFloor = false;
+          }
+
+          if (onFloor) {
+            if (
+              (!characterComponent.input.right && !characterComponent.input.left)
+              || (characterComponent.input.right && characterComponent.input.left)
+            ) {
+              if (velocityComponent.xSpeed > 0) {
+                velocityComponent.xSpeed -= speedIncr;
+              }
+
+              if (velocityComponent.xSpeed < 0) {
+                velocityComponent.xSpeed += speedIncr;
+              }
+
+              if (Math.abs(velocityComponent.xSpeed) < speedIncr) {
+                velocityComponent.xSpeed = 0;
+              }
+            } else {
+              // Moving right
+              if (characterComponent.input.right) {
+                velocityComponent.xSpeed += speedIncr;
+              }
+              // Moving left
+              if (characterComponent.input.left) {
+                velocityComponent.xSpeed -= speedIncr;
+              }
+            }
+          } else if (
+            characterComponent.input.right
+            || characterComponent.input.left
+          ) {
+            velocityComponent.xSpeed
+              += speedIncr * characterComponent.direction;
+          }
+        }
+      }
+
       // Get map component
       const mapComponent = mapEntity.getComponent<MapComponent>(
         COMPONENT_NAMES.Map,
       );
-
-      // console.log(characterComponent);
-      // console.log(velocityComponent);
 
       if (characterComponent) {
         if (velocityComponent) {
@@ -87,7 +170,6 @@ class CharacterSystem extends ExtendedSystem {
         // Fall if no floor under entity
         if (
           mapComponent
-          // && gravityComponent
           && velocityComponent
           && collisionComponent
           && positionComponent
@@ -110,9 +192,6 @@ class CharacterSystem extends ExtendedSystem {
             length,
             horizontal,
           );
-
-          // console.log(characterComponent.onFloor);
-          // console.log(bottom);
 
           // If not on floor, make the entity fall
           if (!characterComponent.onFloor && !gravityComponent) {

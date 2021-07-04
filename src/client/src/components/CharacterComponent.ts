@@ -1,5 +1,7 @@
 import { Component } from 'super-ecs';
 
+import InputMap from '../types/inputMap';
+
 import COMPONENT_NAMES from './types';
 
 class CharacterComponent implements Component {
@@ -23,6 +25,10 @@ class CharacterComponent implements Component {
 
   dirChangeMidAir: boolean;
 
+  input: InputMap;
+
+  inputPressed: InputMap;
+
   constructor() {
     this.state = 0;
 
@@ -34,6 +40,17 @@ class CharacterComponent implements Component {
     this.direction = 1;
     this.speedIncr = 0.2;
     this.dirChangeMidAir = true;
+
+    // Input
+    this.input = {
+      left: false,
+      right: false,
+      up: false,
+      down: false,
+      jump: false,
+    };
+
+    this.inputPressed = { ...this.input };
   }
 }
 

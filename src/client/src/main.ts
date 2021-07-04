@@ -49,12 +49,13 @@ function createPlayerEntity(): Entity {
   const sprite: SpriteMetadata = spriteData;
 
   hero
-    .addComponent(new PlayerComponent())
     .addComponent(new VelocityComponent())
     .addComponent(new CollisionComponent({ width: 16, height: 32 }))
     .addComponent(new PositionComponent({ x: 32, y: 32 }))
     .addComponent(new CharacterComponent())
-    .addComponent(new SpriteComponent(sprite));
+    .addComponent(new SpriteComponent(sprite))
+    .addComponent(new PlayerComponent());
+
   return hero;
 }
 

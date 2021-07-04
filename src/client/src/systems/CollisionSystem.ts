@@ -50,8 +50,6 @@ class CollisionSystem extends ExtendedSystem {
         COMPONENT_NAMES.Map,
       );
 
-      /* TODO: Utiliser la méthode de détection de collision du MapComponent
-      (servira à checker le onFloor de manière plus sûre) */
       if (mapComponent
         && positionComponent
         && collisionComponent

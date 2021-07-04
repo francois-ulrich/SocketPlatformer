@@ -3,9 +3,6 @@ import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
 import PlayerComponent from '../components/PlayerComponent';
-import VelocityComponent from '../components/VelocityComponent';
-import CharacterComponent from '../components/CharacterComponent';
-import GravityComponent from '../components/GravityComponent';
 
 class PlayerSystem extends ExtendedSystem {
   constructor({ app }: ExtendedSystemMetadata) {
@@ -30,74 +27,9 @@ class PlayerSystem extends ExtendedSystem {
         COMPONENT_NAMES.Player,
       );
 
-      const characterComponent = entity.getComponent<CharacterComponent>(
-        COMPONENT_NAMES.Character,
-      );
-
-      const velocityComponent = entity.getComponent<VelocityComponent>(
-        COMPONENT_NAMES.Velocity,
-      );
-
       // TODO: Voir ce qu'on peut mettre dans le CharacterSystem
       // Player movement
-      if (velocityComponent
-        && characterComponent
-        && playerComponent) {
-        const { onFloor, speedIncr } = characterComponent;
-
-        // Stops if pressing left and right / not pressing any of the two buttons
-
-        // Set direction
-        if ((characterComponent.dirChangeMidAir || (velocityComponent.xSpeed === 0))
-          && !(playerComponent.input.right && playerComponent.input.left)) {
-          // Moving right
-          if (playerComponent.input.right) {
-            characterComponent.direction = 1;
-          }
-          // Moving left
-          if (playerComponent.input.left) {
-            characterComponent.direction = -1;
-          }
-        }
-
-        // Jump
-        if (playerComponent.inputPressed.jump && characterComponent.onFloor) {
-          velocityComponent.ySpeed = -characterComponent.jumpForce;
-
-          // Add gravity component
-          entity.addComponent(new GravityComponent());
-          characterComponent.onFloor = false;
-        }
-
-        if (onFloor) {
-          if ((!playerComponent.input.right && !playerComponent.input.left)
-            || (playerComponent.input.right && playerComponent.input.left)) {
-            if (velocityComponent.xSpeed > 0) {
-              velocityComponent.xSpeed -= speedIncr;
-            }
-
-            if (velocityComponent.xSpeed < 0) {
-              velocityComponent.xSpeed += speedIncr;
-            }
-
-            if (Math.abs(velocityComponent.xSpeed) < speedIncr) {
-              velocityComponent.xSpeed = 0;
-            }
-          } else {
-            // Moving right
-            if (playerComponent.input.right) {
-              velocityComponent.xSpeed += speedIncr;
-            }
-            // Moving left
-            if (playerComponent.input.left) {
-              velocityComponent.xSpeed -= speedIncr;
-            }
-          }
-        } else if (playerComponent.input.right
-          || playerComponent.input.left) {
-          velocityComponent.xSpeed += speedIncr * characterComponent.direction;
-        }
-
+      if (playerComponent) {
         // Reset all input pressed values
         Object.keys(playerComponent.inputPressed).forEach((keyCode) => {
           playerComponent.inputPressed[keyCode] = false;
