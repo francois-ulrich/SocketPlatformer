@@ -50,8 +50,8 @@ class CollisionSystem extends ExtendedSystem {
         COMPONENT_NAMES.Map,
       );
 
-      /* TODO: Exporter la détection de collision dans des méthodes du composant
-      collision (servira à checker le onFloor de manière plus sûre) */
+      /* TODO: Utiliser la méthode de détection de collision du MapComponent
+      (servira à checker le onFloor de manière plus sûre) */
       if (mapComponent
         && positionComponent
         && collisionComponent
@@ -70,25 +70,23 @@ class CollisionSystem extends ExtendedSystem {
 
         // Horizontal collision
         if (Math.abs(xSpeed) > 0) {
-          // Get coll check X
-          const checkX = (xSpeed > 0 ? collisionBox.right : collisionBox.left) + xSpeed;
+          // // Get coll check X
+          const checkXStart: number = (
+            xSpeed > 0
+              ? collisionBox.right
+              : collisionBox.left) + xSpeed;
 
-          // Create collisions array
-          const colls: Array<number> = [];
+          const checkYStart: number = collisionBox.top;
 
-          // Get number of collisions needed to be checked,
-          // varies depending on the height of the entity
-          const collsNb: number = Math.max(2, Math.floor(height / TILE_SIZE) + 1);
-          const gap = (height / Math.ceil(height / TILE_SIZE));
-
-          // Check every collisions
-          for (let i = 0; i < collsNb; i += 1) {
-            const checkY = (collisionBox.top + i * gap) - (i === collsNb - 1 ? 1 : 0);
-            colls.push(mapComponent.getCollision(checkX, checkY));
-          }
+          const solidCollision: boolean = mapComponent.getMapCollisionLine(
+            checkXStart,
+            checkYStart,
+            height,
+            true,
+          );
 
           // If one of them is a solid, stops
-          if (colls.includes(1)) {
+          if (solidCollision) {
             if (xSpeed > 0) {
               positionComponent.x = MapComponent.getTilePosition(collisionBox.right + xSpeed)
                 * TILE_SIZE - width / 2;
@@ -101,9 +99,6 @@ class CollisionSystem extends ExtendedSystem {
           }
         }
 
-        // // Update X position
-        // positionComponent.moveX(velocityComponent.xSpeed * delta);
-
         // Update collision box values
         collisionBox = collisionComponent.getCollisionBox(
           positionComponent.x + velocityComponent.xSpeed,
@@ -112,38 +107,34 @@ class CollisionSystem extends ExtendedSystem {
 
         // Vertical collision
         if (Math.abs(ySpeed) > 0) {
-          // Get coll check X
-          const checkY = (ySpeed > 0 ? collisionBox.bottom : collisionBox.top) + ySpeed;
-          const gap = (height / Math.ceil(height / TILE_SIZE));
+          const checkXStart: number = collisionBox.left;
+          const checkYStart: number = (ySpeed > 0
+            ? collisionBox.bottom
+            : collisionBox.top) + ySpeed;
 
-          // Create collisions array
-          const colls: Array<number> = [];
-
-          // Get number of collisions needed to be checked,
-          // varies depending on the width of the entity
-          const collsNb: number = Math.max(2, Math.floor(width / TILE_SIZE) + 1);
-
-          // Check every collisions
-          for (let i = 0; i < collsNb; i += 1) {
-            const checkX = (collisionBox.left + i * gap) - (i === collsNb - 1 ? 1 : 0);
-            colls.push(mapComponent.getCollision(checkX, checkY));
-          }
+          const solidCollision: boolean = mapComponent.getMapCollisionLine(
+            checkXStart,
+            checkYStart,
+            width,
+            false,
+          );
 
           // If one of them is a solid, stops
-          if (colls.includes(1)) {
+          // if (colls.includes(1)) {
+          if (solidCollision) {
             if (ySpeed > 0) {
               positionComponent.y = MapComponent.getTilePosition(collisionBox.bottom + ySpeed)
-                * TILE_SIZE - height / 2;
+                  * TILE_SIZE
+                - height / 2;
             } else {
               positionComponent.y = MapComponent.getTilePosition(collisionBox.top - ySpeed)
-                * TILE_SIZE + height / 2;
+                  * TILE_SIZE
+                + height / 2;
             }
 
             velocityComponent.ySpeed = 0;
           }
         }
-
-        // positionComponent.moveY(velocityComponent.ySpeed * delta);
       }
     });
   }

@@ -44,6 +44,40 @@ class MapComponent implements Component {
   static getTilePosition(val: number): number {
     return Math.floor(val / TILE_SIZE);
   }
+
+  getMapCollisionLine(
+    xStart: number,
+    yStart: number,
+    length: number,
+    horizontal: boolean,
+  ): boolean {
+    // Get number of collisions needed to be checked
+    const collsNb: number = Math.max(2, Math.floor(length / TILE_SIZE) + 1);
+    const gap = length / Math.ceil(length / TILE_SIZE);
+
+    // Check every collisions
+    for (let i = 0; i < collsNb; i += 1) {
+      let checkX: number;
+      let checkY: number;
+
+      // Vertical line
+      if (!horizontal) {
+        checkX = xStart + i * gap - (i === collsNb - 1 ? 1 : 0);
+        checkY = yStart;
+      } else {
+        checkX = xStart;
+        checkY = yStart + i * gap - (i === collsNb - 1 ? 1 : 0);
+      }
+
+      // If solid encountered, return true
+      if (this.getCollision(checkX, checkY) > 0) {
+        return true;
+      }
+    }
+
+    // If no collision found, just return false
+    return false;
+  }
 }
 
 export default MapComponent;

@@ -61,7 +61,7 @@ function createPlayerEntity(): Entity {
 // Map instanciation
 
 function init(): void {
-  const stageScale = 1;
+  const stageScale = 3;
   app.stage.scale.x = stageScale;
   app.stage.scale.y = stageScale;
 
