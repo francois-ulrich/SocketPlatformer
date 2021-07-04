@@ -3,8 +3,6 @@ import * as PIXI from 'pixi.js';
 
 import COMPONENT_NAMES from './types';
 
-import { PositionMetadata } from '../types/positionMetadata';
-
 type CollisionComponentMetadata = {
   width: number;
   height: number;
@@ -34,7 +32,7 @@ class CollisionComponent implements Component {
     this.debugRect.drawRect(0, 0, width, height);
   }
 
-  getCollisionBox({ x, y }: PositionMetadata): CollisionBox {
+  getCollisionBox(x: number, y: number): CollisionBox {
     return {
       top: y - this.height / 2,
       bottom: y + this.height / 2,

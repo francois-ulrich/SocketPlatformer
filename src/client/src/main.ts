@@ -6,11 +6,10 @@ import { World, Entity } from 'super-ecs';
 import PositionComponent from './components/PositionComponent';
 import SpriteComponent from './components/SpriteComponent';
 import VelocityComponent from './components/VelocityComponent';
-import GravityComponent from './components/GravityComponent';
 import MapComponent from './components/MapComponent';
 import CollisionComponent from './components/CollisionComponent';
 import PlayerComponent from './components/PlayerComponent';
-import EntityComponent from './components/EntityComponent';
+import CharacterComponent from './components/CharacterComponent';
 
 import SpriteSystem from './systems/SpriteSystem';
 import PositionSystem from './systems/PositionSystem';
@@ -18,7 +17,7 @@ import VelocitySystem from './systems/VelocitySystem';
 import GravitySystem from './systems/GravitySystem';
 import MapSystem from './systems/MapSystem';
 import PlayerSystem from './systems/PlayerSystem';
-import EntitySystem from './systems/EntitySystem';
+import EntitySystem from './systems/CharacterSystem';
 import CollisionSystem from './systems/CollisionSystem';
 
 import { SpriteMetadata } from './types/spriteMetadata';
@@ -51,11 +50,10 @@ function createPlayerEntity(): Entity {
 
   hero
     .addComponent(new PlayerComponent())
-    .addComponent(new GravityComponent())
     .addComponent(new VelocityComponent())
     .addComponent(new CollisionComponent({ width: 16, height: 32 }))
     .addComponent(new PositionComponent({ x: 32, y: 32 }))
-    .addComponent(new EntityComponent())
+    .addComponent(new CharacterComponent())
     .addComponent(new SpriteComponent(sprite));
   return hero;
 }
@@ -63,7 +61,7 @@ function createPlayerEntity(): Entity {
 // Map instanciation
 
 function init(): void {
-  const stageScale = 3;
+  const stageScale = 1;
   app.stage.scale.x = stageScale;
   app.stage.scale.y = stageScale;
 

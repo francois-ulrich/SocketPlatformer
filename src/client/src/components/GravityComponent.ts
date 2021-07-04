@@ -7,11 +7,8 @@ class GravityComponent implements Component {
 
   force: number;
 
-  enabled: boolean; // TODO: delete cet attribut
-
   constructor() {
     this.force = 0.2;
-    this.enabled = false;
   }
 }
 

@@ -50,8 +50,8 @@ class PositionSystem extends ExtendedSystem {
 
         if (collisionComponent) {
           // Update debug rectangle position
-          collisionComponent.debugRect.x = collisionComponent.getCollisionBox({ x, y }).left;
-          collisionComponent.debugRect.y = collisionComponent.getCollisionBox({ x, y }).top;
+          collisionComponent.debugRect.x = collisionComponent.getCollisionBox(x, y).left;
+          collisionComponent.debugRect.y = collisionComponent.getCollisionBox(x, y).top;
         }
       }
     });

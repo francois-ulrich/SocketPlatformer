@@ -4,7 +4,7 @@ import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 import COMPONENT_NAMES from '../components/types';
 import PlayerComponent from '../components/PlayerComponent';
 import VelocityComponent from '../components/VelocityComponent';
-import EntityComponent from '../components/EntityComponent';
+import CharacterComponent from '../components/CharacterComponent';
 import GravityComponent from '../components/GravityComponent';
 
 class PlayerSystem extends ExtendedSystem {
@@ -17,9 +17,6 @@ class PlayerSystem extends ExtendedSystem {
     // Get entities under this system
     const entities = this.world.getEntities([
       COMPONENT_NAMES.Player,
-      COMPONENT_NAMES.Velocity,
-      COMPONENT_NAMES.Gravity,
-      COMPONENT_NAMES.Entity,
     ]);
 
     // Exit if no entities found
@@ -33,38 +30,43 @@ class PlayerSystem extends ExtendedSystem {
         COMPONENT_NAMES.Player,
       );
 
-      const entityComponent = entity.getComponent<EntityComponent>(
-        COMPONENT_NAMES.Entity,
+      const characterComponent = entity.getComponent<CharacterComponent>(
+        COMPONENT_NAMES.Character,
       );
 
       const velocityComponent = entity.getComponent<VelocityComponent>(
         COMPONENT_NAMES.Velocity,
       );
 
-      const gravityComponent = entity.getComponent<GravityComponent>(
-        COMPONENT_NAMES.Gravity,
-      );
-
+      // TODO: Voir ce qu'on peut mettre dans le CharacterSystem
       // Player movement
       if (velocityComponent
-        && entityComponent
-        && gravityComponent
+        && characterComponent
         && playerComponent) {
-        const { onFloor, speedIncr } = entityComponent;
+        const { onFloor, speedIncr } = characterComponent;
 
         // Stops if pressing left and right / not pressing any of the two buttons
 
         // Set direction
-        if ((entityComponent.dirChangeMidAir || (velocityComponent.xSpeed === 0))
+        if ((characterComponent.dirChangeMidAir || (velocityComponent.xSpeed === 0))
           && !(playerComponent.input.right && playerComponent.input.left)) {
           // Moving right
           if (playerComponent.input.right) {
-            entityComponent.direction = 1;
+            characterComponent.direction = 1;
           }
           // Moving left
           if (playerComponent.input.left) {
-            entityComponent.direction = -1;
+            characterComponent.direction = -1;
           }
+        }
+
+        // Jump
+        if (playerComponent.inputPressed.jump && characterComponent.onFloor) {
+          velocityComponent.ySpeed = -characterComponent.jumpForce;
+
+          // Add gravity component
+          entity.addComponent(new GravityComponent());
+          characterComponent.onFloor = false;
         }
 
         if (onFloor) {
@@ -92,15 +94,8 @@ class PlayerSystem extends ExtendedSystem {
             }
           }
         } else if (playerComponent.input.right
-            || playerComponent.input.left) {
-          velocityComponent.xSpeed += speedIncr * entityComponent.direction;
-        }
-
-        // Jump
-        if (playerComponent.inputPressed.jump && entityComponent.onFloor) {
-          velocityComponent.ySpeed = -entityComponent.jumpForce;
-          gravityComponent.enabled = true;
-          entityComponent.onFloor = false;
+          || playerComponent.input.left) {
+          velocityComponent.xSpeed += speedIncr * characterComponent.direction;
         }
 
         // Reset all input pressed values

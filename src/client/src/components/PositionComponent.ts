@@ -15,6 +15,7 @@ class PositionComponent implements Component {
 
   yFraction: number;
 
+  // TODO: Utiliser des objets en tant qu'arguments pour la création des components?
   constructor({ x = 0, y = 0 }: PositionMetadata) {
     this.x = x;
     this.y = y;

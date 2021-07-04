@@ -2,9 +2,8 @@ import { Component } from 'super-ecs';
 
 import COMPONENT_NAMES from './types';
 
-// TODO: Changer nom
-class EntityComponent implements Component {
-  name = COMPONENT_NAMES.Entity;
+class CharacterComponent implements Component {
+  name = COMPONENT_NAMES.Character;
 
   inputRight: boolean;
 
@@ -38,4 +37,4 @@ class EntityComponent implements Component {
   }
 }
 
-export default EntityComponent;
+export default CharacterComponent;

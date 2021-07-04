@@ -3,7 +3,6 @@ import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 import COMPONENT_NAMES from '../components/types';
 import VelocityComponent from '../components/VelocityComponent';
 import PositionComponent from '../components/PositionComponent';
-import CollisionComponent from '../components/CollisionComponent';
 
 class VelocitySystem extends ExtendedSystem {
   constructor({ app }: ExtendedSystemMetadata) {
@@ -32,13 +31,8 @@ class VelocitySystem extends ExtendedSystem {
         COMPONENT_NAMES.Position,
       );
 
-      const collisionComponent = entity.getComponent<CollisionComponent>(
-        COMPONENT_NAMES.Collision,
-      );
-
       if (positionComponent
-        && velocityComponent
-        && !collisionComponent) {
+        && velocityComponent) {
         positionComponent.moveX(velocityComponent.xSpeed * delta);
         positionComponent.moveY(velocityComponent.ySpeed * delta);
       }
