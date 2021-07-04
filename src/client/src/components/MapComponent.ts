@@ -55,13 +55,15 @@ class MapComponent implements Component {
     const collsNb: number = Math.max(2, Math.floor(length / TILE_SIZE) + 1);
     const gap = length / Math.ceil(length / TILE_SIZE);
 
+    const colls: Array<number> = [];
+
     // Check every collisions
     for (let i = 0; i < collsNb; i += 1) {
       let checkX: number;
       let checkY: number;
 
       // Vertical line
-      if (!horizontal) {
+      if (horizontal) {
         checkX = xStart + i * gap - (i === collsNb - 1 ? 1 : 0);
         checkY = yStart;
       } else {
@@ -69,14 +71,11 @@ class MapComponent implements Component {
         checkY = yStart + i * gap - (i === collsNb - 1 ? 1 : 0);
       }
 
-      // If solid encountered, return true
-      if (this.getCollision(checkX, checkY) > 0) {
-        return true;
-      }
+      colls.push(this.getCollision(checkX, checkY));
     }
 
     // If no collision found, just return false
-    return false;
+    return colls.includes(1);
   }
 }
 

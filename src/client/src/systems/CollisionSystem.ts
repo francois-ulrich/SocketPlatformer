@@ -82,7 +82,7 @@ class CollisionSystem extends ExtendedSystem {
             checkXStart,
             checkYStart,
             height,
-            true,
+            false,
           );
 
           // If one of them is a solid, stops
@@ -116,7 +116,7 @@ class CollisionSystem extends ExtendedSystem {
             checkXStart,
             checkYStart,
             width,
-            false,
+            true,
           );
 
           // If one of them is a solid, stops

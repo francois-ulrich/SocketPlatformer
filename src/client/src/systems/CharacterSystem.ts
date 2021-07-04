@@ -95,12 +95,24 @@ class CharacterSystem extends ExtendedSystem {
           const {
             bottom,
             left,
-            right,
           } = collisionComponent.getCollisionBox(positionComponent.x, positionComponent.y);
 
-          // Check for floor under entity
-          characterComponent.onFloor = mapComponent.getCollision(left, bottom) === 1
-            || mapComponent.getCollision(right - 1, bottom) === 1;
+          const { width } = collisionComponent;
+
+          const xStart: number = left;
+          const yStart: number = bottom;
+          const length: number = width - 1;
+          const horizontal: boolean = true;
+
+          characterComponent.onFloor = mapComponent.getMapCollisionLine(
+            xStart,
+            yStart,
+            length,
+            horizontal,
+          );
+
+          // console.log(characterComponent.onFloor);
+          // console.log(bottom);
 
           // If not on floor, make the entity fall
           if (!characterComponent.onFloor && !gravityComponent) {
