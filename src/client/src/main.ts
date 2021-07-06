@@ -1,7 +1,7 @@
 import './style.css';
 import * as PIXI from 'pixi.js';
 import { World, Entity } from 'super-ecs';
-// import { io } from 'socket.io-client';
+import { io } from 'socket.io-client';
 
 import PositionComponent from './components/PositionComponent';
 import SpriteComponent from './components/SpriteComponent';
@@ -42,6 +42,16 @@ document.body.appendChild(app.view);
 const container = new PIXI.Container();
 app.stage.addChild(container);
 
+// Rescale PIXI stage
+const stageScale = 3;
+app.stage.scale.x = stageScale;
+app.stage.scale.y = stageScale;
+
+// Disable interpolation when scaling, will make texture be pixelated
+PIXI.settings.RESOLUTION = window.devicePixelRatio;
+PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+PIXI.settings.RENDER_OPTIONS.antialias = true; // Enable antialiasing
+
 // Temp: add test entity
 function createPlayerEntity(): Entity {
   const hero: Entity = new Entity();
@@ -60,56 +70,42 @@ function createPlayerEntity(): Entity {
 }
 
 // Map instanciation
+// Init ECS World
+const world = new World();
 
-function init(): void {
-  const stageScale = 3;
-  app.stage.scale.x = stageScale;
-  app.stage.scale.y = stageScale;
+// Instanciate world
+world
+  .addSystem(new CollisionSystem({ app }))
+  .addSystem(new VelocitySystem({ app }))
+  .addSystem(new PositionSystem({ app }))
+  .addSystem(new PlayerSystem({ app }))
+  .addSystem(new MapSystem({ app }))
+  .addSystem(new EntitySystem({ app }))
+  .addSystem(new GravitySystem({ app }))
+  .addSystem(new SpriteSystem({ app }));
 
-  // Disable interpolation when scaling, will make texture be pixelated
-  PIXI.settings.RESOLUTION = window.devicePixelRatio;
-  PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-  PIXI.settings.RENDER_OPTIONS.antialias = true; // Enable antialiasing
+// Instanciate entities
+// entities
+Array.from({ length: 1 }).forEach(() => {
+  const entity = createPlayerEntity();
+  world.addEntity(entity);
+});
 
-  // Init ECS World
-  const world = new World();
+// Create map
+const testMap = new Entity();
+testMap.addComponent(new MapComponent({ collision: map }));
+world.addEntity(testMap);
 
-  // Instanciate world
-  world
-    .addSystem(new CollisionSystem({ app }))
-    .addSystem(new VelocitySystem({ app }))
-    .addSystem(new PositionSystem({ app }))
-    .addSystem(new PlayerSystem({ app }))
-    .addSystem(new MapSystem({ app }))
-    .addSystem(new EntitySystem({ app }))
-    .addSystem(new GravitySystem({ app }))
-    .addSystem(new SpriteSystem({ app }));
+// Add systems to world
+app.ticker.add((deltaTime) => world.update(deltaTime));
 
-  // Instanciate entities
-  // entities
-  Array.from({ length: 1 }).forEach(() => {
-    const entity = createPlayerEntity();
-    world.addEntity(entity);
+// Socket stuff
+const socket = io('ws://localhost:5000/');
+
+socket.on('connect', () => {
+  socket.on('test', (data) => {
+    console.log(data);
   });
-
-  // Create map
-  const testMap = new Entity();
-  testMap.addComponent(new MapComponent({ collision: map }));
-  world.addEntity(testMap);
-
-  // Add systems to world
-  app.ticker.add((deltaTime) => world.update(deltaTime));
-}
-
-init();
-
-// // Socket stuff
-// const socket = io('ws://localhost:5000/');
-
-// socket.on('connect', () => {
-//   socket.on('test', (data) => {
-//     console.log(data);
-//   });
-// });
+});
 
 // Test ECS

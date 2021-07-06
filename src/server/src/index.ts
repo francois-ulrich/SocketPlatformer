@@ -11,9 +11,9 @@ const io = new Server(httpServer, {
 io.on('connection', (socket: Socket) => {
   console.log('A user connected');
 
-  setInterval(() => {
-    socket.broadcast.emit('test', 'Hello everybody!!');
-  }, 1000);
+  // setInterval(() => {
+  //   socket.broadcast.emit('test', 'Hello everybody!!');
+  // }, 1000);
 
   // Whenever someone disconnects this piece of code executed
   socket.on('disconnect', () => {
