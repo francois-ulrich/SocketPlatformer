@@ -43,7 +43,10 @@ class PositionSystem extends ExtendedSystem {
       if (positionComponent) {
         if (spriteComponent) {
           const { object } = spriteComponent;
-          object.position.set(positionComponent.x, positionComponent.y);
+          object.position.set(
+            Math.round(positionComponent.x),
+            Math.round(positionComponent.y),
+          );
         }
 
         const { x, y } = positionComponent;
@@ -80,7 +83,10 @@ class PositionSystem extends ExtendedSystem {
         if (spriteComponent && positionComponent) {
           const { object } = spriteComponent;
 
-          object.position.set(positionComponent.x, positionComponent.y);
+          object.position.set(
+            Math.round(positionComponent.x),
+            Math.round(positionComponent.y),
+          );
         }
       });
 

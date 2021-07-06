@@ -103,7 +103,7 @@ class CharacterSystem extends ExtendedSystem {
 
           // Jump
           if (
-            characterComponent.inputPressed.jump
+            characterComponent.input.jump
             && characterComponent.onFloor
           ) {
             velocityComponent.ySpeed = -characterComponent.jumpForce;

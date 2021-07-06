@@ -38,7 +38,7 @@ class CharacterComponent implements Component {
     this.onFloor = true;
     this.jumpForce = 3.8;
     this.direction = 1;
-    this.speedIncr = 0.2;
+    this.speedIncr = 1;
     this.dirChangeMidAir = true;
 
     // Input
