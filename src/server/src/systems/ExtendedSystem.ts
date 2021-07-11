@@ -1,24 +1,23 @@
 import { System, DisposeBag } from 'super-ecs';
-import * as PIXI from 'pixi.js';
 
 type ExtendedSystemMetadata = {
-    app: PIXI.Application;
 };
 
 class ExtendedSystem extends System {
-    disposeBag: DisposeBag;
+  disposeBag: DisposeBag;
 
-    app: PIXI.Application;
+  // constructor({ app }: ExtendedSystemMetadata) {
+  constructor() {
+    super();
 
-    constructor({ app }: ExtendedSystemMetadata) {
-      super();
-
-      this.app = app;
-      this.disposeBag = new DisposeBag();
-    }
+    // this.app = app;
+    this.disposeBag = new DisposeBag();
+  }
 }
 
 export {
   ExtendedSystemMetadata,
   ExtendedSystem,
 };
+
+// export default ExtendedSystem;

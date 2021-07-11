@@ -4,7 +4,8 @@ import { CompositeTilemap } from '@pixi/tilemap';
 import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
-import MapComponent from '../components/MapComponent';
+// import MapComponent from '../components/MapComponent';
+import MapComponent from './../../../shared/src/components/MapComponent';
 
 import solidTile from '../assets/tilemaps/solid.png';
 
@@ -24,6 +25,8 @@ class MapSystem extends ExtendedSystem {
         ]),
       )
       .subscribe((entity) => {
+        console.log("map added to world");
+
         const mapComponent = entity.getComponent<MapComponent>(
           COMPONENT_NAMES.Map,
         );

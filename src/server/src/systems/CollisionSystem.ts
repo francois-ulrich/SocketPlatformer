@@ -1,18 +1,14 @@
+import { ExtendedSystem } from './ExtendedSystem';
+
 import COMPONENT_NAMES from '../components/types';
 import MapComponent from '../components/MapComponent';
 import VelocityComponent from '../components/VelocityComponent';
 import CollisionComponent from '../components/CollisionComponent';
 import PositionComponent from '../components/PositionComponent';
 
-import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 import { TILE_SIZE } from '../global';
 
 class CollisionSystem extends ExtendedSystem {
-  constructor({ app }: ExtendedSystemMetadata) {
-    super({ app });
-  }
-
-  // update(delta: number): void {
   update(): void {
     const entities = this.world.getEntities([
       COMPONENT_NAMES.Velocity,
@@ -37,9 +33,7 @@ class CollisionSystem extends ExtendedSystem {
       // Collision checking
 
       // Get map entity
-      const mapEntity = this.world.getEntities([
-        COMPONENT_NAMES.Map,
-      ])[0];
+      const mapEntity = this.world.getEntities([COMPONENT_NAMES.Map])[0];
 
       if (!mapEntity) {
         return;
@@ -50,14 +44,13 @@ class CollisionSystem extends ExtendedSystem {
         COMPONENT_NAMES.Map,
       );
 
-      if (mapComponent
+      if (
+        mapComponent
         && positionComponent
         && collisionComponent
-        && velocityComponent) {
-        const {
-          width,
-          height,
-        } = collisionComponent;
+        && velocityComponent
+      ) {
+        const { width, height } = collisionComponent;
 
         const { xSpeed, ySpeed } = velocityComponent;
 
@@ -69,10 +62,7 @@ class CollisionSystem extends ExtendedSystem {
         // Horizontal collision
         if (Math.abs(xSpeed) > 0) {
           // // Get coll check X
-          const checkXStart: number = (
-            xSpeed > 0
-              ? collisionBox.right
-              : collisionBox.left) + xSpeed;
+          const checkXStart: number = (xSpeed > 0 ? collisionBox.right : collisionBox.left) + xSpeed;
 
           const checkYStart: number = collisionBox.top;
 
@@ -87,10 +77,12 @@ class CollisionSystem extends ExtendedSystem {
           if (solidCollision) {
             if (xSpeed > 0) {
               positionComponent.x = MapComponent.getTilePosition(collisionBox.right + xSpeed)
-                * TILE_SIZE - width / 2;
+                  * TILE_SIZE
+                - width / 2;
             } else {
               positionComponent.x = MapComponent.getTilePosition(collisionBox.left - xSpeed)
-                * TILE_SIZE + width / 2;
+                  * TILE_SIZE
+                + width / 2;
             }
 
             velocityComponent.xSpeed = 0;
@@ -106,9 +98,7 @@ class CollisionSystem extends ExtendedSystem {
         // Vertical collision
         if (Math.abs(ySpeed) > 0) {
           const checkXStart: number = collisionBox.left;
-          const checkYStart: number = (ySpeed > 0
-            ? collisionBox.bottom
-            : collisionBox.top) + ySpeed;
+          const checkYStart: number = (ySpeed > 0 ? collisionBox.bottom : collisionBox.top) + ySpeed;
 
           const solidCollision: boolean = mapComponent.getMapCollisionLine(
             checkXStart,

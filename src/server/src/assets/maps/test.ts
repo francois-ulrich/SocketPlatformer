@@ -1,6 +1,6 @@
-import MapMetadata from '../../types/mapMetadata';
+import { MapGridMetadata } from '../../../../shared/src/types/mapMetadata';
 
-const map: MapMetadata = [
+const collision: MapGridMetadata = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
@@ -15,5 +15,10 @@ const map: MapMetadata = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
+
+const map = {
+  collision,
+  tiles: undefined,
+};
 
 export default map;

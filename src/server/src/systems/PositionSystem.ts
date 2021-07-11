@@ -1,18 +1,12 @@
 import { World } from 'super-ecs';
-// import * as PIXI from 'pixi.js';
 
-import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
+import { ExtendedSystem } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
 import PositionComponent from '../components/PositionComponent';
-import SpriteComponent from '../components/SpriteComponent';
 import CollisionComponent from '../components/CollisionComponent';
 
 class PositionSystem extends ExtendedSystem {
-  constructor({ app }: ExtendedSystemMetadata) {
-    super({ app });
-  }
-
   // update(delta: number): void {
   update(): void {
     // Get entities under this system

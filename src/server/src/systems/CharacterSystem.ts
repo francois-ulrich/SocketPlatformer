@@ -1,9 +1,7 @@
-import { World } from 'super-ecs';
-
-import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
+import { ExtendedSystem } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
-import SpriteComponent from '../components/SpriteComponent';
+
 import CharacterComponent from '../components/CharacterComponent';
 import CollisionComponent from '../components/CollisionComponent';
 import VelocityComponent from '../components/VelocityComponent';
@@ -13,16 +11,10 @@ import PositionComponent from '../components/PositionComponent';
 import PlayerComponent from '../components/PlayerComponent';
 
 class CharacterSystem extends ExtendedSystem {
-  constructor({ app }: ExtendedSystemMetadata) {
-    super({ app });
-  }
-
   // update(delta: number): void {
   update(): void {
     // Get entities under this system
-    const entities = this.world.getEntities([
-      COMPONENT_NAMES.Character,
-    ]);
+    const entities = this.world.getEntities([COMPONENT_NAMES.Character]);
 
     // Exit if no entities found
     if (entities.length === 0) {
@@ -33,10 +25,6 @@ class CharacterSystem extends ExtendedSystem {
     entities.forEach((entity) => {
       const characterComponent = entity.getComponent<CharacterComponent>(
         COMPONENT_NAMES.Character,
-      );
-
-      const spriteComponent = entity.getComponent<SpriteComponent>(
-        COMPONENT_NAMES.Sprite,
       );
 
       const collisionComponent = entity.getComponent<CollisionComponent>(
@@ -60,9 +48,7 @@ class CharacterSystem extends ExtendedSystem {
       );
 
       // Get map entity
-      const [mapEntity] = this.world.getEntities([
-        COMPONENT_NAMES.Map,
-      ]);
+      const [mapEntity] = this.world.getEntities([COMPONENT_NAMES.Map]);
 
       if (!mapEntity) {
         return;
@@ -73,9 +59,6 @@ class CharacterSystem extends ExtendedSystem {
         if (playerComponent) {
           characterComponent.input = playerComponent.input;
           characterComponent.inputPressed = playerComponent.inputPressed;
-
-          // console.log(characterComponent.input);
-          // console.log(characterComponent.inputPressed);
         }
 
         // Character input
@@ -102,10 +85,7 @@ class CharacterSystem extends ExtendedSystem {
           }
 
           // Jump
-          if (
-            characterComponent.input.jump
-            && characterComponent.onFloor
-          ) {
+          if (characterComponent.input.jump && characterComponent.onFloor) {
             velocityComponent.ySpeed = -characterComponent.jumpForce;
 
             // Add gravity component
@@ -115,7 +95,8 @@ class CharacterSystem extends ExtendedSystem {
 
           if (onFloor) {
             if (
-              (!characterComponent.input.right && !characterComponent.input.left)
+              (!characterComponent.input.right
+                && !characterComponent.input.left)
               || (characterComponent.input.right && characterComponent.input.left)
             ) {
               if (velocityComponent.xSpeed > 0) {
@@ -165,8 +146,6 @@ class CharacterSystem extends ExtendedSystem {
           }
         }
 
-        const { onFloor } = characterComponent;
-
         // Fall if no floor under entity
         if (
           mapComponent
@@ -174,10 +153,10 @@ class CharacterSystem extends ExtendedSystem {
           && collisionComponent
           && positionComponent
         ) {
-          const {
-            bottom,
-            left,
-          } = collisionComponent.getCollisionBox(positionComponent.x, positionComponent.y);
+          const { bottom, left } = collisionComponent.getCollisionBox(
+            positionComponent.x,
+            positionComponent.y,
+          );
 
           const { width } = collisionComponent;
 
@@ -202,55 +181,8 @@ class CharacterSystem extends ExtendedSystem {
             entity.removeComponent(COMPONENT_NAMES.Gravity);
           }
         }
-
-        // Sprite update
-        if (spriteComponent
-          && velocityComponent) {
-          switch (characterComponent.state) {
-            default:
-              if (onFloor) {
-                if (Math.abs(velocityComponent.xSpeed) > 0) {
-                  spriteComponent.setAnimation('walk');
-                  spriteComponent.setScale({ x: Math.sign(velocityComponent.xSpeed) });
-                } else {
-                  spriteComponent.setAnimation('idle');
-                }
-              } else {
-                spriteComponent.setAnimation('jump');
-                spriteComponent.setScale({ x: Math.sign(characterComponent.direction) });
-              }
-
-              break;
-          }
-        }
       }
     });
-  }
-
-  addedToWorld(world: World): void {
-    super.addedToWorld(world);
-
-    // Add sprite to stage
-    this.disposeBag
-      .completable$(
-        world.entityAdded$([
-          COMPONENT_NAMES.Character,
-          COMPONENT_NAMES.Sprite,
-        ]),
-      )
-      .subscribe((entity) => {
-        const spriteComponent = entity.getComponent<SpriteComponent>(
-          COMPONENT_NAMES.Sprite,
-        );
-
-        const characterComponent = entity.getComponent<CharacterComponent>(
-          COMPONENT_NAMES.Character,
-        );
-
-        if (spriteComponent && characterComponent) {
-          spriteComponent.setAnimation('idle');
-        }
-      });
   }
 }
 

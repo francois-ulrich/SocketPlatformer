@@ -3,6 +3,7 @@ import * as PIXI from 'pixi.js';
 import { World, Entity } from 'super-ecs';
 import { io } from 'socket.io-client';
 
+// Component
 import PositionComponent from './components/PositionComponent';
 import SpriteComponent from './components/SpriteComponent';
 import VelocityComponent from './components/VelocityComponent';
@@ -11,6 +12,7 @@ import CollisionComponent from './components/CollisionComponent';
 import PlayerComponent from './components/PlayerComponent';
 import CharacterComponent from './components/CharacterComponent';
 
+// System
 import SpriteSystem from './systems/SpriteSystem';
 import PositionSystem from './systems/PositionSystem';
 import VelocitySystem from './systems/VelocitySystem';
@@ -20,12 +22,12 @@ import PlayerSystem from './systems/PlayerSystem';
 import EntitySystem from './systems/CharacterSystem';
 import CollisionSystem from './systems/CollisionSystem';
 
+// Metadata
 import { SpriteMetadata } from './types/spriteMetadata';
+import { MapMetadata } from '../../shared/src/types/mapMetadata';
+import GameRoomMetadata from '../../shared/src/types/gameRoomMetadata';
 
 import spriteData from './assets/sprites/simon/data';
-
-// Test map
-import map from './assets/maps/test';
 
 // Create a Pixi Application
 const app = new PIXI.Application({
@@ -43,7 +45,7 @@ const container = new PIXI.Container();
 app.stage.addChild(container);
 
 // Rescale PIXI stage
-const stageScale = 1;
+const stageScale = 2;
 app.stage.scale.x = stageScale;
 app.stage.scale.y = stageScale;
 
@@ -53,51 +55,29 @@ PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 PIXI.settings.RENDER_OPTIONS.antialias = true; // Enable antialiasing
 
 // Temp: add test entity
-// function createPlayerEntity(): Entity {
-//   const hero: Entity = new Entity();
+function createPlayerEntity(): Entity {
+  const hero: Entity = new Entity();
 
-//   const sprite: SpriteMetadata = spriteData;
+  const sprite: SpriteMetadata = spriteData;
 
-//   hero
-//     .addComponent(new VelocityComponent())
-//     .addComponent(new CollisionComponent({ width: 16, height: 32 }))
-//     .addComponent(new PositionComponent({ x: 32, y: 32 }))
-//     .addComponent(new CharacterComponent())
-//     .addComponent(new SpriteComponent(sprite))
-//     .addComponent(new PlayerComponent());
+  hero
+    .addComponent(new VelocityComponent())
+    .addComponent(new CollisionComponent({ width: 16, height: 32 }))
+    .addComponent(new PositionComponent({ x: 32, y: 32 }))
+    .addComponent(new CharacterComponent())
+    .addComponent(new SpriteComponent(sprite))
+    .addComponent(new PlayerComponent());
 
-//   return hero;
-// }
-
-// Map instanciation
-// Init ECS World
-// const world = new World();
-
-// // Instanciate world
-// world
-//   .addSystem(new CollisionSystem({ app }))
-//   .addSystem(new VelocitySystem({ app }))
-//   .addSystem(new PositionSystem({ app }))
-//   .addSystem(new PlayerSystem({ app }))
-//   .addSystem(new MapSystem({ app }))
-//   .addSystem(new EntitySystem({ app }))
-//   .addSystem(new GravitySystem({ app }))
-//   .addSystem(new SpriteSystem({ app }));
-
-// // Instanciate entities
-// // entities
-// Array.from({ length: 1 }).forEach(() => {
-//   const entity = createPlayerEntity();
-//   world.addEntity(entity);
-// });
-
-// Create map
-// const testMap = new Entity();
-// testMap.addComponent(new MapComponent({ collision: map }));
-// world.addEntity(testMap);
+  return hero;
+}
 
 // // Add systems to world
 // app.ticker.add((deltaTime) => world.update(deltaTime));
+
+// Client initialization
+
+// Init ECS World
+let world: World;
 
 // Socket stuff
 const socket = io('ws://localhost:5000/');
@@ -110,9 +90,39 @@ socket.on('connect', () => {
     console.log(data);
   });
 
-  socket.on('createPlayer', (data) => {
-    console.log("Un joueur a rejoint la partie!");
-    console.log(data);
+  socket.on('player:init', () => {
+    console.log('Init player');
+
+    const newPlayerEntity = createPlayerEntity();
+    world.addEntity(newPlayerEntity);
+  });
+
+  socket.on('gameRoom:init', (data: GameRoomMetadata) => {
+    console.log('Initializing client game room...');
+
+    // Map instanciation
+    world = new World();
+
+    // Instanciate world
+    world
+      .addSystem(new CollisionSystem({ app }))
+      .addSystem(new VelocitySystem({ app }))
+      .addSystem(new PositionSystem({ app }))
+      .addSystem(new PlayerSystem({ app }))
+      .addSystem(new MapSystem({ app }))
+      .addSystem(new EntitySystem({ app }))
+      .addSystem(new GravitySystem({ app }))
+      .addSystem(new SpriteSystem({ app }))
+    ;
+
+    // Initialize map
+    const mapData: MapMetadata = data.map;
+    const mapEntity: Entity = new Entity();
+    mapEntity.addComponent(new MapComponent(mapData));
+    world.addEntity(mapEntity);
+
+    // Start world
+    app.ticker.add((deltaTime) => world.update(deltaTime));
   });
 });
 

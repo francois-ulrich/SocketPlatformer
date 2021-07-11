@@ -1,20 +1,19 @@
 import { Component } from 'super-ecs';
-import COMPONENT_NAMES from './types';
-import MapMetadata from '../types/mapMetadata';
+import COMPONENT_NAMES from '../../../shared/src/components/types';
+import { MapMetadata, MapGridMetadata } from '../../../shared/src/types/mapMetadata';
 
-import { TILE_SIZE } from '../global';
-
-type MapComponentMetadata = {
-  collision: MapMetadata,
-}
+import { TILE_SIZE } from '../../../shared/src/global';
 
 class MapComponent implements Component {
   name = COMPONENT_NAMES.Map;
 
-  public collision: MapMetadata;
+  public collision: MapGridMetadata;
 
-  constructor({ collision }: MapComponentMetadata) {
+  public tiles: MapGridMetadata | undefined;
+
+  constructor({ collision, tiles }: MapMetadata) {
     this.collision = collision;
+    this.tiles = tiles;
   }
 
   getWidth(): number {

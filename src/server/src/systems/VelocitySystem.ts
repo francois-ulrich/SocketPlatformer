@@ -1,14 +1,10 @@
-import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
+import { ExtendedSystem } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
 import VelocityComponent from '../components/VelocityComponent';
 import PositionComponent from '../components/PositionComponent';
 
 class VelocitySystem extends ExtendedSystem {
-  constructor({ app }: ExtendedSystemMetadata) {
-    super({ app });
-  }
-
   update(delta: number): void {
     // Get entities under this system
     const entities = this.world.getEntities([

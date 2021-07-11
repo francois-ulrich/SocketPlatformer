@@ -1,14 +1,10 @@
 import { World } from 'super-ecs';
-import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
+import { ExtendedSystem } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
 import PlayerComponent from '../components/PlayerComponent';
 
 class PlayerSystem extends ExtendedSystem {
-  constructor({ app }: ExtendedSystemMetadata) {
-    super({ app });
-  }
-
   // update(delta: number): void {
   update(): void {
     // Get entities under this system
