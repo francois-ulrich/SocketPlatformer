@@ -27,13 +27,30 @@ class PlayerSystem extends ExtendedSystem {
         COMPONENT_NAMES.Player,
       );
 
-      // TODO: Voir ce qu'on peut mettre dans le CharacterSystem
       // Player movement
       if (playerComponent) {
-        // Reset all input pressed values
-        Object.keys(playerComponent.inputPressed).forEach((keyCode) => {
-          playerComponent.inputPressed[keyCode] = false;
-        });
+        const { socket } = playerComponent;
+
+        if (socket) {
+          // console.log("hey");
+          // Reset all input pressed values
+          Object.keys(playerComponent.input).forEach((keyCode) => {
+            // playerComponent.inputPressed[keyCode] = false;
+
+            var keyDown: boolean = (playerComponent.input[keyCode] === true);
+
+            if (playerComponent.inputPrev[keyCode] !== playerComponent.input[keyCode]) {
+              const type: string = keyDown ? "down" : "up";
+
+              socket.emit(`input:${type}:${keyCode}`);
+
+              console.log(`input:${type}:${keyCode}`);
+            }
+          });
+        }
+
+        // Set object of previous inputs
+        playerComponent.inputPrev = { ...playerComponent.input };
       }
     });
   }

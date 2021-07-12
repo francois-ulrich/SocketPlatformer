@@ -1,7 +1,7 @@
 import './style.css';
 import * as PIXI from 'pixi.js';
 import { World, Entity } from 'super-ecs';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 // Component
 import PositionComponent from './components/PositionComponent';
@@ -45,7 +45,7 @@ const container = new PIXI.Container();
 app.stage.addChild(container);
 
 // Rescale PIXI stage
-const stageScale = 2;
+const stageScale = 1;
 app.stage.scale.x = stageScale;
 app.stage.scale.y = stageScale;
 
@@ -56,19 +56,18 @@ PIXI.settings.RENDER_OPTIONS.antialias = true; // Enable antialiasing
 
 // Temp: add test entity
 function createPlayerEntity(): Entity {
-  const hero: Entity = new Entity();
+  const playerEntity: Entity = new Entity();
 
   const sprite: SpriteMetadata = spriteData;
 
-  hero
+  playerEntity
     .addComponent(new VelocityComponent())
     .addComponent(new CollisionComponent({ width: 16, height: 32 }))
     .addComponent(new PositionComponent({ x: 32, y: 32 }))
     .addComponent(new CharacterComponent())
-    .addComponent(new SpriteComponent(sprite))
-    .addComponent(new PlayerComponent());
+    .addComponent(new SpriteComponent(sprite));
 
-  return hero;
+  return playerEntity;
 }
 
 // // Add systems to world
@@ -82,18 +81,24 @@ let world: World;
 // Socket stuff
 const socket = io('ws://localhost:5000/');
 
+console.log(socket);
+
 socket.on('connect', () => {
   // Make player automatically join the test room
   socket.emit('join', 'test');
 
-  socket.on('hello', (data) => {
-    console.log(data);
+  socket.on('player:join', () => {
+    console.log('Init player');
+
+    const newPlayerEntity = createPlayerEntity();
+    world.addEntity(newPlayerEntity);
   });
 
   socket.on('player:init', () => {
     console.log('Init player');
 
     const newPlayerEntity = createPlayerEntity();
+    newPlayerEntity.addComponent(new PlayerComponent(socket));
     world.addEntity(newPlayerEntity);
   });
 
@@ -108,15 +113,16 @@ socket.on('connect', () => {
       .addSystem(new CollisionSystem({ app }))
       .addSystem(new VelocitySystem({ app }))
       .addSystem(new PositionSystem({ app }))
-      .addSystem(new PlayerSystem({ app }))
       .addSystem(new MapSystem({ app }))
       .addSystem(new EntitySystem({ app }))
       .addSystem(new GravitySystem({ app }))
       .addSystem(new SpriteSystem({ app }))
-    ;
+      .addSystem(new PlayerSystem({ app }))
+      ;
 
     // Initialize map
     const mapData: MapMetadata = data.map;
+
     const mapEntity: Entity = new Entity();
     mapEntity.addComponent(new MapComponent(mapData));
     world.addEntity(mapEntity);
@@ -125,5 +131,3 @@ socket.on('connect', () => {
     app.ticker.add((deltaTime) => world.update(deltaTime));
   });
 });
-
-// Test ECS

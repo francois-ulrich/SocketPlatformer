@@ -21,7 +21,7 @@ import VelocitySystem from './systems/VelocitySystem';
 import GravitySystem from './systems/GravitySystem';
 import MapSystem from './systems/MapSystem';
 import PlayerSystem from './systems/PlayerSystem';
-import EntitySystem from './systems/CharacterSystem';
+import CharacterSystem from './systems/CharacterSystem';
 import CollisionSystem from './systems/CollisionSystem';
 
 // Test map
@@ -63,6 +63,9 @@ io.on('connection', (socket: Socket) => {
   // Whenever someone disconnects this piece of code executed
   socket.on('disconnect', () => {
     console.log('A user disconnected!');
+
+    // Tell the client to create a player instance
+    socket.broadcast.emit('createPlayer');
   });
 });
 
@@ -89,7 +92,7 @@ io.of('/').adapter.on('create-room', (room: string) => {
     .addSystem(new VelocitySystem())
     .addSystem(new PlayerSystem())
     .addSystem(new MapSystem())
-    .addSystem(new EntitySystem())
+    .addSystem(new CharacterSystem())
     .addSystem(new GravitySystem());
 
   // Create linked game room
@@ -129,7 +132,7 @@ io.of('/').adapter.on('join-room', (room, socketId) => {
   }
 
   console.log(`Socket ${socketId} has joined room "${room}"`);
-  console.log(`Room "${room}" has now ${gameRoom.clientsNumber} players`);
+  console.log(`Room "${room}" now has ${gameRoom.clientsNumber} players`);
 
   // Client side game init
   socket.emit('gameRoom:init', {
@@ -140,8 +143,12 @@ io.of('/').adapter.on('join-room', (room, socketId) => {
   createPlayerEntity();
 
   // Client side player init
-  socket.emit('hello');
+
+  // Create player for socket
   socket.emit('player:init');
+
+  // Create new player for everyone else
+  socket.broadcast.emit('player:join');
 });
 
 // Room leave
@@ -156,6 +163,7 @@ io.of('/').adapter.on('leave-room', (room, socketId) => {
 
   gameRoom.clientsNumber -= 1;
   console.log(`Socket ${socketId} has left room ${room}`);
+  console.log(`Room "${room}" has now ${gameRoom.clientsNumber} players`);
 });
 
 const port = process.env.PORT || 5000;

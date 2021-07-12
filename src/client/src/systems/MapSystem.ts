@@ -25,8 +25,6 @@ class MapSystem extends ExtendedSystem {
         ]),
       )
       .subscribe((entity) => {
-        console.log("map added to world");
-
         const mapComponent = entity.getComponent<MapComponent>(
           COMPONENT_NAMES.Map,
         );
