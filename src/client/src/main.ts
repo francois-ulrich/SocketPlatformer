@@ -21,6 +21,7 @@ import MapSystem from './systems/MapSystem';
 import PlayerSystem from './systems/PlayerSystem';
 import EntitySystem from './systems/CharacterSystem';
 import CollisionSystem from './systems/CollisionSystem';
+// import CharUpdateSystem from './systems/CharUpdateSystem';
 
 // Metadata
 import { SpriteMetadata } from './types/spriteMetadata';
@@ -70,9 +71,7 @@ function createPlayerEntity(): Entity {
   return playerEntity;
 }
 
-// // Add systems to world
-// app.ticker.add((deltaTime) => world.update(deltaTime));
-
+// Add systems to world
 // Client initialization
 
 // Init ECS World
@@ -80,8 +79,6 @@ let world: World;
 
 // Socket stuff
 const socket = io('ws://localhost:5000/');
-
-console.log(socket);
 
 socket.on('connect', () => {
   // Make player automatically join the test room
@@ -94,7 +91,9 @@ socket.on('connect', () => {
     world.addEntity(newPlayerEntity);
   });
 
-  socket.on('player:init', () => {
+  socket.on('player:init', (data) => {
+    console.log(data);
+
     console.log('Init player');
 
     const newPlayerEntity = createPlayerEntity();
@@ -110,6 +109,7 @@ socket.on('connect', () => {
 
     // Instanciate world
     world
+      // .addSystem(new CharUpdateSystem())
       .addSystem(new CollisionSystem({ app }))
       .addSystem(new VelocitySystem({ app }))
       .addSystem(new PositionSystem({ app }))
@@ -130,4 +130,8 @@ socket.on('connect', () => {
     // Start world
     app.ticker.add((deltaTime) => world.update(deltaTime));
   });
+
+  socket.on("characterUpdate", data => {
+    console.log(data);
+  })
 });

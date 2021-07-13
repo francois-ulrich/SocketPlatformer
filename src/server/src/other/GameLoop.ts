@@ -7,11 +7,15 @@ class GameLoop {
 
     tickLengthMs: number = 1000 / TICK_RATE;
 
-    updateFn: Function;
+    updateFn: Function | undefined;
 
-    constructor(updateFn: Function) {
+    constructor(updateFn?: Function) {
         this.updateFn = updateFn;
         this.previous = this.hrtimeMs();
+    }
+
+    setUpdateFunction(updateFn: Function): void {
+        this.updateFn = updateFn;
     }
 
     hrtimeMs(): number {
@@ -20,15 +24,17 @@ class GameLoop {
     }
 
     loop(): void {
-        setTimeout(() => { this.loop() }, this.tickLengthMs);
+        if (this.updateFn !== undefined) {
+            setTimeout(() => { this.loop() }, this.tickLengthMs);
 
-        const now: number = this.hrtimeMs();
-        const delta: number = (now - this.previous) / 1000;
+            const now: number = this.hrtimeMs();
+            const delta: number = (now - this.previous) / 1000;
 
-        this.updateFn(delta, this.tick);
+            this.updateFn(delta, this.tick);
 
-        this.previous = now
-        this.tick++
+            this.previous = now
+            this.tick++
+        }
     }
 }
 

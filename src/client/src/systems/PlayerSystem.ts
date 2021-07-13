@@ -37,14 +37,12 @@ class PlayerSystem extends ExtendedSystem {
           Object.keys(playerComponent.input).forEach((keyCode) => {
             // playerComponent.inputPressed[keyCode] = false;
 
-            var keyDown: boolean = (playerComponent.input[keyCode] === true);
+            const keyDown: boolean = (playerComponent.input[keyCode] === true);
 
             if (playerComponent.inputPrev[keyCode] !== playerComponent.input[keyCode]) {
-              const type: string = keyDown ? "down" : "up";
+              const type: string = keyDown ? "Down" : "Up";
 
-              socket.emit(`input:${type}:${keyCode}`);
-
-              console.log(`input:${type}:${keyCode}`);
+              socket.emit(`input${type}`, keyCode);
             }
           });
         }
@@ -58,7 +56,6 @@ class PlayerSystem extends ExtendedSystem {
   addedToWorld(world: World): void {
     super.addedToWorld(world);
 
-    // Add sprite to stage
     this.disposeBag
       .completable$(
         world.entityAdded$([

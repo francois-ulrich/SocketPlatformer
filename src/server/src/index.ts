@@ -3,7 +3,7 @@ import { Server, Socket } from 'socket.io';
 import { Entity } from 'super-ecs';
 
 // Other
-import GameRoom from '../../shared/src/other/GameRoom';
+import GameRoom from './other/GameRoom';
 // import GameLoop from './other/GameLoop';
 
 // ECS Stuff
@@ -27,15 +27,31 @@ import CollisionSystem from './systems/CollisionSystem';
 // Test map
 import map from './assets/maps/test';
 
-function createPlayerEntity(): Entity {
+import { CLIENT_FPS, TICK_RATE } from './global';
+
+const randomString = (len: number, an?: string) => {
+  an = an && an.toLowerCase();
+  var str = "",
+    i = 0,
+    min = an == "a" ? 10 : 0,
+    max = an == "n" ? 10 : 62;
+  for (; i++ < len;) {
+    var r = Math.random() * (max - min) + min << 0;
+    str += String.fromCharCode(r += r > 9 ? r < 36 ? 55 : 61 : 48);
+  }
+  return str;
+}
+
+function createPlayerEntity(socket: Socket): Entity {
   const hero: Entity = new Entity();
 
   hero
     .addComponent(new VelocityComponent())
     .addComponent(new CollisionComponent({ width: 16, height: 32 }))
     .addComponent(new PositionComponent({ x: 32, y: 32 }))
-    .addComponent(new CharacterComponent())
-    .addComponent(new PlayerComponent());
+    .addComponent(new CharacterComponent(io))
+    .addComponent(new PlayerComponent(socket));
+  ;
 
   return hero;
 }
@@ -95,6 +111,16 @@ io.of('/').adapter.on('create-room', (room: string) => {
     .addSystem(new CharacterSystem())
     .addSystem(new GravitySystem());
 
+  // Start game room gameloop
+  gameRoom.gameLoop.setUpdateFunction((delta: number) => {
+    // Convert gameloop delta time to super ecs delta time value
+    const ECSDeltaTime = 1 * (delta / (1 / TICK_RATE)) * (CLIENT_FPS / TICK_RATE);
+
+    gameRoom.world.update(ECSDeltaTime);
+  });
+
+  gameRoom.gameLoop.loop();
+
   // Create linked game room
   gameRooms.set(room, gameRoom);
 });
@@ -122,8 +148,6 @@ io.of('/').adapter.on('join-room', (room, socketId) => {
     return;
   }
 
-  gameRoom.clientsNumber += 1;
-
   // Get linked socket
   const socket: Socket | undefined = io.sockets.sockets.get(socketId);
 
@@ -140,15 +164,21 @@ io.of('/').adapter.on('join-room', (room, socketId) => {
   });
 
   // Create server-side player ECS entity
-  createPlayerEntity();
+  const player = createPlayerEntity(socket);
+  gameRoom.world.addEntity(player);
 
-  // Client side player init
+  // Add client to gameroom client list
+  gameRoom.clients[randomString(30)] = {
+    entity: player
+  };
 
   // Create player for socket
-  socket.emit('player:init');
+  socket.emit('player:init', {
+    players: Object.keys(gameRoom.clients)
+  });
 
   // Create new player for everyone else
-  socket.broadcast.emit('player:join');
+  // socket.broadcast.emit('player:join');
 });
 
 // Room leave
@@ -171,6 +201,6 @@ httpServer.listen(port);
 
 // Test gameloop
 // const gameLoop = new GameLoop((delta: number, tick: number) => {
-// console.log(delta, tick);
+//   console.log(delta, tick);
 // });
 // gameLoop.loop();

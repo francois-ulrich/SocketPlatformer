@@ -1,3 +1,11 @@
-type MapMetadata = Array<Array<number>>;
+type MapGridMetadata = Array<Array<number>>;
 
-export default MapMetadata;
+type MapMetadata = {
+    collision: MapGridMetadata,
+    tiles: MapGridMetadata | undefined
+}
+
+export {
+    MapGridMetadata,
+    MapMetadata
+};

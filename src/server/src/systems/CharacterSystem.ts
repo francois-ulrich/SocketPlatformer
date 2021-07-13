@@ -182,6 +182,20 @@ class CharacterSystem extends ExtendedSystem {
           }
         }
       }
+
+      // Socket emit character data
+      if (characterComponent
+        && playerComponent) {
+        const { socket } = playerComponent;
+        const { server } = characterComponent;
+
+        console.log("emit characterUpdate");
+        server.emit("characterUpdate", {
+          socketId: socket.id,
+          test: "test",
+        });
+      }
+
     });
   }
 }

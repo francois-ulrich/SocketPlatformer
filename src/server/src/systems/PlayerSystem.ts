@@ -23,13 +23,8 @@ class PlayerSystem extends ExtendedSystem {
         COMPONENT_NAMES.Player,
       );
 
-      // TODO: Voir ce qu'on peut mettre dans le CharacterSystem
-      // Player movement
       if (playerComponent) {
-        // Reset all input pressed values
-        Object.keys(playerComponent.inputPressed).forEach((keyCode) => {
-          playerComponent.inputPressed[keyCode] = false;
-        });
+
       }
     });
   }
@@ -49,52 +44,35 @@ class PlayerSystem extends ExtendedSystem {
           COMPONENT_NAMES.Player,
         );
 
-        const usedKeys = ['ArrowUp', 'ArrowDown', 'ArrowRight', 'ArrowLeft', 'Space'];
-
         if (playerComponent) {
-          // Event listener for key press
-          document.addEventListener('keydown', (e: KeyboardEvent) => {
-            // Prevent default browser behavior for key press
-            if (usedKeys.includes(e.code)) {
-              // Prevent default browser behavior for key press
-              e.preventDefault();
-            }
+          const { socket } = playerComponent;
 
-            switch (e.code) {
+          socket.on("inputDown", (keyCode) => {
+            switch (keyCode) {
               case 'ArrowRight':
                 playerComponent.input.right = true;
-                playerComponent.inputPressed.right = playerComponent.input.right;
                 break;
               case 'ArrowLeft':
                 playerComponent.input.left = true;
-                playerComponent.inputPressed.left = playerComponent.input.left;
                 break;
               case 'Space':
                 playerComponent.input.jump = true;
-                playerComponent.inputPressed.jump = playerComponent.input.jump;
                 break;
               default:
                 break;
             }
           });
 
-          // Event listener for key press
-          document.addEventListener('keyup', (e: KeyboardEvent) => {
-            // Prevent default browser behavior for key press
-            if (usedKeys.includes(e.code)) {
-              // Prevent default browser behavior for key press
-              e.preventDefault();
-            }
-
-            if (playerComponent.input.right && e.code === 'ArrowRight') {
+          socket.on("inputUp", (keyCode) => {
+            if (playerComponent.input.right && keyCode === 'ArrowRight') {
               playerComponent.input.right = false;
             }
 
-            if (playerComponent.input.left && e.code === 'ArrowLeft') {
+            if (playerComponent.input.left && keyCode === 'ArrowLeft') {
               playerComponent.input.left = false;
             }
 
-            if (playerComponent.input.jump && e.code === 'Space') {
+            if (playerComponent.input.jump && keyCode === 'Space') {
               playerComponent.input.jump = false;
             }
           });

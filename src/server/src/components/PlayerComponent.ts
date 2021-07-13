@@ -2,6 +2,8 @@ import { Component } from 'super-ecs';
 
 import COMPONENT_NAMES from './types';
 
+import { Socket } from "socket.io";
+
 type InputMap = {
   [key: string]: boolean
 }
@@ -13,7 +15,9 @@ class PlayerComponent implements Component {
 
   public inputPressed: InputMap;
 
-  constructor() {
+  public socket: Socket;
+
+  constructor(socket: Socket) {
     this.input = {
       left: false,
       right: false,
@@ -23,6 +27,10 @@ class PlayerComponent implements Component {
     };
 
     this.inputPressed = { ...this.input };
+
+    this.socket = socket;
+
+    console.log(`User socket: ${socket.id}`);
   }
 }
 
