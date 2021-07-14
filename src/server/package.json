@@ -13,6 +13,8 @@
 	"author": "François Ulrich",
 	"license": "ISC",
 	"dependencies": {
+		"@types/randomstring": "^1.1.7",
+		"randomstring": "^1.2.1",
 		"socket.io": "^4.1.2",
 		"super-ecs": "^1.4.0"
 	},

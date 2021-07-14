@@ -29,18 +29,7 @@ import map from './assets/maps/test';
 
 import { CLIENT_FPS, TICK_RATE } from './global';
 
-const randomString = (len: number, an?: string) => {
-  an = an && an.toLowerCase();
-  var str = "",
-    i = 0,
-    min = an == "a" ? 10 : 0,
-    max = an == "n" ? 10 : 62;
-  for (; i++ < len;) {
-    var r = Math.random() * (max - min) + min << 0;
-    str += String.fromCharCode(r += r > 9 ? r < 36 ? 55 : 61 : 48);
-  }
-  return str;
-}
+const randomstring = require('randomstring');
 
 function createPlayerEntity(socket: Socket): Entity {
   const hero: Entity = new Entity();
@@ -51,7 +40,6 @@ function createPlayerEntity(socket: Socket): Entity {
     .addComponent(new PositionComponent({ x: 32, y: 32 }))
     .addComponent(new CharacterComponent(io))
     .addComponent(new PlayerComponent(socket));
-  ;
 
   return hero;
 }
@@ -168,13 +156,15 @@ io.of('/').adapter.on('join-room', (room, socketId) => {
   gameRoom.world.addEntity(player);
 
   // Add client to gameroom client list
-  gameRoom.clients[randomString(30)] = {
-    entity: player
+  const clientId = randomstring.generate();
+  gameRoom.clients[clientId] = {
+    entity: player,
   };
 
   // Create player for socket
   socket.emit('player:init', {
-    players: Object.keys(gameRoom.clients)
+    clientId,
+    players: Object.keys(gameRoom.clients),
   });
 
   // Create new player for everyone else
