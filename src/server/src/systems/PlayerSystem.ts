@@ -24,7 +24,8 @@ class PlayerSystem extends ExtendedSystem {
       );
 
       if (playerComponent) {
-
+        // console.log(playerComponent.socket.id);
+        // console.log(playerComponent.input);
       }
     });
   }
@@ -47,34 +48,12 @@ class PlayerSystem extends ExtendedSystem {
         if (playerComponent) {
           const { socket } = playerComponent;
 
-          socket.on("inputDown", (keyCode) => {
-            switch (keyCode) {
-              case 'ArrowRight':
-                playerComponent.input.right = true;
-                break;
-              case 'ArrowLeft':
-                playerComponent.input.left = true;
-                break;
-              case 'Space':
-                playerComponent.input.jump = true;
-                break;
-              default:
-                break;
-            }
+          socket.on('inputDown', (key:string) => {
+            playerComponent.input[key] = true;
           });
 
-          socket.on("inputUp", (keyCode) => {
-            if (playerComponent.input.right && keyCode === 'ArrowRight') {
-              playerComponent.input.right = false;
-            }
-
-            if (playerComponent.input.left && keyCode === 'ArrowLeft') {
-              playerComponent.input.left = false;
-            }
-
-            if (playerComponent.input.jump && keyCode === 'Space') {
-              playerComponent.input.jump = false;
-            }
+          socket.on('inputUp', (key:string) => {
+            playerComponent.input[key] = false;
           });
         }
       });

@@ -17,7 +17,9 @@ class PlayerComponent implements Component {
 
   public socket?: Socket;
 
-  constructor(clientId:string, socket?: Socket) {
+  public clientId: string;
+
+  constructor(clientId: string, socket?: Socket) {
     this.input = {
       left: false,
       right: false,
@@ -31,6 +33,8 @@ class PlayerComponent implements Component {
     this.inputPrev = { ...this.input };
 
     this.socket = socket;
+
+    this.clientId = clientId;
   }
 }
 

@@ -32,17 +32,16 @@ class PlayerSystem extends ExtendedSystem {
         const { socket } = playerComponent;
 
         if (socket) {
-          // console.log("hey");
           // Reset all input pressed values
-          Object.keys(playerComponent.input).forEach((keyCode) => {
-            // playerComponent.inputPressed[keyCode] = false;
+          Object.keys(playerComponent.input).forEach((key) => {
+            // playerComponent.inputPressed[key] = false;
 
-            const keyDown: boolean = (playerComponent.input[keyCode] === true);
+            const keyDown: boolean = (playerComponent.input[key] === true);
 
-            if (playerComponent.inputPrev[keyCode] !== playerComponent.input[keyCode]) {
+            if (playerComponent.inputPrev[key] !== playerComponent.input[key]) {
               const type: string = keyDown ? "Down" : "Up";
 
-              socket.emit(`input${type}`, keyCode);
+              socket.emit(`input${type}`, key);
             }
           });
         }

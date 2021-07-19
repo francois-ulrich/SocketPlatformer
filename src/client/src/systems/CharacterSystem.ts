@@ -239,16 +239,25 @@ class CharacterSystem extends ExtendedSystem {
         ]),
       )
       .subscribe((entity) => {
-        const spriteComponent = entity.getComponent<SpriteComponent>(
-          COMPONENT_NAMES.Sprite,
+        const playerComponent = entity.getComponent<PlayerComponent>(
+          COMPONENT_NAMES.Player,
         );
 
         const characterComponent = entity.getComponent<CharacterComponent>(
           COMPONENT_NAMES.Character,
         );
 
-        if (spriteComponent && characterComponent) {
-          spriteComponent.setAnimation('idle');
+        if (characterComponent) {
+          // Listen to socket events
+          if (playerComponent) {
+            const { socket, clientId } = playerComponent;
+
+            if (socket) {
+              socket.on(`characterUpdate:${clientId}`, (data) => {
+                console.log(data);
+              });
+            }
+          }
         }
       });
   }

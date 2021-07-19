@@ -17,7 +17,9 @@ class PlayerComponent implements Component {
 
   public socket: Socket;
 
-  constructor(socket: Socket) {
+  public clientId: string;
+
+  constructor(socket: Socket, clientId: string) {
     this.input = {
       left: false,
       right: false,
@@ -30,7 +32,9 @@ class PlayerComponent implements Component {
 
     this.socket = socket;
 
-    console.log(`User socket: ${socket.id}`);
+    this.clientId = clientId;
+
+    console.log(`User socket: ${this.socket.id}`);
   }
 }
 

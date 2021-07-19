@@ -23,6 +23,7 @@ class CharacterSystem extends ExtendedSystem {
 
     // Loop through all entities
     entities.forEach((entity) => {
+
       const characterComponent = entity.getComponent<CharacterComponent>(
         COMPONENT_NAMES.Character,
       );
@@ -185,19 +186,62 @@ class CharacterSystem extends ExtendedSystem {
 
       // Socket emit character data
       if (characterComponent
-        && playerComponent) {
-        const { socket } = playerComponent;
+        && playerComponent
+        && velocityComponent
+        && positionComponent) {
+        // const { socket, clientId } = playerComponent;
+        const { clientId } = playerComponent;
         const { server } = characterComponent;
 
-        console.log("emit characterUpdate");
-        server.emit("characterUpdate", {
-          socketId: socket.id,
-          test: "test",
+        const { x, y } = positionComponent;
+        const { xSpeed, ySpeed } = velocityComponent;
+
+        server.emit(`characterUpdate:${clientId}`, {
+          // socketId: socket.id,
+          // test: "test",
+          x,
+          y,
+          xSpeed,
+          ySpeed
         });
       }
-
     });
   }
+
+  // addedToWorld(world: World): void {
+  //   super.addedToWorld(world);
+
+  //   // Add sprite to stage
+  //   this.disposeBag
+  //     .completable$(
+  //       world.entityAdded$([
+  //         COMPONENT_NAMES.Character,
+  //         COMPONENT_NAMES.Sprite,
+  //       ]),
+  //     )
+  //     .subscribe((entity) => {
+  //       const playerComponent = entity.getComponent<PlayerComponent>(
+  //         COMPONENT_NAMES.Player,
+  //       );
+
+  //       const characterComponent = entity.getComponent<CharacterComponent>(
+  //         COMPONENT_NAMES.Character,
+  //       );
+
+  //       if (characterComponent) {
+  //         // Listen to socket events
+  //         if (playerComponent) {
+  //           const { socket, clientId } = playerComponent;
+
+  //           if (socket) {
+  //             socket.on(`characterUpdate:${clientId}`, (data) => {
+  //               console.log(data);
+  //             });
+  //           }
+  //         }
+  //       }
+  //     });
+  // }
 }
 
 export default CharacterSystem;

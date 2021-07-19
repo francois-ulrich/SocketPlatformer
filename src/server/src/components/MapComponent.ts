@@ -1,11 +1,11 @@
 import { Component } from 'super-ecs';
-import COMPONENT_NAMES from '../../../shared/src/components/types';
+import COMPONENT_NAMES from './types';
 import { MapMetadata, MapGridMetadata } from '../../../shared/src/types/mapMetadata';
 
 import { TILE_SIZE } from '../../../shared/src/global';
 
 class MapComponent implements Component {
-  name = COMPONENT_NAMES.Map;
+  public name: symbol = COMPONENT_NAMES.Map;
 
   public collision: MapGridMetadata;
 

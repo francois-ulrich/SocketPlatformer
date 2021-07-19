@@ -46,7 +46,7 @@ const container = new PIXI.Container();
 app.stage.addChild(container);
 
 // Rescale PIXI stage
-const stageScale = 3;
+const stageScale: number = 1;
 app.stage.scale.x = stageScale;
 app.stage.scale.y = stageScale;
 
@@ -92,8 +92,6 @@ socket.on('connect', () => {
   });
 
   socket.on('player:init', (data) => {
-    console.log(data);
-
     console.log('Init player');
 
     const { clientId } = data;
@@ -120,7 +118,7 @@ socket.on('connect', () => {
       .addSystem(new GravitySystem({ app }))
       .addSystem(new SpriteSystem({ app }))
       .addSystem(new PlayerSystem({ app }))
-    ;
+      ;
 
     // Initialize map
     const mapData: MapMetadata = data.map;

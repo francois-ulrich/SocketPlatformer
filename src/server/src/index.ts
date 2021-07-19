@@ -4,7 +4,6 @@ import { Entity } from 'super-ecs';
 
 // Other
 import GameRoom from './other/GameRoom';
-// import GameLoop from './other/GameLoop';
 
 // ECS Stuff
 
@@ -15,11 +14,11 @@ import MapComponent from './components/MapComponent';
 import CollisionComponent from './components/CollisionComponent';
 import PlayerComponent from './components/PlayerComponent';
 import CharacterComponent from './components/CharacterComponent';
+import GravityComponent from './components/GravityComponent';
 
 // System
 import VelocitySystem from './systems/VelocitySystem';
 import GravitySystem from './systems/GravitySystem';
-import MapSystem from './systems/MapSystem';
 import PlayerSystem from './systems/PlayerSystem';
 import CharacterSystem from './systems/CharacterSystem';
 import CollisionSystem from './systems/CollisionSystem';
@@ -31,15 +30,16 @@ import { CLIENT_FPS, TICK_RATE } from './global';
 
 const randomstring = require('randomstring');
 
-function createPlayerEntity(socket: Socket): Entity {
+function createPlayerEntity(socket: Socket, clientId: string): Entity {
   const hero: Entity = new Entity();
 
   hero
     .addComponent(new VelocityComponent())
+    .addComponent(new GravityComponent())
     .addComponent(new CollisionComponent({ width: 16, height: 32 }))
     .addComponent(new PositionComponent({ x: 32, y: 32 }))
     .addComponent(new CharacterComponent(io))
-    .addComponent(new PlayerComponent(socket));
+    .addComponent(new PlayerComponent(socket, clientId));
 
   return hero;
 }
@@ -75,42 +75,43 @@ io.on('connection', (socket: Socket) => {
 
 // On room creation, a few things need to be done
 io.of('/').adapter.on('create-room', (room: string) => {
-  console.log(`Room "${room}" has been created`);
+  console.log(`Create room: "${room}"`);
 
   // Create new game room
-  const gameRoom = new GameRoom({
+  let gameRoom = new GameRoom({
     map,
   });
 
-  // Add system to game room's world
-  gameRoom.world
-    .addSystem(new MapSystem());
+  // Create linked game room
+  gameRooms.set(room, gameRoom);
 
-  // Create map map
-  const mapEntity = new Entity();
+  gameRoom.world
+    .addSystem(new VelocitySystem())
+    .addSystem(new GravitySystem())
+    .addSystem(new CollisionSystem())
+    .addSystem(new PlayerSystem())
+    .addSystem(new CharacterSystem())
+    ;
+
+  // Add system to game room's world
+  let mapEntity = new Entity();
   mapEntity.addComponent(new MapComponent(map));
   gameRoom.world.addEntity(mapEntity);
-
-  gameRoom.world
-    .addSystem(new CollisionSystem())
-    .addSystem(new VelocitySystem())
-    .addSystem(new PlayerSystem())
-    .addSystem(new MapSystem())
-    .addSystem(new CharacterSystem())
-    .addSystem(new GravitySystem());
 
   // Start game room gameloop
   gameRoom.gameLoop.setUpdateFunction((delta: number) => {
     // Convert gameloop delta time to super ecs delta time value
-    const ECSDeltaTime = 1 * (delta / (1 / TICK_RATE)) * (CLIENT_FPS / TICK_RATE);
+    const ecsDeltaTime = 1 * (delta / (1 / TICK_RATE)) * (CLIENT_FPS / TICK_RATE);
 
-    gameRoom.world.update(ECSDeltaTime);
+    gameRoom.world.update(ecsDeltaTime);
   });
 
+  // Launch loop
   gameRoom.gameLoop.loop();
 
-  // Create linked game room
   gameRooms.set(room, gameRoom);
+
+  console.log(`Room "${room}" has been created`);
 });
 
 // ROOM DELETION
@@ -123,7 +124,7 @@ io.of('/').adapter.on('delete-room', (room: string) => {
 
 // ROOM JOIN
 io.of('/').adapter.on('join-room', (room, socketId) => {
-  // If the room is the socket's own default room
+  // If the room is the socket's own default room, don't do anything
   if (room === socketId) {
     return;
   }
@@ -143,20 +144,18 @@ io.of('/').adapter.on('join-room', (room, socketId) => {
     return;
   }
 
-  console.log(`Socket ${socketId} has joined room "${room}"`);
-  console.log(`Room "${room}" now has ${gameRoom.clientsNumber} players`);
-
   // Client side game init
   socket.emit('gameRoom:init', {
     map: gameRoom.map,
   });
 
-  // Create server-side player ECS entity
-  const player = createPlayerEntity(socket);
-  gameRoom.world.addEntity(player);
-
   // Add client to gameroom client list
   const clientId = randomstring.generate();
+
+  // Create server-side player ECS entity
+  const player = createPlayerEntity(socket, clientId);
+  gameRoom.world.addEntity(player);
+
   gameRoom.clients[clientId] = {
     entity: player,
   };
