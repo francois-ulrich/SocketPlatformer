@@ -39,7 +39,7 @@ class PlayerSystem extends ExtendedSystem {
             const keyDown: boolean = (playerComponent.input[key] === true);
 
             if (playerComponent.inputPrev[key] !== playerComponent.input[key]) {
-              const type: string = keyDown ? "Down" : "Up";
+              const type: string = keyDown ? 'Down' : 'Up';
 
               socket.emit(`input${type}`, key);
             }
@@ -48,6 +48,8 @@ class PlayerSystem extends ExtendedSystem {
 
         // Set object of previous inputs
         playerComponent.inputPrev = { ...playerComponent.input };
+
+        // SocketIO stuff
       }
     });
   }

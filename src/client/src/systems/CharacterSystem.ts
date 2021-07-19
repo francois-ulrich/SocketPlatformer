@@ -247,6 +247,14 @@ class CharacterSystem extends ExtendedSystem {
           COMPONENT_NAMES.Character,
         );
 
+        const positionComponent = entity.getComponent<PositionComponent>(
+          COMPONENT_NAMES.Position,
+        );
+
+        const velocityComponent = entity.getComponent<VelocityComponent>(
+          COMPONENT_NAMES.Velocity,
+        );
+
         if (characterComponent) {
           // Listen to socket events
           if (playerComponent) {
@@ -254,7 +262,21 @@ class CharacterSystem extends ExtendedSystem {
 
             if (socket) {
               socket.on(`characterUpdate:${clientId}`, (data) => {
+                const {
+                  x, y, xSpeed, ySpeed,
+                } = data;
+
                 console.log(data);
+
+                if (positionComponent) {
+                  positionComponent.x = x;
+                  positionComponent.y = y;
+                }
+
+                if (velocityComponent) {
+                  velocityComponent.xSpeed = xSpeed;
+                  velocityComponent.ySpeed = ySpeed;
+                }
               });
             }
           }

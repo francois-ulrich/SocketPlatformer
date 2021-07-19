@@ -78,7 +78,7 @@ io.of('/').adapter.on('create-room', (room: string) => {
   console.log(`Create room: "${room}"`);
 
   // Create new game room
-  let gameRoom = new GameRoom({
+  const gameRoom = new GameRoom({
     map,
   });
 
@@ -91,10 +91,10 @@ io.of('/').adapter.on('create-room', (room: string) => {
     .addSystem(new CollisionSystem())
     .addSystem(new PlayerSystem())
     .addSystem(new CharacterSystem())
-    ;
+  ;
 
   // Add system to game room's world
-  let mapEntity = new Entity();
+  const mapEntity = new Entity();
   mapEntity.addComponent(new MapComponent(map));
   gameRoom.world.addEntity(mapEntity);
 
@@ -187,9 +187,3 @@ io.of('/').adapter.on('leave-room', (room, socketId) => {
 
 const port = process.env.PORT || 5000;
 httpServer.listen(port);
-
-// Test gameloop
-// const gameLoop = new GameLoop((delta: number, tick: number) => {
-//   console.log(delta, tick);
-// });
-// gameLoop.loop();

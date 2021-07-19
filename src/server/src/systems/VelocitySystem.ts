@@ -29,8 +29,11 @@ class VelocitySystem extends ExtendedSystem {
 
       if (positionComponent
         && velocityComponent) {
-        positionComponent.moveX(velocityComponent.xSpeed * delta);
-        positionComponent.moveY(velocityComponent.ySpeed * delta);
+        // positionComponent.moveX(velocityComponent.xSpeed * delta);
+        // positionComponent.moveY(velocityComponent.ySpeed * delta);
+
+        positionComponent.x += (velocityComponent.xSpeed * delta);
+        positionComponent.y += (velocityComponent.ySpeed * delta);
       }
     });
   }

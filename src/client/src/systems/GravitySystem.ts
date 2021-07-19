@@ -9,7 +9,7 @@ class GravitySystem extends ExtendedSystem {
     super({ app });
   }
 
-  update(): void {
+  update(delta: number): void {
     // Get entities under this system
     const entities = this.world.getEntities([
       COMPONENT_NAMES.Gravity,
@@ -32,7 +32,7 @@ class GravitySystem extends ExtendedSystem {
       );
 
       if (gravityComponent && velocityComponent) {
-        velocityComponent.ySpeed += gravityComponent.force;
+        velocityComponent.ySpeed += gravityComponent.force * delta;
       }
     });
   }

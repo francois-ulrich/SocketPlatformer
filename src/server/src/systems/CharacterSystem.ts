@@ -23,7 +23,6 @@ class CharacterSystem extends ExtendedSystem {
 
     // Loop through all entities
     entities.forEach((entity) => {
-
       const characterComponent = entity.getComponent<CharacterComponent>(
         COMPONENT_NAMES.Character,
       );
@@ -202,7 +201,7 @@ class CharacterSystem extends ExtendedSystem {
           x,
           y,
           xSpeed,
-          ySpeed
+          ySpeed,
         });
       }
     });

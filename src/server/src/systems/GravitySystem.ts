@@ -5,7 +5,7 @@ import GravityComponent from '../components/GravityComponent';
 import VelocityComponent from '../components/VelocityComponent';
 
 class GravitySystem extends ExtendedSystem {
-  update(): void {
+  update(delta:number): void {
     // Get entities under this system
     const entities = this.world.getEntities([
       COMPONENT_NAMES.Gravity,
@@ -28,7 +28,7 @@ class GravitySystem extends ExtendedSystem {
       );
 
       if (gravityComponent && velocityComponent) {
-        velocityComponent.ySpeed += gravityComponent.force;
+        velocityComponent.ySpeed += gravityComponent.force * delta;
       }
     });
   }

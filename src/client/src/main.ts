@@ -118,7 +118,7 @@ socket.on('connect', () => {
       .addSystem(new GravitySystem({ app }))
       .addSystem(new SpriteSystem({ app }))
       .addSystem(new PlayerSystem({ app }))
-      ;
+    ;
 
     // Initialize map
     const mapData: MapMetadata = data.map;

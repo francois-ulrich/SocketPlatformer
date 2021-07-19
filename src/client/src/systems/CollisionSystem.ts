@@ -13,7 +13,7 @@ class CollisionSystem extends ExtendedSystem {
   }
 
   // update(delta: number): void {
-  update(): void {
+  update(delta:number): void {
     const entities = this.world.getEntities([
       COMPONENT_NAMES.Velocity,
       COMPONENT_NAMES.Position,
@@ -86,10 +86,14 @@ class CollisionSystem extends ExtendedSystem {
           // If one of them is a solid, stops
           if (solidCollision) {
             if (xSpeed > 0) {
-              positionComponent.x = MapComponent.getTilePosition(collisionBox.right + xSpeed)
+              positionComponent.x = MapComponent.getTilePosition(
+                collisionBox.right + xSpeed * delta,
+              )
                 * TILE_SIZE - width / 2;
             } else {
-              positionComponent.x = MapComponent.getTilePosition(collisionBox.left - xSpeed)
+              positionComponent.x = MapComponent.getTilePosition(
+                collisionBox.left - xSpeed * delta,
+              )
                 * TILE_SIZE + width / 2;
             }
 
@@ -99,16 +103,15 @@ class CollisionSystem extends ExtendedSystem {
 
         // Update collision box values
         collisionBox = collisionComponent.getCollisionBox(
-          positionComponent.x + velocityComponent.xSpeed,
+          positionComponent.x + velocityComponent.xSpeed * delta,
           positionComponent.y,
         );
 
         // Vertical collision
         if (Math.abs(ySpeed) > 0) {
           const checkXStart: number = collisionBox.left;
-          const checkYStart: number = (ySpeed > 0
-            ? collisionBox.bottom
-            : collisionBox.top) + ySpeed;
+          const checkYStart: number = (ySpeed > 0 ? collisionBox.bottom : collisionBox.top)
+            + ySpeed * delta;
 
           const solidCollision: boolean = mapComponent.getMapCollisionLine(
             checkXStart,
@@ -121,11 +124,15 @@ class CollisionSystem extends ExtendedSystem {
           // if (colls.includes(1)) {
           if (solidCollision) {
             if (ySpeed > 0) {
-              positionComponent.y = MapComponent.getTilePosition(collisionBox.bottom + ySpeed)
+              positionComponent.y = MapComponent.getTilePosition(
+                collisionBox.bottom + ySpeed * delta,
+              )
                   * TILE_SIZE
                 - height / 2;
             } else {
-              positionComponent.y = MapComponent.getTilePosition(collisionBox.top - ySpeed)
+              positionComponent.y = MapComponent.getTilePosition(
+                collisionBox.top - ySpeed * delta,
+              )
                   * TILE_SIZE
                 + height / 2;
             }
