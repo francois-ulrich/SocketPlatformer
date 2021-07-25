@@ -32,7 +32,7 @@ class GravitySystem extends ExtendedSystem {
       );
 
       if (gravityComponent && velocityComponent) {
-        velocityComponent.ySpeed += gravityComponent.force * delta;
+        // velocityComponent.ySpeed += gravityComponent.force * delta;
       }
     });
   }

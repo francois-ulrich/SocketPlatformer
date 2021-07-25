@@ -27,6 +27,7 @@ import CollisionSystem from './systems/CollisionSystem';
 import map from './assets/maps/test';
 
 import { CLIENT_FPS, TICK_RATE } from './global';
+// import { TICK_RATE } from './global';
 
 const randomstring = require('randomstring');
 
@@ -37,7 +38,7 @@ function createPlayerEntity(socket: Socket, clientId: string): Entity {
     .addComponent(new VelocityComponent())
     .addComponent(new GravityComponent())
     .addComponent(new CollisionComponent({ width: 16, height: 32 }))
-    .addComponent(new PositionComponent({ x: 32, y: 32 }))
+    .addComponent(new PositionComponent({ x: 0, y: 0 }))
     .addComponent(new CharacterComponent(io))
     .addComponent(new PlayerComponent(socket, clientId));
 
@@ -101,7 +102,7 @@ io.of('/').adapter.on('create-room', (room: string) => {
   // Start game room gameloop
   gameRoom.gameLoop.setUpdateFunction((delta: number) => {
     // Convert gameloop delta time to super ecs delta time value
-    const ecsDeltaTime = 1 * (delta / (1 / TICK_RATE)) * (CLIENT_FPS / TICK_RATE);
+    const ecsDeltaTime = (delta / (1 / TICK_RATE)) * (CLIENT_FPS / TICK_RATE);
 
     gameRoom.world.update(ecsDeltaTime);
   });

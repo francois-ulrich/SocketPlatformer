@@ -1,8 +1,15 @@
 import { Component } from 'super-ecs';
 import COMPONENT_NAMES from './types';
 import { MapMetadata, MapGridMetadata } from '../../../shared/src/types/mapMetadata';
+import { PositionMetadata } from '../types/positionMetadata';
 
 import { TILE_SIZE } from '../../../shared/src/global';
+
+type collisionVectorData = {
+  x: number,
+  y: number,
+  collision: number,
+}
 
 class MapComponent implements Component {
   public name: symbol = COMPONENT_NAMES.Map;
@@ -22,6 +29,10 @@ class MapComponent implements Component {
 
   getHeight(): number {
     return this.collision.length;
+  }
+
+  getPositionInBound(x: number, y: number): boolean {
+    return x >= 0 || y >= 0 || x < this.getWidth() || y < this.getHeight();
   }
 
   getCollision(x: number, y: number): number {
@@ -44,17 +55,17 @@ class MapComponent implements Component {
     return Math.floor(val / TILE_SIZE);
   }
 
-  getMapCollisionLine(
+  getMapCollisionLineData(
     xStart: number,
     yStart: number,
     length: number,
     horizontal: boolean,
-  ): boolean {
+  ): Array<collisionVectorData> {
     // Get number of collisions needed to be checked
     const collsNb: number = Math.max(2, Math.floor(length / TILE_SIZE) + 1);
-    const gap = length / Math.ceil(length / TILE_SIZE);
+    const gap: number = length / Math.ceil(length / TILE_SIZE);
 
-    const colls: Array<number> = [];
+    const colls: Array<collisionVectorData> = [];
 
     // Check every collisions
     for (let i = 0; i < collsNb; i += 1) {
@@ -70,11 +81,143 @@ class MapComponent implements Component {
         checkY = yStart + i * gap - (i === collsNb - 1 ? 1 : 0);
       }
 
-      colls.push(this.getCollision(checkX, checkY));
+      colls.push({
+        x: checkX,
+        y: checkY,
+        collision: this.getCollision(checkX, checkY),
+      });
     }
 
     // If no collision found, just return false
-    return colls.includes(1);
+    return colls;
+  }
+
+  getMapCollisionLine(
+    xStart: number,
+    yStart: number,
+    length: number,
+    horizontal: boolean,
+  ): boolean {
+    const collData = this.getMapCollisionLineData(
+      xStart,
+      yStart,
+      length,
+      horizontal,
+    );
+
+    return collData.filter((el) => el.collision > 0).length > 0;
+  }
+
+  getMapCollisionRect(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  ): PositionMetadata | null {
+    const horColls = this.getMapCollisionLineData(x, y, width, true);
+
+    for (let i = 0; i < horColls.length; i += 1) {
+      const coll = horColls[i];
+
+      const verColls = this.getMapCollisionLineData(
+        coll.x,
+        coll.y,
+        height,
+        false,
+      );
+
+      const verSolidColls = verColls.filter((el) => el.collision > 0);
+
+      if (verSolidColls.length > 0) {
+        // console.log(x, y);
+        // console.log(MapComponent.getTilePosition(x), MapComponent.getTilePosition(y));
+
+        return {
+          x: MapComponent.getTilePosition(verSolidColls[0].x),
+          y: MapComponent.getTilePosition(verSolidColls[0].y),
+        };
+      }
+
+      // verColls.forEach((verColl) => {
+      //   if(vercoll)
+      // });
+    }
+
+    return null;
+  }
+
+  getNearestWallTilePos(
+    x: number,
+    y: number,
+    direction: string,
+    collFree?: boolean,
+  ): PositionMetadata | null {
+    const checkPos: PositionMetadata = {
+      x: MapComponent.getTilePosition(x),
+      y: MapComponent.getTilePosition(y),
+    };
+
+    let xShift: number = 0;
+    let yShift: number = 0;
+
+    if (collFree) {
+      switch (direction) {
+        case 'right':
+          xShift = 1;
+          break;
+        case 'left':
+          xShift = -1;
+          break;
+        case 'down':
+          yShift = 1;
+          break;
+        case 'up':
+          yShift = -1;
+          break;
+        default:
+          break;
+      }
+    }
+
+    while (this.getPositionInBound(checkPos.x + xShift, checkPos.y + yShift)) {
+      console.log(checkPos);
+
+      switch (direction) {
+        case 'right':
+          checkPos.x += 1;
+          break;
+        case 'left':
+          checkPos.x -= 1;
+          break;
+        case 'down':
+          checkPos.y += 1;
+          break;
+        case 'up':
+          checkPos.y -= 1;
+          break;
+        default:
+          break;
+      }
+
+      console.log('checkPos.x + xShift, checkPos.y + yShift');
+      console.log(checkPos.x + xShift, checkPos.y + yShift);
+
+      const currentColl = this.getCollision(
+        checkPos.x + xShift,
+        checkPos.y + yShift,
+      );
+
+      console.log(currentColl);
+
+      if (currentColl === 1) {
+        return {
+          x: checkPos.x,
+          y: checkPos.y,
+        };
+      }
+    }
+
+    return null;
   }
 }
 

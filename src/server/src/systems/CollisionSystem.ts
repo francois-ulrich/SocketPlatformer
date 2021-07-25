@@ -6,6 +6,9 @@ import VelocityComponent from '../components/VelocityComponent';
 import CollisionComponent from '../components/CollisionComponent';
 import PositionComponent from '../components/PositionComponent';
 
+// Types
+import { PositionMetadata } from '../types/positionMetadata';
+
 import { TILE_SIZE } from '../global';
 
 class CollisionSystem extends ExtendedSystem {
@@ -61,32 +64,29 @@ class CollisionSystem extends ExtendedSystem {
 
         // Horizontal collision
         if (Math.abs(xSpeed) > 0) {
-          // // Get coll check X
-          const checkXStart: number = (xSpeed > 0 ? collisionBox.right : collisionBox.left)
-            + xSpeed * delta;
+          const collCheckWidth = Math.abs(xSpeed) * delta;
+
+          // Get coll check X
+          const checkXStart: number = (xSpeed > 0
+            ? collisionBox.right
+            : collisionBox.left - collCheckWidth);
 
           const checkYStart: number = collisionBox.top;
 
-          const solidCollision: boolean = mapComponent.getMapCollisionLine(
+          const solidCollision: PositionMetadata | null = mapComponent.getMapCollisionRect(
             checkXStart,
             checkYStart,
+            collCheckWidth,
             height,
-            false,
           );
 
           // If one of them is a solid, stops
           if (solidCollision) {
             if (xSpeed > 0) {
-              positionComponent.x = MapComponent.getTilePosition(
-                collisionBox.right + xSpeed * delta,
-              )
-                  * TILE_SIZE
-                - width / 2;
+              positionComponent.x = solidCollision.x * TILE_SIZE - width / 2;
             } else {
-              positionComponent.x = MapComponent.getTilePosition(
-                collisionBox.left - xSpeed * delta,
-              )
-                  * TILE_SIZE
+              positionComponent.x = solidCollision.x * TILE_SIZE
+                + TILE_SIZE
                 + width / 2;
             }
 
@@ -94,40 +94,36 @@ class CollisionSystem extends ExtendedSystem {
           }
         }
 
+        const newPositionX = positionComponent.x + velocityComponent.xSpeed * delta;
+
         // Update collision box values
         collisionBox = collisionComponent.getCollisionBox(
-          positionComponent.x + velocityComponent.xSpeed * delta,
+          newPositionX,
           positionComponent.y,
         );
 
         // Vertical collision
         if (Math.abs(ySpeed) > 0) {
-          const checkXStart: number = collisionBox.left;
-          const checkYStart: number = (ySpeed > 0 ? collisionBox.bottom : collisionBox.top)
-            + ySpeed * delta;
+          const collCheckHeight = Math.abs(ySpeed) * delta;
 
-          const solidCollision: boolean = mapComponent.getMapCollisionLine(
+          const checkXStart: number = collisionBox.left;
+          const checkYStart: number = (ySpeed > 0
+            ? collisionBox.bottom
+            : collisionBox.top - collCheckHeight);
+
+          const solidCollision: PositionMetadata | null = mapComponent.getMapCollisionRect(
             checkXStart,
             checkYStart,
             width,
-            true,
+            collCheckHeight,
           );
 
           // If one of them is a solid, stops
-          // if (colls.includes(1)) {
           if (solidCollision) {
             if (ySpeed > 0) {
-              positionComponent.y = MapComponent.getTilePosition(
-                collisionBox.bottom + ySpeed * delta,
-              )
-                  * TILE_SIZE
-                - height / 2;
+              positionComponent.y = solidCollision.y * TILE_SIZE - height / 2;
             } else {
-              positionComponent.y = MapComponent.getTilePosition(
-                collisionBox.top - ySpeed * delta,
-              )
-                  * TILE_SIZE
-                + height / 2;
+              positionComponent.y = solidCollision.y * TILE_SIZE + TILE_SIZE + height / 2;
             }
 
             velocityComponent.ySpeed = 0;

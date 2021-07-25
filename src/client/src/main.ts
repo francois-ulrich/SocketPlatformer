@@ -15,12 +15,12 @@ import CharacterComponent from './components/CharacterComponent';
 // System
 import SpriteSystem from './systems/SpriteSystem';
 import PositionSystem from './systems/PositionSystem';
-import VelocitySystem from './systems/VelocitySystem';
-import GravitySystem from './systems/GravitySystem';
+// import VelocitySystem from './systems/VelocitySystem';
+// import GravitySystem from './systems/GravitySystem';
 import MapSystem from './systems/MapSystem';
 import PlayerSystem from './systems/PlayerSystem';
-import EntitySystem from './systems/CharacterSystem';
-import CollisionSystem from './systems/CollisionSystem';
+import CharacterSystem from './systems/CharacterSystem';
+// import CollisionSystem from './systems/CollisionSystem';
 // import CharUpdateSystem from './systems/CharUpdateSystem';
 
 // Metadata
@@ -46,7 +46,7 @@ const container = new PIXI.Container();
 app.stage.addChild(container);
 
 // Rescale PIXI stage
-const stageScale: number = 1;
+const stageScale: number = 2;
 app.stage.scale.x = stageScale;
 app.stage.scale.y = stageScale;
 
@@ -110,12 +110,12 @@ socket.on('connect', () => {
     // Instanciate world
     world
       // .addSystem(new CharUpdateSystem())
-      .addSystem(new CollisionSystem({ app }))
-      .addSystem(new VelocitySystem({ app }))
+      // .addSystem(new CollisionSystem({ app }))
+      // .addSystem(new VelocitySystem({ app }))
       .addSystem(new PositionSystem({ app }))
       .addSystem(new MapSystem({ app }))
-      .addSystem(new EntitySystem({ app }))
-      .addSystem(new GravitySystem({ app }))
+      .addSystem(new CharacterSystem({ app }))
+      // .addSystem(new GravitySystem({ app }))
       .addSystem(new SpriteSystem({ app }))
       .addSystem(new PlayerSystem({ app }))
     ;
