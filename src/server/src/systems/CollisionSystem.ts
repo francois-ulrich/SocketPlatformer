@@ -126,6 +126,13 @@ class CollisionSystem extends ExtendedSystem {
               positionComponent.y = solidCollision.y * TILE_SIZE + TILE_SIZE + height / 2;
             }
 
+            if (ySpeed > 0) {
+              console.log(`positionComponent.y: ${positionComponent.y}`);
+              console.log(
+                `velocityComponent.ySpeed: ${velocityComponent.ySpeed}`,
+              );
+            }
+
             velocityComponent.ySpeed = 0;
           }
         }

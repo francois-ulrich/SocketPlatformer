@@ -35,9 +35,9 @@ function createPlayerEntity(socket: Socket, clientId: string): Entity {
   const hero: Entity = new Entity();
 
   hero
-    .addComponent(new VelocityComponent())
     .addComponent(new GravityComponent())
     .addComponent(new CollisionComponent({ width: 16, height: 32 }))
+    .addComponent(new VelocityComponent())
     .addComponent(new PositionComponent({ x: 0, y: 0 }))
     .addComponent(new CharacterComponent(io))
     .addComponent(new PlayerComponent(socket, clientId));
@@ -87,12 +87,12 @@ io.of('/').adapter.on('create-room', (room: string) => {
   gameRooms.set(room, gameRoom);
 
   gameRoom.world
-    .addSystem(new VelocitySystem())
-    .addSystem(new GravitySystem())
-    .addSystem(new CollisionSystem())
     .addSystem(new PlayerSystem())
     .addSystem(new CharacterSystem())
-  ;
+    .addSystem(new GravitySystem())
+    .addSystem(new CollisionSystem())
+    .addSystem(new VelocitySystem())
+    ;
 
   // Add system to game room's world
   const mapEntity = new Entity();

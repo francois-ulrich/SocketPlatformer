@@ -1,3 +1,5 @@
+// import {World} from 'super-ecs'
+
 import COMPONENT_NAMES from '../components/types';
 import MapComponent from '../components/MapComponent';
 import VelocityComponent from '../components/VelocityComponent';
@@ -13,7 +15,7 @@ class CollisionSystem extends ExtendedSystem {
   }
 
   // update(delta: number): void {
-  update(delta:number): void {
+  update(delta: number): void {
     const entities = this.world.getEntities([
       COMPONENT_NAMES.Velocity,
       COMPONENT_NAMES.Position,
@@ -127,13 +129,13 @@ class CollisionSystem extends ExtendedSystem {
               positionComponent.y = MapComponent.getTilePosition(
                 collisionBox.bottom + ySpeed * delta,
               )
-                  * TILE_SIZE
+                * TILE_SIZE
                 - height / 2;
             } else {
               positionComponent.y = MapComponent.getTilePosition(
                 collisionBox.top - ySpeed * delta,
               )
-                  * TILE_SIZE
+                * TILE_SIZE
                 + height / 2;
             }
 

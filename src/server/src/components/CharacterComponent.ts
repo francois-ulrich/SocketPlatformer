@@ -1,7 +1,7 @@
 import { Component } from 'super-ecs';
 
 // import { Socket } from "socket.io";
-import { Server } from "socket.io";
+import { Server } from 'socket.io';
 
 import InputMap from '../types/inputMap';
 
@@ -44,7 +44,7 @@ class CharacterComponent implements Component {
     this.inputLeft = false;
     this.maxXSpeed = 1;
     this.onFloor = true;
-    this.jumpForce = 3.8;
+    this.jumpForce = 3.9;
     this.direction = 1;
     this.speedIncr = 1;
     this.dirChangeMidAir = true;

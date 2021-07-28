@@ -35,10 +35,6 @@ class CharacterSystem extends ExtendedSystem {
         COMPONENT_NAMES.Velocity,
       );
 
-      const gravityComponent = entity.getComponent<GravityComponent>(
-        COMPONENT_NAMES.Gravity,
-      );
-
       const positionComponent = entity.getComponent<PositionComponent>(
         COMPONENT_NAMES.Position,
       );
@@ -85,8 +81,10 @@ class CharacterSystem extends ExtendedSystem {
           }
 
           // Jump
-          if (characterComponent.input.jump && characterComponent.onFloor) {
+          if (characterComponent.input.jump && onFloor) {
             velocityComponent.ySpeed = -characterComponent.jumpForce;
+
+            // console.log(velocityComponent.ySpeed);
 
             // Add gravity component
             entity.addComponent(new GravityComponent());
@@ -160,25 +158,33 @@ class CharacterSystem extends ExtendedSystem {
 
           const { width } = collisionComponent;
 
+          const { ySpeed } = velocityComponent;
+
           const xStart: number = left;
           const yStart: number = bottom;
           const length: number = width - 1;
           const horizontal: boolean = true;
 
-          characterComponent.onFloor = mapComponent.getMapCollisionLine(
+          const floorColl = ySpeed >= 0 && mapComponent.getMapCollisionLine(
             xStart,
             yStart,
             length,
             horizontal,
           );
 
+          const gravityComponent = entity.getComponent<GravityComponent>(
+            COMPONENT_NAMES.Gravity,
+          );
+
           // If not on floor, make the entity fall
-          if (!characterComponent.onFloor && !gravityComponent) {
+          if (!floorColl && !gravityComponent) {
             entity.addComponent(new GravityComponent());
+            characterComponent.onFloor = false;
           }
 
-          if (characterComponent.onFloor && gravityComponent) {
+          if (floorColl && gravityComponent) {
             entity.removeComponent(COMPONENT_NAMES.Gravity);
+            characterComponent.onFloor = true;
           }
         }
       }
@@ -188,7 +194,6 @@ class CharacterSystem extends ExtendedSystem {
         && playerComponent
         && velocityComponent
         && positionComponent) {
-        // const { socket, clientId } = playerComponent;
         const { clientId } = playerComponent;
         const { server } = characterComponent;
 
@@ -196,8 +201,6 @@ class CharacterSystem extends ExtendedSystem {
         const { xSpeed, ySpeed } = velocityComponent;
 
         server.emit(`characterUpdate:${clientId}`, {
-          // socketId: socket.id,
-          // test: "test",
           x,
           y,
           xSpeed,

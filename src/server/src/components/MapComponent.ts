@@ -61,6 +61,9 @@ class MapComponent implements Component {
     length: number,
     horizontal: boolean,
   ): Array<collisionVectorData> {
+    if (length <= 0)
+      return [];
+
     // Get number of collisions needed to be checked
     const collsNb: number = Math.max(2, Math.floor(length / TILE_SIZE) + 1);
     const gap: number = length / Math.ceil(length / TILE_SIZE);
@@ -180,8 +183,6 @@ class MapComponent implements Component {
     }
 
     while (this.getPositionInBound(checkPos.x + xShift, checkPos.y + yShift)) {
-      console.log(checkPos);
-
       switch (direction) {
         case 'right':
           checkPos.x += 1;
@@ -198,9 +199,6 @@ class MapComponent implements Component {
         default:
           break;
       }
-
-      console.log('checkPos.x + xShift, checkPos.y + yShift');
-      console.log(checkPos.x + xShift, checkPos.y + yShift);
 
       const currentColl = this.getCollision(
         checkPos.x + xShift,
