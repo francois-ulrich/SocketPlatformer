@@ -266,19 +266,17 @@ class CharacterSystem extends ExtendedSystem {
                   x, y, xSpeed, ySpeed,
                 } = data;
 
-                // if (x % 2 == 0 && y % 2 == 0) {
-                //   console.log(data);
-                // }
+                console.log(data);
 
                 if (positionComponent) {
                   positionComponent.x = x;
                   positionComponent.y = y;
                 }
 
-                if (velocityComponent) {
-                  velocityComponent.xSpeed = xSpeed;
-                  velocityComponent.ySpeed = ySpeed;
-                }
+                // if (velocityComponent) {
+                //   velocityComponent.xSpeed = xSpeed;
+                //   velocityComponent.ySpeed = ySpeed;
+                // }
               });
             }
           }

@@ -162,7 +162,7 @@ class CharacterSystem extends ExtendedSystem {
 
           const xStart: number = left;
           const yStart: number = bottom;
-          const length: number = width - 1;
+          const length: number = width;
           const horizontal: boolean = true;
 
           const floorColl = ySpeed >= 0 && mapComponent.getMapCollisionLine(
@@ -180,11 +180,6 @@ class CharacterSystem extends ExtendedSystem {
           if (!floorColl && !gravityComponent) {
             entity.addComponent(new GravityComponent());
             characterComponent.onFloor = false;
-          }
-
-          if (floorColl && gravityComponent) {
-            entity.removeComponent(COMPONENT_NAMES.Gravity);
-            characterComponent.onFloor = true;
           }
         }
       }

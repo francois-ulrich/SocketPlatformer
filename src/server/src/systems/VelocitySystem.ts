@@ -3,7 +3,7 @@ import { ExtendedSystem } from './ExtendedSystem';
 import COMPONENT_NAMES from '../components/types';
 import VelocityComponent from '../components/VelocityComponent';
 import PositionComponent from '../components/PositionComponent';
-import { TILE_SIZE } from '../global';
+// import { TILE_SIZE } from '../global';
 
 class VelocitySystem extends ExtendedSystem {
   update(delta: number): void {
@@ -30,14 +30,14 @@ class VelocitySystem extends ExtendedSystem {
 
       if (positionComponent
         && velocityComponent) {
-        // positionComponent.moveX(velocityComponent.xSpeed * delta);
-        // positionComponent.moveY(velocityComponent.ySpeed * delta);
+        positionComponent.moveX(velocityComponent.xSpeed * delta);
+        positionComponent.moveY(velocityComponent.ySpeed * delta);
 
-        positionComponent.x += Math.min(velocityComponent.xSpeed * delta, TILE_SIZE);
-        positionComponent.y += Math.min(
-          velocityComponent.ySpeed * delta,
-          TILE_SIZE,
-        );
+        // positionComponent.x += Math.min(velocityComponent.xSpeed * delta, TILE_SIZE);
+        // positionComponent.y += Math.min(
+        //   velocityComponent.ySpeed * delta,
+        //   TILE_SIZE,
+        // );
       }
     });
   }

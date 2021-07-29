@@ -5,6 +5,7 @@ import MapComponent from '../components/MapComponent';
 import VelocityComponent from '../components/VelocityComponent';
 import CollisionComponent from '../components/CollisionComponent';
 import PositionComponent from '../components/PositionComponent';
+import CharacterComponent from '../components/CharacterComponent';
 
 // Types
 import { PositionMetadata } from '../types/positionMetadata';
@@ -31,6 +32,10 @@ class CollisionSystem extends ExtendedSystem {
 
       const collisionComponent = entity.getComponent<CollisionComponent>(
         COMPONENT_NAMES.Collision,
+      );
+
+      const characterComponent = entity.getComponent<CharacterComponent>(
+        COMPONENT_NAMES.Character,
       );
 
       // Collision checking
@@ -106,6 +111,9 @@ class CollisionSystem extends ExtendedSystem {
         if (Math.abs(ySpeed) > 0) {
           const collCheckHeight = Math.abs(ySpeed) * delta;
 
+          // console.log(`collCheckHeight: ${collCheckHeight}`);
+          // console.log(`ySpeed: ${ySpeed}`);
+
           const checkXStart: number = collisionBox.left;
           const checkYStart: number = (ySpeed > 0
             ? collisionBox.bottom
@@ -118,19 +126,25 @@ class CollisionSystem extends ExtendedSystem {
             collCheckHeight,
           );
 
+          console.log(mapComponent.getMapCollisionRectData(
+            checkXStart,
+            checkYStart,
+            width,
+            collCheckHeight,
+          ));
+
           // If one of them is a solid, stops
           if (solidCollision) {
             if (ySpeed > 0) {
               positionComponent.y = solidCollision.y * TILE_SIZE - height / 2;
+
+              // If character, remove gravity component
+              if (characterComponent) {
+                characterComponent.onFloor = true;
+                entity.removeComponent(COMPONENT_NAMES.Gravity);
+              }
             } else {
               positionComponent.y = solidCollision.y * TILE_SIZE + TILE_SIZE + height / 2;
-            }
-
-            if (ySpeed > 0) {
-              console.log(`positionComponent.y: ${positionComponent.y}`);
-              console.log(
-                `velocityComponent.ySpeed: ${velocityComponent.ySpeed}`,
-              );
             }
 
             velocityComponent.ySpeed = 0;
