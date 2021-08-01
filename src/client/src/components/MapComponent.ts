@@ -8,6 +8,7 @@ class MapComponent implements Component {
   name = COMPONENT_NAMES.Map;
 
   public collision: MapGridMetadata;
+
   public tiles: MapGridMetadata | undefined;
 
   constructor({ collision, tiles }: MapMetadata) {

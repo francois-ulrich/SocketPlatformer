@@ -190,7 +190,7 @@ class CharacterSystem extends ExtendedSystem {
         && velocityComponent
         && positionComponent) {
         const { clientId } = playerComponent;
-        const { server } = characterComponent;
+        const { server, state } = characterComponent;
 
         const { x, y } = positionComponent;
         const { xSpeed, ySpeed } = velocityComponent;
@@ -200,6 +200,7 @@ class CharacterSystem extends ExtendedSystem {
           y,
           xSpeed,
           ySpeed,
+          state,
         });
       }
     });

@@ -216,7 +216,8 @@ class CharacterSystem extends ExtendedSystem {
                   spriteComponent.setAnimation('idle');
                 }
               } else {
-                spriteComponent.setAnimation('jump');
+                // spriteComponent.setAnimation('jump');
+                spriteComponent.setAnimation('idle');
                 spriteComponent.setScale({ x: Math.sign(characterComponent.direction) });
               }
 
@@ -266,7 +267,7 @@ class CharacterSystem extends ExtendedSystem {
                   x, y, xSpeed, ySpeed,
                 } = data;
 
-                console.log(data);
+                // console.log(data);
 
                 if (positionComponent) {
                   positionComponent.x = x;

@@ -92,7 +92,7 @@ io.of('/').adapter.on('create-room', (room: string) => {
     .addSystem(new GravitySystem())
     .addSystem(new CollisionSystem())
     .addSystem(new VelocitySystem())
-    ;
+  ;
 
   // Add system to game room's world
   const mapEntity = new Entity();
@@ -102,7 +102,7 @@ io.of('/').adapter.on('create-room', (room: string) => {
   // Start game room gameloop
   gameRoom.gameLoop.setUpdateFunction((delta: number) => {
     // Convert gameloop delta time to super ecs delta time value
-    const ecsDeltaTime = (delta / (1 / TICK_RATE)) * (CLIENT_FPS / TICK_RATE);
+    const ecsDeltaTime = ((delta / (1 / TICK_RATE)) * (CLIENT_FPS / TICK_RATE));
 
     gameRoom.world.update(ecsDeltaTime);
   });

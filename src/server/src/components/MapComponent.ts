@@ -34,8 +34,8 @@ class MapComponent implements Component {
   getPositionInBound(x: number, y: number): boolean {
     return x >= 0
       && y >= 0
-      && x < this.getWidth() - 1
-      && y < this.getHeight() - 1;
+      && x < this.getWidth()
+      && y < this.getHeight();
   }
 
   getCollision(x: number, y: number): number {
@@ -165,34 +165,60 @@ class MapComponent implements Component {
     width: number,
     height: number,
   ): Array<collisionMetadata> {
+    // console.log({
+    //   x,
+    //   y,
+    //   width,
+    //   height,
+    // });
+
     const res: Array<collisionMetadata> = [];
 
     // Get number of collisions needed to be checked
-    const collsNbHor: number = Math.max(2, Math.floor(width / TILE_SIZE) + 1);
-    const collsNbVer: number = Math.max(2, Math.floor(height / TILE_SIZE) + 1);
+    const collsNbHor: number = Math.max(
+      1,
+      Math.ceil(width / TILE_SIZE) + (x % TILE_SIZE === 0 ? 0 : 1),
+    );
+    const collsNbVer: number = Math.max(
+      1,
+      Math.ceil(height / TILE_SIZE) + (y % TILE_SIZE === 0 ? 0 : 1),
+    );
 
-    console.log(collsNbHor, collsNbVer);
+    // console.log({ collsNbHor, collsNbVer });
 
-    const start: PositionMetadata = {
-      x: Math.floor(x / TILE_SIZE),
-      y: Math.floor(y / TILE_SIZE),
+    const gap = {
+      width: width / Math.ceil(width / TILE_SIZE),
+      height: height / Math.ceil(height / TILE_SIZE),
     };
+
+    // console.log('gap');
+    // console.log(gap);
+
+    // console.log('checks:');
 
     for (let yy = 0; yy < collsNbVer; yy += 1) {
       for (let xx = 0; xx < collsNbHor; xx += 1) {
         const check: PositionMetadata = {
-          x: start.x + xx,
-          y: start.y + yy,
+          x: MapComponent.getTilePosition(
+            x + gap.width * xx,
+          ),
+          y: MapComponent.getTilePosition(
+            y + gap.height * yy,
+          ),
         };
 
         const collValue = this.getCollision(check.x, check.y);
 
         if (this.getPositionInBound(check.x, check.y)
           && collValue > 0) {
-          res.push({ ...check, collision: collValue });
+          const newColl = { ...check, collision: collValue };
+
+          res.push(newColl);
         }
       }
     }
+
+    // console.log(res);
 
     return res;
   }
@@ -202,127 +228,46 @@ class MapComponent implements Component {
     y: number,
     width: number,
     height: number,
+    dir: string,
   ): PositionMetadata | null {
-    const w: number = width - 1;
-    const h: number = height - 1;
+    const collData = this.getMapCollisionRectData(x, y, width, height);
 
-    // Get number of collisions needed to be checked
-    const collsNbHor: number = Math.max(2, Math.floor(width / TILE_SIZE) + 1);
-    const collsNbVer: number = Math.max(2, Math.floor(height / TILE_SIZE) + 1);
+    if (collData.length === 0) { return null; }
 
-    const gapHor: number = w / Math.ceil(width / TILE_SIZE);
-    const gapVer: number = h / Math.ceil(height / TILE_SIZE);
+    if (collData.length > 1) {
+      switch (dir) {
+        case 'up':
+          collData.sort((a, b) => b.y - a.y);
 
-    // const colls: Array<collisionMetadata> = [];
+          break;
+        case 'down':
+          collData.sort((a, b) => a.y - b.y);
 
-    for (let yy = 0; yy < collsNbVer; yy += 1) {
-      for (let xx = 0; xx < collsNbHor; xx += 1) {
-        const check: PositionMetadata = {
-          x: MapComponent.getTilePosition(x + gapHor * xx),
-          y: MapComponent.getTilePosition(y + gapVer * yy),
-        };
+          break;
+        case 'left':
+          collData.sort((a, b) => b.x - a.x);
 
-        if (this.getPositionInBound(check.x, check.y)
-          && this.getCollision(check.x, check.y) > 0) {
-          return check;
-        }
+          break;
+        case 'right':
+          collData.sort((a, b) => a.x - b.x);
+
+          break;
+        default:
+          break;
       }
     }
 
-    return null;
+    const collResult = collData[0];
+
+    const res = collResult ? {
+      x: collResult.x,
+      y: collResult.y,
+    } : null;
+
+    // console.log(res);
+
+    return res;
   }
-
-  // // Check every collisions
-  // for (let i = 0; i < collsNb; i += 1) {
-  //   let checkX: number;
-  //   let checkY: number;
-
-  //   // Vertical line
-  //   if (horizontal) {
-  //     checkX = xStart + i * gap - (i === collsNb - 1 ? 1 : 0);
-  //     checkY = yStart;
-  //   } else {
-  //     checkX = xStart;
-  //     checkY = yStart + i * gap - (i === collsNb - 1 ? 1 : 0);
-  //   }
-
-  //   colls.push({
-  //     x: checkX,
-  //     y: checkY,
-  //     collision: this.getCollision(checkX, checkY),
-  //   });
-
-  //   return null;
-  // }
-
-  // getNearestWallTilePos(
-  //   x: number,
-  //   y: number,
-  //   direction: string,
-  //   collFree?: boolean,
-  // ): PositionMetadata | null {
-  //   const checkPos: PositionMetadata = {
-  //     x: MapComponent.getTilePosition(x),
-  //     y: MapComponent.getTilePosition(y),
-  //   };
-
-  //   let xShift: number = 0;
-  //   let yShift: number = 0;
-
-  //   if (collFree) {
-  //     switch (direction) {
-  //       case 'right':
-  //         xShift = 1;
-  //         break;
-  //       case 'left':
-  //         xShift = -1;
-  //         break;
-  //       case 'down':
-  //         yShift = 1;
-  //         break;
-  //       case 'up':
-  //         yShift = -1;
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //   }
-
-  //   while (this.getPositionInBound(checkPos.x + xShift, checkPos.y + yShift)) {
-  //     switch (direction) {
-  //       case 'right':
-  //         checkPos.x += 1;
-  //         break;
-  //       case 'left':
-  //         checkPos.x -= 1;
-  //         break;
-  //       case 'down':
-  //         checkPos.y += 1;
-  //         break;
-  //       case 'up':
-  //         checkPos.y -= 1;
-  //         break;
-  //       default:
-  //         break;
-  //     }
-
-  //     const currentColl = this.getCollision(
-  //       checkPos.x + xShift,
-  //       checkPos.y + yShift,
-  //     );
-
-  //     console.log(currentColl);
-
-  //     if (currentColl === 1) {
-  //       return {
-  //         x: checkPos.x,
-  //         y: checkPos.y,
-  //       };
-  //     }
-  //   }
-
-  //   return null;
-  // }
 }
 
 export default MapComponent;

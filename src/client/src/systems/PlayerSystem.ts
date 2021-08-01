@@ -68,7 +68,14 @@ class PlayerSystem extends ExtendedSystem {
           COMPONENT_NAMES.Player,
         );
 
-        const usedKeys = ['ArrowUp', 'ArrowDown', 'ArrowRight', 'ArrowLeft', 'Space'];
+        const usedKeys = [
+          'ArrowUp',
+          'ArrowDown',
+          'ArrowRight',
+          'ArrowLeft',
+          'Space',
+          'KeyX',
+        ];
 
         if (playerComponent) {
           // Event listener for key press

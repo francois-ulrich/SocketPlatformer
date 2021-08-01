@@ -62,6 +62,12 @@ class CollisionSystem extends ExtendedSystem {
 
         const { xSpeed, ySpeed } = velocityComponent;
 
+        // if (xSpeed !== 0 || ySpeed !== 0) {
+        //   console.log('====================');
+        //   console.log('====================');
+        //   console.log('====================');
+        // }
+
         let collisionBox = collisionComponent.getCollisionBox(
           positionComponent.x,
           positionComponent.y,
@@ -69,20 +75,25 @@ class CollisionSystem extends ExtendedSystem {
 
         // Horizontal collision
         if (Math.abs(xSpeed) > 0) {
-          const collCheckWidth = Math.abs(xSpeed) * delta;
+          // console.log(`new X: ${positionComponent.x}`);
+
+          const checkWidth = Math.abs(xSpeed) * delta;
 
           // Get coll check X
           const checkXStart: number = (xSpeed > 0
             ? collisionBox.right
-            : collisionBox.left - collCheckWidth);
+            : collisionBox.left - checkWidth);
 
           const checkYStart: number = collisionBox.top;
+
+          const dir = xSpeed > 0 ? 'right' : 'left';
 
           const solidCollision: PositionMetadata | null = mapComponent.getMapCollisionRect(
             checkXStart,
             checkYStart,
-            collCheckWidth,
+            checkWidth,
             height,
+            dir,
           );
 
           // If one of them is a solid, stops
@@ -94,6 +105,9 @@ class CollisionSystem extends ExtendedSystem {
                 + TILE_SIZE
                 + width / 2;
             }
+
+            // console.log(`hor dir: ${dir}`);
+            // console.log(`new X: ${positionComponent.x}`);
 
             velocityComponent.xSpeed = 0;
           }
@@ -109,32 +123,30 @@ class CollisionSystem extends ExtendedSystem {
 
         // Vertical collision
         if (Math.abs(ySpeed) > 0) {
-          const collCheckHeight = Math.abs(ySpeed) * delta;
+          // console.log(`Y: ${positionComponent.y}`);
 
-          // console.log(`collCheckHeight: ${collCheckHeight}`);
-          // console.log(`ySpeed: ${ySpeed}`);
+          const collCheckHeight = Math.abs(ySpeed) * delta;
 
           const checkXStart: number = collisionBox.left;
           const checkYStart: number = (ySpeed > 0
             ? collisionBox.bottom
             : collisionBox.top - collCheckHeight);
 
+          const dir = ySpeed > 0 ? 'down' : 'up';
+
           const solidCollision: PositionMetadata | null = mapComponent.getMapCollisionRect(
             checkXStart,
             checkYStart,
             width,
             collCheckHeight,
+            dir,
           );
-
-          console.log(mapComponent.getMapCollisionRectData(
-            checkXStart,
-            checkYStart,
-            width,
-            collCheckHeight,
-          ));
 
           // If one of them is a solid, stops
           if (solidCollision) {
+            // console.log(`y: ${positionComponent.y}`);
+            // console.log(solidCollision);
+
             if (ySpeed > 0) {
               positionComponent.y = solidCollision.y * TILE_SIZE - height / 2;
 
@@ -142,10 +154,15 @@ class CollisionSystem extends ExtendedSystem {
               if (characterComponent) {
                 characterComponent.onFloor = true;
                 entity.removeComponent(COMPONENT_NAMES.Gravity);
+
+                // console.log('char on floor');
               }
             } else {
               positionComponent.y = solidCollision.y * TILE_SIZE + TILE_SIZE + height / 2;
             }
+
+            // console.log(`ver dir: ${dir}`);
+            // console.log(`new Y: ${positionComponent.y}`);
 
             velocityComponent.ySpeed = 0;
           }

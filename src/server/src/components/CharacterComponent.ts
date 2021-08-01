@@ -44,7 +44,7 @@ class CharacterComponent implements Component {
     this.inputLeft = false;
     this.maxXSpeed = 1;
     this.onFloor = true;
-    this.jumpForce = 4;
+    this.jumpForce = 4.1;
     this.direction = 1;
     this.speedIncr = 1;
     this.dirChangeMidAir = true;

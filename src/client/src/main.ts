@@ -44,7 +44,7 @@ const container = new PIXI.Container();
 app.stage.addChild(container);
 
 // Rescale PIXI stage
-const stageScale: number = 1;
+const stageScale: number = 2;
 app.stage.scale.x = stageScale;
 app.stage.scale.y = stageScale;
 
@@ -61,7 +61,7 @@ function createPlayerEntity(): Entity {
 
   playerEntity
     .addComponent(new VelocityComponent())
-    .addComponent(new CollisionComponent({ width: 16, height: 32 }))
+    // .addComponent(new CollisionComponent({ width: 16, height: 32 }))
     .addComponent(new PositionComponent({ x: 32, y: 32 }))
     .addComponent(new CharacterComponent())
     .addComponent(new SpriteComponent(sprite));
@@ -114,7 +114,7 @@ socket.on('connect', () => {
       .addSystem(new CharacterSystem({ app }))
       .addSystem(new SpriteSystem({ app }))
       .addSystem(new PlayerSystem({ app }))
-      ;
+    ;
 
     // Initialize map
     const mapData: MapMetadata = data.map;
