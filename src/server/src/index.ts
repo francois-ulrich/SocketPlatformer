@@ -15,6 +15,7 @@ import CollisionComponent from './components/CollisionComponent';
 import PlayerComponent from './components/PlayerComponent';
 import CharacterComponent from './components/CharacterComponent';
 import GravityComponent from './components/GravityComponent';
+import SpriteComponent from './components/SpriteComponent';
 
 // System
 import VelocitySystem from './systems/VelocitySystem';
@@ -27,6 +28,7 @@ import CollisionSystem from './systems/CollisionSystem';
 import map from './assets/maps/test';
 
 import { CLIENT_FPS, TICK_RATE } from './global';
+
 // import { TICK_RATE } from './global';
 
 const randomstring = require('randomstring');
@@ -40,6 +42,7 @@ function createPlayerEntity(socket: Socket, clientId: string): Entity {
     .addComponent(new VelocityComponent())
     .addComponent(new PositionComponent({ x: 0, y: 0 }))
     .addComponent(new CharacterComponent(io))
+    .addComponent(new SpriteComponent())
     .addComponent(new PlayerComponent(socket, clientId));
 
   return hero;

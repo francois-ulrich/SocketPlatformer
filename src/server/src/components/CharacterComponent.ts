@@ -32,12 +32,10 @@ class CharacterComponent implements Component {
 
   inputPressed: InputMap;
 
-  // socket: Socket;
-
   server: Server;
 
-  // constructor(socket: Socket) {
   constructor(server: Server) {
+    this.server = server;
     this.state = 0;
 
     this.inputRight = false;
@@ -48,8 +46,6 @@ class CharacterComponent implements Component {
     this.direction = 1;
     this.speedIncr = 1;
     this.dirChangeMidAir = true;
-    // this.socket = socket;
-    this.server = server;
 
     // Input
     this.input = {

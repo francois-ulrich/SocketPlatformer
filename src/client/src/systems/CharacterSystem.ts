@@ -206,23 +206,23 @@ class CharacterSystem extends ExtendedSystem {
         // Sprite update
         if (spriteComponent
           && velocityComponent) {
-          switch (characterComponent.state) {
-            default:
-              if (onFloor) {
-                if (Math.abs(velocityComponent.xSpeed) > 0) {
-                  spriteComponent.setAnimation('walk');
-                  spriteComponent.setScale({ x: Math.sign(velocityComponent.xSpeed) });
-                } else {
-                  spriteComponent.setAnimation('idle');
-                }
-              } else {
-                // spriteComponent.setAnimation('jump');
-                spriteComponent.setAnimation('idle');
-                spriteComponent.setScale({ x: Math.sign(characterComponent.direction) });
-              }
+          // switch (characterComponent.state) {
+          //   default:
+          //     if (onFloor) {
+          //       if (Math.abs(velocityComponent.xSpeed) > 0) {
+          //         spriteComponent.setAnimation('walk');
+          //         spriteComponent.setScale({ x: Math.sign(velocityComponent.xSpeed) });
+          //       } else {
+          //         spriteComponent.setAnimation('idle');
+          //       }
+          //     } else {
+          //       // spriteComponent.setAnimation('jump');
+          //       spriteComponent.setAnimation('idle');
+          //       spriteComponent.setScale({ x: Math.sign(characterComponent.direction) });
+          //     }
 
-              break;
-          }
+          //     break;
+          // }
         }
       }
     });
@@ -264,14 +264,16 @@ class CharacterSystem extends ExtendedSystem {
             if (socket) {
               socket.on(`characterUpdate:${clientId}`, (data) => {
                 const {
-                  x, y, xSpeed, ySpeed,
+                  x, y, xSpeed, ySpeed, sprite,
                 } = data;
-
-                // console.log(data);
 
                 if (positionComponent) {
                   positionComponent.x = x;
                   positionComponent.y = y;
+                }
+
+                if (sprite) {
+                  console.log(data);
                 }
 
                 // if (velocityComponent) {

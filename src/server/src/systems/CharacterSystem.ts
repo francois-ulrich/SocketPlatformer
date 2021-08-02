@@ -9,6 +9,17 @@ import GravityComponent from '../components/GravityComponent';
 import MapComponent from '../components/MapComponent';
 import PositionComponent from '../components/PositionComponent';
 import PlayerComponent from '../components/PlayerComponent';
+import SpriteComponent from '../components/SpriteComponent';
+
+type SpriteScaleData = {
+  x?: number,
+  y?: number,
+}
+
+type SpriteData = {
+  name?: string,
+  scale?: SpriteScaleData
+}
 
 class CharacterSystem extends ExtendedSystem {
   // update(delta: number): void {
@@ -41,6 +52,10 @@ class CharacterSystem extends ExtendedSystem {
 
       const playerComponent = entity.getComponent<PlayerComponent>(
         COMPONENT_NAMES.Player,
+      );
+
+      const spriteComponent = entity.getComponent<SpriteComponent>(
+        COMPONENT_NAMES.Sprite,
       );
 
       // Get map entity
@@ -188,20 +203,58 @@ class CharacterSystem extends ExtendedSystem {
       if (characterComponent
         && playerComponent
         && velocityComponent
-        && positionComponent) {
+        && positionComponent
+        && spriteComponent) {
         const { clientId } = playerComponent;
-        const { server, state } = characterComponent;
-
+        const { server, onFloor } = characterComponent;
         const { x, y } = positionComponent;
         const { xSpeed, ySpeed } = velocityComponent;
+        const { spriteName } = spriteComponent;
 
-        server.emit(`characterUpdate:${clientId}`, {
+        // Sprite name to send to client
+        const spriteData: SpriteData = {};
+
+        let newSpriteName: string | null = null;
+        const newScale: SpriteScaleData = {};
+
+        if (onFloor) {
+          if (Math.abs(velocityComponent.xSpeed) > 0) {
+            newSpriteName = 'walk';
+            newScale.x = Math.sign(velocityComponent.xSpeed);
+          } else {
+            newSpriteName = 'idle';
+          }
+        } else {
+          newSpriteName = 'jump';
+          newScale.x = Math.sign(characterComponent.direction);
+        }
+
+        // Set sprite change
+        if (newSpriteName !== spriteName) {
+          spriteData.name = newSpriteName;
+          spriteComponent.spriteName = newSpriteName;
+        }
+
+        // Set scale change
+        if (Object.keys(newScale).length > 0) {
+          spriteData.scale = { ...newScale };
+
+          // Apply to spriteComponent
+        }
+
+        let emitData: any = {
           x,
           y,
           xSpeed,
           ySpeed,
-          state,
-        });
+        };
+
+        // If sprite data change, send it to client
+        if (Object.keys(spriteData).length > 0) {
+          emitData = { ...emitData, sprite: spriteData };
+        }
+
+        server.emit(`characterUpdate:${clientId}`, emitData);
       }
     });
   }

@@ -61,7 +61,6 @@ function createPlayerEntity(): Entity {
 
   playerEntity
     .addComponent(new VelocityComponent())
-    // .addComponent(new CollisionComponent({ width: 16, height: 32 }))
     .addComponent(new PositionComponent({ x: 32, y: 32 }))
     .addComponent(new CharacterComponent())
     .addComponent(new SpriteComponent(sprite));
