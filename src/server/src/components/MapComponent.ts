@@ -191,11 +191,6 @@ class MapComponent implements Component {
       height: height / Math.ceil(height / TILE_SIZE),
     };
 
-    // console.log('gap');
-    // console.log(gap);
-
-    // console.log('checks:');
-
     for (let yy = 0; yy < collsNbVer; yy += 1) {
       for (let xx = 0; xx < collsNbHor; xx += 1) {
         const check: PositionMetadata = {

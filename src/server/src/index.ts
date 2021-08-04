@@ -6,6 +6,7 @@ import { Entity } from 'super-ecs';
 import GameRoom from './other/GameRoom';
 
 // ECS Stuff
+import COMPONENT_NAMES from './components/types';
 
 // Component
 import PositionComponent from './components/PositionComponent';
@@ -33,6 +34,19 @@ import { CLIENT_FPS, TICK_RATE } from './global';
 
 const randomstring = require('randomstring');
 
+
+// ======================================================
+// ======================================================
+// ======================================================
+
+// Socket.IO server instanciation
+const httpServer = createServer();
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*',
+  },
+});
+
 function createPlayerEntity(socket: Socket, clientId: string): Entity {
   const hero: Entity = new Entity();
 
@@ -48,13 +62,50 @@ function createPlayerEntity(socket: Socket, clientId: string): Entity {
   return hero;
 }
 
-// Socket.IO server instanciation
-const httpServer = createServer();
-const io = new Server(httpServer, {
-  cors: {
-    origin: '*',
-  },
-});
+type PlayersList = {
+  [key: string]: PlayerData
+}
+
+type PlayerData = null | {
+  clientId: string,
+  x: number,
+  y: number
+}
+
+function getPlayerDataFromEntity(entity: Entity): PlayerData {
+  const playerComponent = entity.getComponent<PlayerComponent>(
+    COMPONENT_NAMES.Player,
+  );
+
+  const positionComponent = entity.getComponent<PositionComponent>(
+    COMPONENT_NAMES.Position,
+  );
+
+  let result = null;
+
+  if (positionComponent
+    && playerComponent) {
+    const { x, y } = positionComponent;
+    const { clientId } = playerComponent;
+
+    result = {
+      x,
+      y,
+      clientId,
+    }
+  }
+
+  return result;
+}
+
+// function sendPlayerData(): void {
+//   io.sockets.emit("")
+// }
+
+// ======================================================
+// ======================================================
+// ======================================================
+
 
 // Map storing room data for each socket room
 const gameRooms: Map<string, GameRoom> = new Map<string, GameRoom>();
@@ -95,7 +146,7 @@ io.of('/').adapter.on('create-room', (room: string) => {
     .addSystem(new GravitySystem())
     .addSystem(new CollisionSystem())
     .addSystem(new VelocitySystem())
-  ;
+    ;
 
   // Add system to game room's world
   const mapEntity = new Entity();
@@ -154,24 +205,29 @@ io.of('/').adapter.on('join-room', (room, socketId) => {
   });
 
   // Add client to gameroom client list
-  const clientId = randomstring.generate();
+  const newClientId = randomstring.generate();
 
   // Create server-side player ECS entity
-  const player = createPlayerEntity(socket, clientId);
+  const player = createPlayerEntity(socket, newClientId);
   gameRoom.world.addEntity(player);
 
-  gameRoom.clients[clientId] = {
+  gameRoom.clients[newClientId] = {
     entity: player,
   };
 
-  // Create player for socket
-  socket.emit('player:init', {
-    clientId,
-    players: Object.keys(gameRoom.clients),
-  });
+  const players: PlayersList = {}
 
-  // Create new player for everyone else
-  // socket.broadcast.emit('player:join');
+  for (const clientId of Object.keys(gameRoom.clients)) {
+    const playerEntity = gameRoom.clients[clientId].entity;
+
+    players[clientId] = getPlayerDataFromEntity(playerEntity);
+  }
+
+  // Create player for socket
+  socket.emit('players:init', {
+    newClientId,
+    players,
+  });
 });
 
 // Room leave

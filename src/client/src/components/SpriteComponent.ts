@@ -59,7 +59,7 @@ class SpriteComponent implements Component {
 
     this.object = new PIXI.AnimatedSprite(this.sheet.idle);
 
-    this.currentAnimationName = 'idle';
+    this.currentAnimationName = 'default';
   }
 
   setAnimation(animationName: string): void {
@@ -81,14 +81,23 @@ class SpriteComponent implements Component {
     }
   }
 
-  setScale({ x = null, y = null }: setScaleMetadata): void {
-    if (x) {
-      this.object.scale.x = x;
-    }
+  // setScale(x:number|undefined,): void {
+  //   console.log("setScale");
+  //   if (x) {
+  //     this.object.scale.x = x;
+  //   }
 
-    if (y) {
-      this.object.scale.y = y;
-    }
+  //   if (y) {
+  //     this.object.scale.y = y;
+  //   }
+  // }
+
+  setXScale(value: number): void {
+    this.object.scale.x = value;
+  }
+
+  setYScale(value: number): void {
+    this.object.scale.y = value;
   }
 }
 

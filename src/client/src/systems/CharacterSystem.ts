@@ -256,6 +256,10 @@ class CharacterSystem extends ExtendedSystem {
           COMPONENT_NAMES.Velocity,
         );
 
+        const spriteComponent = entity.getComponent<SpriteComponent>(
+          COMPONENT_NAMES.Sprite,
+        );
+
         if (characterComponent) {
           // Listen to socket events
           if (playerComponent) {
@@ -264,7 +268,7 @@ class CharacterSystem extends ExtendedSystem {
             if (socket) {
               socket.on(`characterUpdate:${clientId}`, (data) => {
                 const {
-                  x, y, xSpeed, ySpeed, sprite,
+                  x, y, sprite,
                 } = data;
 
                 if (positionComponent) {
@@ -272,17 +276,23 @@ class CharacterSystem extends ExtendedSystem {
                   positionComponent.y = y;
                 }
 
-                if (sprite) {
-                  console.log(data);
-                }
+                if (spriteComponent && sprite) {
+                  if (sprite.name) {
+                    spriteComponent.setAnimation(sprite.name);
+                  }
 
-                // if (velocityComponent) {
-                //   velocityComponent.xSpeed = xSpeed;
-                //   velocityComponent.ySpeed = ySpeed;
-                // }
+                  if (sprite.scale) {
+                    if (sprite.scale.x) {
+                      spriteComponent.setXScale(sprite.scale.x);
+                    }
+                  }
+                }
               });
             }
           }
+
+          // Set initial sprite
+          spriteComponent?.setAnimation("idle");
         }
       });
   }

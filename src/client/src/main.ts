@@ -44,7 +44,7 @@ const container = new PIXI.Container();
 app.stage.addChild(container);
 
 // Rescale PIXI stage
-const stageScale: number = 2;
+const stageScale: number = 1;
 app.stage.scale.x = stageScale;
 app.stage.scale.y = stageScale;
 
@@ -81,21 +81,35 @@ socket.on('connect', () => {
   // Make player automatically join the test room
   socket.emit('join', 'test');
 
-  socket.on('player:join', () => {
-    console.log('Init player');
+  // socket.on('player:join', (data) => {
+  //   console.log('New player joins in');
+  //   console.log(data);
 
-    const newPlayerEntity = createPlayerEntity();
-    world.addEntity(newPlayerEntity);
+  //   // const newPlayerEntity = createPlayerEntity();
+  //   // world.addEntity(newPlayerEntity);
+  // });
+
+  socket.on('players:init', (data) => {
+    console.log('Init players');
+
+    console.log('players:init');
+    console.log(data);
+
+
+    // // Add client player
+    // const { clientId } = data;
+
+    // const newPlayerEntity = createPlayerEntity();
+    // newPlayerEntity.addComponent(new PlayerComponent(clientId, socket));
+    // world.addEntity(newPlayerEntity);
   });
 
-  socket.on('player:init', (data) => {
-    console.log('Init player');
+  socket.on('players:join', (data) => {
+    console.log('New player joins in');
+    console.log(data);
 
-    const { clientId } = data;
-
-    const newPlayerEntity = createPlayerEntity();
-    newPlayerEntity.addComponent(new PlayerComponent(clientId, socket));
-    world.addEntity(newPlayerEntity);
+    // const newPlayerEntity = createPlayerEntity();
+    // world.addEntity(newPlayerEntity);
   });
 
   socket.on('gameRoom:init', (data: GameRoomMetadata) => {
@@ -113,7 +127,7 @@ socket.on('connect', () => {
       .addSystem(new CharacterSystem({ app }))
       .addSystem(new SpriteSystem({ app }))
       .addSystem(new PlayerSystem({ app }))
-    ;
+      ;
 
     // Initialize map
     const mapData: MapMetadata = data.map;
@@ -124,9 +138,5 @@ socket.on('connect', () => {
 
     // Start world
     app.ticker.add((deltaTime) => world.update(deltaTime));
-  });
-
-  socket.on('characterUpdate', (data) => {
-    console.log(data);
   });
 });

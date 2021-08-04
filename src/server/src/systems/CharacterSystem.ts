@@ -209,7 +209,7 @@ class CharacterSystem extends ExtendedSystem {
         const { server, onFloor } = characterComponent;
         const { x, y } = positionComponent;
         const { xSpeed, ySpeed } = velocityComponent;
-        const { spriteName } = spriteComponent;
+        const { spriteName, scale } = spriteComponent;
 
         // Sprite name to send to client
         const spriteData: SpriteData = {};
@@ -238,6 +238,14 @@ class CharacterSystem extends ExtendedSystem {
         // Set scale change
         if (Object.keys(newScale).length > 0) {
           spriteData.scale = { ...newScale };
+
+          if (newScale.x && newScale.x != scale.x) {
+            spriteComponent.scale.x = newScale.x;
+          }
+
+          if (newScale.y && newScale.y != scale.y) {
+            spriteComponent.scale.y = newScale.y;
+          }
 
           // Apply to spriteComponent
         }
