@@ -83,21 +83,6 @@ class PositionSystem extends ExtendedSystem {
           );
         }
       });
-
-    // this.disposeBag
-    //   .completable$(
-    //     world.entityRemoved$([
-    //       COMPONENT_NAMES.Position,
-    //       COMPONENT_NAMES.Sprite,
-    //     ]),
-    //   )
-    //   .subscribe((entity) => {
-    //     const sprite = entity.getComponent(COMPONENT_NAMES.Sprite);
-
-    //     if (sprite) {
-    //       this.app.stage.removeChild(sprite.object);
-    //     }
-    //   });
   }
 }
 

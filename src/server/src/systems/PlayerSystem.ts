@@ -58,6 +58,29 @@ class PlayerSystem extends ExtendedSystem {
         }
       });
   }
+
+  removedFromWorld(world: World): void {
+    this.disposeBag
+      .completable$(
+        world.entityRemoved$([
+          COMPONENT_NAMES.Player,
+          COMPONENT_NAMES.Character,
+        ]),
+      )
+      .subscribe((entity) => {
+        const playerComponent = entity.getComponent<PlayerComponent>(
+          COMPONENT_NAMES.Player,
+        );
+
+        if (playerComponent) {
+          const { socket, clientId } = playerComponent;
+
+          socket.emit('player:delete', {
+            clientId,
+          });
+        }
+      });
+  }
 }
 
 export default PlayerSystem;

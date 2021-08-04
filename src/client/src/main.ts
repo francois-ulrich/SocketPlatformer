@@ -44,7 +44,7 @@ const container = new PIXI.Container();
 app.stage.addChild(container);
 
 // Rescale PIXI stage
-const stageScale: number = 1;
+const stageScale: number = 2;
 app.stage.scale.x = stageScale;
 app.stage.scale.y = stageScale;
 
@@ -90,26 +90,30 @@ socket.on('connect', () => {
   // });
 
   socket.on('players:init', (data) => {
-    console.log('Init players');
+    console.log('Init player');
 
-    console.log('players:init');
-    console.log(data);
+    const { clientId } = data;
 
-
-    // // Add client player
-    // const { clientId } = data;
-
-    // const newPlayerEntity = createPlayerEntity();
-    // newPlayerEntity.addComponent(new PlayerComponent(clientId, socket));
-    // world.addEntity(newPlayerEntity);
+    const newPlayerEntity = createPlayerEntity();
+    newPlayerEntity.addComponent(new PlayerComponent(clientId, socket));
+    world.addEntity(newPlayerEntity);
   });
 
-  socket.on('players:join', (data) => {
-    console.log('New player joins in');
-    console.log(data);
+  socket.on('player:add', (data) => {
+    const { clientId } = data;
 
-    // const newPlayerEntity = createPlayerEntity();
-    // world.addEntity(newPlayerEntity);
+    const newPlayerEntity = createPlayerEntity();
+    newPlayerEntity.addComponent(new PlayerComponent(clientId));
+    world.addEntity(newPlayerEntity);
+  });
+
+  socket.on('players:update', (data) => {
+    console.log(data);
+  });
+
+  socket.on('player:delete', (data) => {
+    console.log('delete player');
+    console.log(data);
   });
 
   socket.on('gameRoom:init', (data: GameRoomMetadata) => {
@@ -127,7 +131,7 @@ socket.on('connect', () => {
       .addSystem(new CharacterSystem({ app }))
       .addSystem(new SpriteSystem({ app }))
       .addSystem(new PlayerSystem({ app }))
-      ;
+    ;
 
     // Initialize map
     const mapData: MapMetadata = data.map;

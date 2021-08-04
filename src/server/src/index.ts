@@ -25,6 +25,9 @@ import PlayerSystem from './systems/PlayerSystem';
 import CharacterSystem from './systems/CharacterSystem';
 import CollisionSystem from './systems/CollisionSystem';
 
+// Types
+import { PlayerData, PlayersList } from './types/player';
+
 // Test map
 import map from './assets/maps/test';
 
@@ -33,7 +36,6 @@ import { CLIENT_FPS, TICK_RATE } from './global';
 // import { TICK_RATE } from './global';
 
 const randomstring = require('randomstring');
-
 
 // ======================================================
 // ======================================================
@@ -62,16 +64,6 @@ function createPlayerEntity(socket: Socket, clientId: string): Entity {
   return hero;
 }
 
-type PlayersList = {
-  [key: string]: PlayerData
-}
-
-type PlayerData = null | {
-  clientId: string,
-  x: number,
-  y: number
-}
-
 function getPlayerDataFromEntity(entity: Entity): PlayerData {
   const playerComponent = entity.getComponent<PlayerComponent>(
     COMPONENT_NAMES.Player,
@@ -92,7 +84,7 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData {
       x,
       y,
       clientId,
-    }
+    };
   }
 
   return result;
@@ -105,7 +97,6 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData {
 // ======================================================
 // ======================================================
 // ======================================================
-
 
 // Map storing room data for each socket room
 const gameRooms: Map<string, GameRoom> = new Map<string, GameRoom>();
@@ -132,9 +123,12 @@ io.on('connection', (socket: Socket) => {
 io.of('/').adapter.on('create-room', (room: string) => {
   console.log(`Create room: "${room}"`);
 
+  const name = 'test';
+
   // Create new game room
   const gameRoom = new GameRoom({
     map,
+    name,
   });
 
   // Create linked game room
@@ -146,7 +140,7 @@ io.of('/').adapter.on('create-room', (room: string) => {
     .addSystem(new GravitySystem())
     .addSystem(new CollisionSystem())
     .addSystem(new VelocitySystem())
-    ;
+  ;
 
   // Add system to game room's world
   const mapEntity = new Entity();
@@ -215,19 +209,20 @@ io.of('/').adapter.on('join-room', (room, socketId) => {
     entity: player,
   };
 
-  const players: PlayersList = {}
+  const players: PlayersList = {};
 
-  for (const clientId of Object.keys(gameRoom.clients)) {
+  Object.keys(gameRoom.clients).forEach((clientId) => {
     const playerEntity = gameRoom.clients[clientId].entity;
-
     players[clientId] = getPlayerDataFromEntity(playerEntity);
-  }
+  });
 
-  // Create player for socket
+  // Send player and other players data to client
   socket.emit('players:init', {
-    newClientId,
+    clientId: newClientId,
     players,
   });
+
+  socket.broadcast.emit('player:add', players[newClientId]);
 });
 
 // Room leave
@@ -238,6 +233,29 @@ io.of('/').adapter.on('leave-room', (room, socketId) => {
   // If no gameRoom corresponding to given room name is found, exit event,
   if (gameRoom === undefined) {
     return;
+  }
+
+  // Remove player entity from world
+
+  // Get player entities
+  const playerEntities = gameRoom.world.getEntities([COMPONENT_NAMES.Player]);
+
+  for (let i = 0; i < playerEntities.length; i += 1) {
+    const entity = playerEntities[i];
+
+    const playerComponent = entity.getComponent<PlayerComponent>(COMPONENT_NAMES.Player);
+
+    if (playerComponent) {
+      const { socket, clientId } = playerComponent;
+
+      if (socket.id === socketId) {
+        io.of(gameRoom.name).emit('player:delete', {
+          clientId,
+        });
+
+        break;
+      }
+    }
   }
 
   gameRoom.clientsNumber -= 1;
