@@ -64,7 +64,7 @@ function createPlayerEntity(socket: Socket, clientId: string): Entity {
   return hero;
 }
 
-function getPlayerDataFromEntity(entity: Entity): PlayerData {
+function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
   const playerComponent = entity.getComponent<PlayerComponent>(
     COMPONENT_NAMES.Player,
   );
@@ -78,21 +78,15 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData {
   if (positionComponent
     && playerComponent) {
     const { x, y } = positionComponent;
-    const { clientId } = playerComponent;
 
     result = {
       x,
       y,
-      clientId,
     };
   }
 
   return result;
 }
-
-// function sendPlayerData(): void {
-//   io.sockets.emit("")
-// }
 
 // ======================================================
 // ======================================================
@@ -140,7 +134,7 @@ io.of('/').adapter.on('create-room', (room: string) => {
     .addSystem(new GravitySystem())
     .addSystem(new CollisionSystem())
     .addSystem(new VelocitySystem())
-  ;
+    ;
 
   // Add system to game room's world
   const mapEntity = new Entity();
@@ -213,7 +207,12 @@ io.of('/').adapter.on('join-room', (room, socketId) => {
 
   Object.keys(gameRoom.clients).forEach((clientId) => {
     const playerEntity = gameRoom.clients[clientId].entity;
-    players[clientId] = getPlayerDataFromEntity(playerEntity);
+
+    var playerData = getPlayerDataFromEntity(playerEntity);
+
+    if (playerData) {
+      players[clientId] = playerData;
+    }
   });
 
   // Send player and other players data to client
@@ -223,6 +222,9 @@ io.of('/').adapter.on('join-room', (room, socketId) => {
   });
 
   socket.broadcast.emit('player:add', players[newClientId]);
+
+  // Increment client number
+  gameRoom.clientsNumber += 1;
 });
 
 // Room leave
@@ -249,7 +251,9 @@ io.of('/').adapter.on('leave-room', (room, socketId) => {
       const { socket, clientId } = playerComponent;
 
       if (socket.id === socketId) {
-        io.of(gameRoom.name).emit('player:delete', {
+        console.log(`Socket ${socketId} leaves room ${gameRoom.name}`);
+
+        io.in(gameRoom.name).emit('player:delete', {
           clientId,
         });
 
@@ -258,8 +262,9 @@ io.of('/').adapter.on('leave-room', (room, socketId) => {
     }
   }
 
+  // Decrement client number
   gameRoom.clientsNumber -= 1;
-  console.log(`Socket ${socketId} has left room ${room}`);
+
   console.log(`Room "${room}" has now ${gameRoom.clientsNumber} players`);
 });
 

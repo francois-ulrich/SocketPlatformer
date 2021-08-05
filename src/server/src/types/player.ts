@@ -1,5 +1,4 @@
-type PlayerData = null | {
-  clientId: string;
+type PlayerData = {
   x: number;
   y: number;
 };

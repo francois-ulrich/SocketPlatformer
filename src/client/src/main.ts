@@ -3,12 +3,15 @@ import * as PIXI from 'pixi.js';
 import { World, Entity } from 'super-ecs';
 import { io, Socket } from 'socket.io-client';
 
+// ECS Stuff
+import COMPONENT_NAMES from './components/types';
+
 // Component
 import PositionComponent from './components/PositionComponent';
 import SpriteComponent from './components/SpriteComponent';
 import VelocityComponent from './components/VelocityComponent';
 import MapComponent from './components/MapComponent';
-import CollisionComponent from './components/CollisionComponent';
+// import CollisionComponent from './components/CollisionComponent';
 import PlayerComponent from './components/PlayerComponent';
 import CharacterComponent from './components/CharacterComponent';
 
@@ -21,10 +24,11 @@ import PlayerSystem from './systems/PlayerSystem';
 import CharacterSystem from './systems/CharacterSystem';
 // import CollisionSystem from './systems/CollisionSystem';
 
-// Metadata
+// Types
 import { SpriteMetadata } from './types/spriteMetadata';
 import { MapMetadata } from '../../shared/src/types/mapMetadata';
 import GameRoomMetadata from '../../shared/src/types/gameRoomMetadata';
+import { PlayerData } from '../../server/src/types/player';
 
 import spriteData from './assets/sprites/simon/data';
 
@@ -44,7 +48,7 @@ const container = new PIXI.Container();
 app.stage.addChild(container);
 
 // Rescale PIXI stage
-const stageScale: number = 2;
+const stageScale: number = 1;
 app.stage.scale.x = stageScale;
 app.stage.scale.y = stageScale;
 
@@ -54,14 +58,15 @@ PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 PIXI.settings.RENDER_OPTIONS.antialias = true; // Enable antialiasing
 
 // Temp: add test entity
-function createPlayerEntity(): Entity {
-  const playerEntity: Entity = new Entity();
+function createPlayerEntity(data: PlayerData): Entity {
+  const { x, y } = data;
 
+  const playerEntity: Entity = new Entity();
   const sprite: SpriteMetadata = spriteData;
 
   playerEntity
     .addComponent(new VelocityComponent())
-    .addComponent(new PositionComponent({ x: 32, y: 32 }))
+    .addComponent(new PositionComponent({ x, y }))
     .addComponent(new CharacterComponent())
     .addComponent(new SpriteComponent(sprite));
 
@@ -81,28 +86,31 @@ socket.on('connect', () => {
   // Make player automatically join the test room
   socket.emit('join', 'test');
 
-  // socket.on('player:join', (data) => {
-  //   console.log('New player joins in');
-  //   console.log(data);
-
-  //   // const newPlayerEntity = createPlayerEntity();
-  //   // world.addEntity(newPlayerEntity);
-  // });
-
+  // =============
   socket.on('players:init', (data) => {
     console.log('Init player');
 
-    const { clientId } = data;
+    const { clientId, players } = data;
 
-    const newPlayerEntity = createPlayerEntity();
-    newPlayerEntity.addComponent(new PlayerComponent(clientId, socket));
-    world.addEntity(newPlayerEntity);
+    // Add all entities
+    Object.entries(players).forEach(([id, playerData]) => {
+      console.log(id, playerData);
+
+      const newPlayerEntity = createPlayerEntity(playerData);
+
+      // Add player component on client's player 
+      if (id === clientId) {
+        newPlayerEntity.addComponent(new PlayerComponent(clientId, socket));
+      }
+
+      world.addEntity(newPlayerEntity);
+    });
   });
 
   socket.on('player:add', (data) => {
     const { clientId } = data;
 
-    const newPlayerEntity = createPlayerEntity();
+    const newPlayerEntity = createPlayerEntity(data);
     newPlayerEntity.addComponent(new PlayerComponent(clientId));
     world.addEntity(newPlayerEntity);
   });
@@ -112,8 +120,20 @@ socket.on('connect', () => {
   });
 
   socket.on('player:delete', (data) => {
-    console.log('delete player');
-    console.log(data);
+    const { clientId } = data;
+
+    // Find entity to delete
+    const playerEntities = world.getEntities([COMPONENT_NAMES.Player]);
+
+    for (let i = 0; i < playerEntities.length; i += 1) {
+      const entity = playerEntities[i];
+
+      const playerComponent = entity.getComponent<PlayerComponent>(COMPONENT_NAMES.Player);
+
+      if (playerComponent && clientId === playerComponent.clientId) {
+        world.removeEntity(entity);
+      }
+    }
   });
 
   socket.on('gameRoom:init', (data: GameRoomMetadata) => {
@@ -131,7 +151,7 @@ socket.on('connect', () => {
       .addSystem(new CharacterSystem({ app }))
       .addSystem(new SpriteSystem({ app }))
       .addSystem(new PlayerSystem({ app }))
-    ;
+      ;
 
     // Initialize map
     const mapData: MapMetadata = data.map;

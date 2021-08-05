@@ -34,6 +34,23 @@ class SpriteSystem extends ExtendedSystem {
           this.app.stage.addChild(spriteComponent.object);
         }
       });
+
+    // Remove sprite object on entity delete
+    this.disposeBag
+      .completable$(
+        world.entityRemoved$([
+          COMPONENT_NAMES.Sprite,
+        ]),
+      )
+      .subscribe((entity) => {
+        const spriteComponent = entity.getComponent<SpriteComponent>(
+          COMPONENT_NAMES.Sprite,
+        );
+
+        if (spriteComponent) {
+          this.app.stage.removeChild(spriteComponent.object);
+        }
+      });
   }
 }
 
