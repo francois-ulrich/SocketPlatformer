@@ -9,17 +9,17 @@ import GravityComponent from '../components/GravityComponent';
 import MapComponent from '../components/MapComponent';
 import PositionComponent from '../components/PositionComponent';
 import PlayerComponent from '../components/PlayerComponent';
-import SpriteComponent from '../components/SpriteComponent';
+// import SpriteComponent from '../components/SpriteComponent';
 
-type SpriteScaleData = {
-  x?: number,
-  y?: number,
-}
+// type SpriteScaleData = {
+//   x?: number,
+//   y?: number,
+// }
 
-type SpriteData = {
-  name?: string,
-  scale?: SpriteScaleData
-}
+// type SpriteData = {
+//   name?: string,
+//   scale?: SpriteScaleData
+// }
 
 class CharacterSystem extends ExtendedSystem {
   // update(delta: number): void {
@@ -54,9 +54,9 @@ class CharacterSystem extends ExtendedSystem {
         COMPONENT_NAMES.Player,
       );
 
-      const spriteComponent = entity.getComponent<SpriteComponent>(
-        COMPONENT_NAMES.Sprite,
-      );
+      // const spriteComponent = entity.getComponent<SpriteComponent>(
+      //   COMPONENT_NAMES.Sprite,
+      // );
 
       // Get map entity
       const [mapEntity] = this.world.getEntities([COMPONENT_NAMES.Map]);
@@ -199,71 +199,71 @@ class CharacterSystem extends ExtendedSystem {
         }
       }
 
-      // Socket emit character data
-      if (characterComponent
-        && playerComponent
-        && velocityComponent
-        && positionComponent
-        && spriteComponent) {
-        const { clientId } = playerComponent;
-        const { server, onFloor } = characterComponent;
-        const { x, y } = positionComponent;
-        const { xSpeed, ySpeed } = velocityComponent;
-        const { spriteName, scale } = spriteComponent;
+      // // Socket emit character data
+      // if (characterComponent
+      //   && playerComponent
+      //   && velocityComponent
+      //   && positionComponent
+      //   && spriteComponent) {
+      //   const { clientId } = playerComponent;
+      //   const { server, onFloor } = characterComponent;
+      //   const { x, y } = positionComponent;
+      //   const { xSpeed, ySpeed } = velocityComponent;
+      //   const { spriteName, scale } = spriteComponent;
 
-        // Sprite name to send to client
-        const spriteData: SpriteData = {};
+      //   // Sprite name to send to client
+      //   const spriteData: SpriteData = {};
 
-        let newSpriteName: string | null = null;
-        const newScale: SpriteScaleData = {};
+      //   let newSpriteName: string | null = null;
+      //   const newScale: SpriteScaleData = {};
 
-        if (onFloor) {
-          if (Math.abs(velocityComponent.xSpeed) > 0) {
-            newSpriteName = 'walk';
-            newScale.x = Math.sign(velocityComponent.xSpeed);
-          } else {
-            newSpriteName = 'idle';
-          }
-        } else {
-          newSpriteName = 'jump';
-          newScale.x = Math.sign(characterComponent.direction);
-        }
+      //   if (onFloor) {
+      //     if (Math.abs(velocityComponent.xSpeed) > 0) {
+      //       newSpriteName = 'walk';
+      //       newScale.x = Math.sign(velocityComponent.xSpeed);
+      //     } else {
+      //       newSpriteName = 'idle';
+      //     }
+      //   } else {
+      //     newSpriteName = 'jump';
+      //     newScale.x = Math.sign(characterComponent.direction);
+      //   }
 
-        // Set sprite change
-        if (newSpriteName !== spriteName) {
-          spriteData.name = newSpriteName;
-          spriteComponent.spriteName = newSpriteName;
-        }
+      //   // Set sprite change
+      //   if (newSpriteName !== spriteName) {
+      //     spriteData.name = newSpriteName;
+      //     spriteComponent.spriteName = newSpriteName;
+      //   }
 
-        // Set scale change
-        if (Object.keys(newScale).length > 0) {
-          spriteData.scale = { ...newScale };
+      //   // Set scale change
+      //   if (Object.keys(newScale).length > 0) {
+      //     spriteData.scale = { ...newScale };
 
-          if (newScale.x && newScale.x != scale.x) {
-            spriteComponent.scale.x = newScale.x;
-          }
+      //     if (newScale.x && newScale.x != scale.x) {
+      //       spriteComponent.scale.x = newScale.x;
+      //     }
 
-          if (newScale.y && newScale.y != scale.y) {
-            spriteComponent.scale.y = newScale.y;
-          }
+      //     if (newScale.y && newScale.y != scale.y) {
+      //       spriteComponent.scale.y = newScale.y;
+      //     }
 
-          // Apply to spriteComponent
-        }
+      //     // Apply to spriteComponent
+      //   }
 
-        let emitData: any = {
-          x,
-          y,
-          xSpeed,
-          ySpeed,
-        };
+      //   let emitData: any = {
+      //     x,
+      //     y,
+      //     xSpeed,
+      //     ySpeed,
+      //   };
 
-        // If sprite data change, send it to client
-        if (Object.keys(spriteData).length > 0) {
-          emitData = { ...emitData, sprite: spriteData };
-        }
+      //   // If sprite data change, send it to client
+      //   if (Object.keys(spriteData).length > 0) {
+      //     emitData = { ...emitData, sprite: spriteData };
+      //   }
 
-        server.emit(`characterUpdate:${clientId}`, emitData);
-      }
+      //   server.emit(`characterUpdate:${clientId}`, emitData);
+      // }
     });
   }
 

@@ -73,9 +73,6 @@ class CharacterSystem extends ExtendedSystem {
         if (playerComponent) {
           characterComponent.input = playerComponent.input;
           characterComponent.inputPressed = playerComponent.inputPressed;
-
-          // console.log(characterComponent.input);
-          // console.log(characterComponent.inputPressed);
         }
 
         // Character input
@@ -292,7 +289,7 @@ class CharacterSystem extends ExtendedSystem {
           }
 
           // Set initial sprite
-          spriteComponent?.setAnimation("idle");
+          spriteComponent?.setAnimation('idle');
         }
       });
   }

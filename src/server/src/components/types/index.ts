@@ -7,6 +7,7 @@ const COMPONENT_NAMES = {
   Collision: Symbol('Collision'),
   Character: Symbol('Character'),
   Player: Symbol('Player'),
+  Update: Symbol('Update'),
 };
 
 export default COMPONENT_NAMES;

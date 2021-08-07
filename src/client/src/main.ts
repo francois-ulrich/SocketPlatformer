@@ -30,6 +30,8 @@ import { MapMetadata } from '../../shared/src/types/mapMetadata';
 import GameRoomMetadata from '../../shared/src/types/gameRoomMetadata';
 import { PlayerData } from '../../server/src/types/player';
 
+import getPlayerEntityFromClientId from './util/getPlayerEntityFromClientId';
+
 import spriteData from './assets/sprites/simon/data';
 
 // Create a Pixi Application
@@ -48,7 +50,7 @@ const container = new PIXI.Container();
 app.stage.addChild(container);
 
 // Rescale PIXI stage
-const stageScale: number = 1;
+const stageScale: number = 2;
 app.stage.scale.x = stageScale;
 app.stage.scale.y = stageScale;
 
@@ -58,17 +60,20 @@ PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 PIXI.settings.RENDER_OPTIONS.antialias = true; // Enable antialiasing
 
 // Temp: add test entity
-function createPlayerEntity(data: PlayerData): Entity {
-  const { x, y } = data;
+function createPlayerEntity(data: PlayerData, socket?:Socket): Entity {
+  const { clientId, x, y } = data;
+
+  console.log(data);
 
   const playerEntity: Entity = new Entity();
   const sprite: SpriteMetadata = spriteData;
 
   playerEntity
-    .addComponent(new VelocityComponent())
+    // .addComponent(new VelocityComponent())
     .addComponent(new PositionComponent({ x, y }))
     .addComponent(new CharacterComponent())
-    .addComponent(new SpriteComponent(sprite));
+    .addComponent(new SpriteComponent(sprite))
+    .addComponent(new PlayerComponent(clientId, socket));
 
   return playerEntity;
 }
@@ -94,29 +99,63 @@ socket.on('connect', () => {
 
     // Add all entities
     Object.entries(players).forEach(([id, playerData]) => {
-      console.log(id, playerData);
+      const newPlayerEntity = createPlayerEntity(playerData, id === clientId ? socket : null);
 
-      const newPlayerEntity = createPlayerEntity(playerData);
-
-      // Add player component on client's player 
-      if (id === clientId) {
-        newPlayerEntity.addComponent(new PlayerComponent(clientId, socket));
-      }
+      // // Add player component on client's player
+      // if (id === clientId) {
+      //   newPlayerEntity.addComponent(new PlayerComponent(clientId, socket));
+      // }
 
       world.addEntity(newPlayerEntity);
     });
   });
 
   socket.on('player:add', (data) => {
-    const { clientId } = data;
-
+    console.log(data);
     const newPlayerEntity = createPlayerEntity(data);
-    newPlayerEntity.addComponent(new PlayerComponent(clientId));
+    // newPlayerEntity.addComponent(new PlayerComponent(clientId));
+
     world.addEntity(newPlayerEntity);
   });
 
-  socket.on('players:update', (data) => {
-    console.log(data);
+  socket.on('players:update', (playersData) => {
+    // console.log(Object.entries(playersData));
+
+    // Update each players
+    Object.keys(playersData).forEach((clientId) => {
+      const playerData = playersData[clientId];
+
+      const { x, y } = playerData;
+
+      const entity = getPlayerEntityFromClientId(world, clientId);
+
+      // console.log(entity);
+
+      if (entity) {
+        const positionComponent = entity.getComponent<PositionComponent>(
+          COMPONENT_NAMES.Position,
+        );
+
+        if (positionComponent) {
+          positionComponent.x = x;
+          positionComponent.y = y;
+
+          // console.log(x, y);
+        }
+      }
+    });
+
+    // // Add all entities
+    // Object.entries(players).forEach(([id, playerData]) => {
+    //   const newPlayerEntity = createPlayerEntity(playerData);
+
+    //   // Add player component on client's player
+    //   if (id === clientId) {
+    //     newPlayerEntity.addComponent(new PlayerComponent(clientId, socket));
+    //   }
+
+    //   world.addEntity(newPlayerEntity);
+    // });
   });
 
   socket.on('player:delete', (data) => {
@@ -151,7 +190,7 @@ socket.on('connect', () => {
       .addSystem(new CharacterSystem({ app }))
       .addSystem(new SpriteSystem({ app }))
       .addSystem(new PlayerSystem({ app }))
-      ;
+    ;
 
     // Initialize map
     const mapData: MapMetadata = data.map;

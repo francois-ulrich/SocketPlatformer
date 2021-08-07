@@ -1,4 +1,5 @@
 type PlayerData = {
+  clientId: string;
   x: number;
   y: number;
 };

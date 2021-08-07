@@ -2,13 +2,10 @@ import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import { Entity } from 'super-ecs';
 
-// Other
-import GameRoom from './other/GameRoom';
-
-// ECS Stuff
+// ECS Types
 import COMPONENT_NAMES from './components/types';
 
-// Component
+// ECS Component
 import PositionComponent from './components/PositionComponent';
 import VelocityComponent from './components/VelocityComponent';
 import MapComponent from './components/MapComponent';
@@ -17,18 +14,26 @@ import PlayerComponent from './components/PlayerComponent';
 import CharacterComponent from './components/CharacterComponent';
 import GravityComponent from './components/GravityComponent';
 import SpriteComponent from './components/SpriteComponent';
+import UpdateComponent from './components/UpdateComponent';
 
-// System
+// ECS System
 import VelocitySystem from './systems/VelocitySystem';
 import GravitySystem from './systems/GravitySystem';
 import PlayerSystem from './systems/PlayerSystem';
 import CharacterSystem from './systems/CharacterSystem';
 import CollisionSystem from './systems/CollisionSystem';
+import UpdateSystem from './systems/UpdateSystem';
 
 // Types
-import { PlayerData, PlayersList } from './types/player';
+import { PlayersList } from './types/player';
 
-// Test map
+// Util
+import getPlayerDataFromEntity from './util/getPlayerDataFromEntity';
+
+// Other
+import GameRoom from './other/GameRoom';
+
+// Map
 import map from './assets/maps/test';
 
 import { CLIENT_FPS, TICK_RATE } from './global';
@@ -49,7 +54,9 @@ const io = new Server(httpServer, {
   },
 });
 
-function createPlayerEntity(socket: Socket, clientId: string): Entity {
+function createPlayerEntity(socket: Socket,
+  clientId: string,
+  roomName: string): Entity {
   const hero: Entity = new Entity();
 
   hero
@@ -59,33 +66,9 @@ function createPlayerEntity(socket: Socket, clientId: string): Entity {
     .addComponent(new PositionComponent({ x: 0, y: 0 }))
     .addComponent(new CharacterComponent(io))
     .addComponent(new SpriteComponent())
-    .addComponent(new PlayerComponent(socket, clientId));
+    .addComponent(new PlayerComponent(socket, clientId, roomName));
 
   return hero;
-}
-
-function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
-  const playerComponent = entity.getComponent<PlayerComponent>(
-    COMPONENT_NAMES.Player,
-  );
-
-  const positionComponent = entity.getComponent<PositionComponent>(
-    COMPONENT_NAMES.Position,
-  );
-
-  let result = null;
-
-  if (positionComponent
-    && playerComponent) {
-    const { x, y } = positionComponent;
-
-    result = {
-      x,
-      y,
-    };
-  }
-
-  return result;
 }
 
 // ======================================================
@@ -117,12 +100,12 @@ io.on('connection', (socket: Socket) => {
 io.of('/').adapter.on('create-room', (room: string) => {
   console.log(`Create room: "${room}"`);
 
-  const name = 'test';
+  const roomName = 'test';
 
   // Create new game room
   const gameRoom = new GameRoom({
     map,
-    name,
+    name: roomName,
   });
 
   // Create linked game room
@@ -134,12 +117,14 @@ io.of('/').adapter.on('create-room', (room: string) => {
     .addSystem(new GravitySystem())
     .addSystem(new CollisionSystem())
     .addSystem(new VelocitySystem())
-    ;
+    .addSystem(new UpdateSystem())
+  ;
 
   // Add system to game room's world
-  const mapEntity = new Entity();
-  mapEntity.addComponent(new MapComponent(map));
-  gameRoom.world.addEntity(mapEntity);
+  const roomEntity = new Entity();
+  roomEntity.addComponent(new MapComponent(map));
+  roomEntity.addComponent(new UpdateComponent(io, roomName));
+  gameRoom.world.addEntity(roomEntity);
 
   // Start game room gameloop
   gameRoom.gameLoop.setUpdateFunction((delta: number) => {
@@ -196,7 +181,7 @@ io.of('/').adapter.on('join-room', (room, socketId) => {
   const newClientId = randomstring.generate();
 
   // Create server-side player ECS entity
-  const player = createPlayerEntity(socket, newClientId);
+  const player = createPlayerEntity(socket, newClientId, gameRoom.name);
   gameRoom.world.addEntity(player);
 
   gameRoom.clients[newClientId] = {
@@ -208,7 +193,7 @@ io.of('/').adapter.on('join-room', (room, socketId) => {
   Object.keys(gameRoom.clients).forEach((clientId) => {
     const playerEntity = gameRoom.clients[clientId].entity;
 
-    var playerData = getPlayerDataFromEntity(playerEntity);
+    const playerData = getPlayerDataFromEntity(playerEntity);
 
     if (playerData) {
       players[clientId] = playerData;
