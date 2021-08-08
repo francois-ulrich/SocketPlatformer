@@ -58,7 +58,10 @@ class UpdateSystem extends ExtendedSystem {
 
     // Send player and other players data to client
     if (updateComponent) {
-      updateComponent.io.in(updateComponent.roomName).emit('players:update', playersData);
+      updateComponent
+        .io
+        .in(updateComponent.roomName)
+        .emit('players:update', playersData);
     }
   }
 }
