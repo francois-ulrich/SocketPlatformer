@@ -33,8 +33,7 @@ class UpdateSystem extends ExtendedSystem {
     ])[0];
 
     // Exit if no entities found
-    if (entities.length === 0
-            || !updateEntity) {
+    if (entities.length === 0 || !updateEntity) {
       return;
     }
 
@@ -58,8 +57,7 @@ class UpdateSystem extends ExtendedSystem {
 
     // Send player and other players data to client
     if (updateComponent) {
-      updateComponent
-        .io
+      updateComponent.io
         .in(updateComponent.roomName)
         .emit('players:update', playersData);
     }

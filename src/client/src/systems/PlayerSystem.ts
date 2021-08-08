@@ -56,8 +56,6 @@ class PlayerSystem extends ExtendedSystem {
         if (socket) {
           // Reset all input pressed values
           Object.keys(playerComponent.input).forEach((key) => {
-            // playerComponent.inputPressed[key] = false;
-
             const keyDown: boolean = playerComponent.input[key] === true;
 
             if (playerComponent.inputPrev[key] !== playerComponent.input[key]) {
@@ -70,8 +68,6 @@ class PlayerSystem extends ExtendedSystem {
 
         // Set object of previous inputs
         playerComponent.inputPrev = { ...playerComponent.input };
-
-        // SocketIO stuff
       }
     });
   }
@@ -176,14 +172,11 @@ class PlayerSystem extends ExtendedSystem {
     });
 
     socket.on('players:update', (playersData) => {
-      // console.log('players:update');
-      // console.log(playersData);
-
       // Update each players
       Object.keys(playersData).forEach((clientId) => {
         const playerData = playersData[clientId];
 
-        const { x, y } = playerData;
+        const { x, y, sprite } = playerData;
 
         const entity = PlayerSystem.getPlayerEntityFromClientId(
           this.world,
@@ -191,6 +184,11 @@ class PlayerSystem extends ExtendedSystem {
         );
 
         if (entity) {
+          // Position update
+          const spriteComponent = entity.getComponent<SpriteComponent>(
+            COMPONENT_NAMES.Sprite,
+          );
+
           const positionComponent = entity.getComponent<PositionComponent>(
             COMPONENT_NAMES.Position,
           );
@@ -199,20 +197,20 @@ class PlayerSystem extends ExtendedSystem {
             positionComponent.x = x;
             positionComponent.y = y;
           }
+
+          if (spriteComponent && sprite) {
+            if (sprite.name) {
+              spriteComponent.setAnimation(sprite.name);
+            }
+
+            if (sprite.scale) {
+              if (sprite.scale.x) {
+                spriteComponent.setXScale(sprite.scale.x);
+              }
+            }
+          }
         }
       });
-
-      // // Add all entities
-      // Object.entries(players).forEach(([id, playerData]) => {
-      //   const newPlayerEntity = createPlayerEntity(playerData);
-
-      //   // Add player component on client's player
-      //   if (id === clientId) {
-      //     newPlayerEntity.addComponent(new PlayerComponent(clientId, socket));
-      //   }
-
-      //   world.addEntity(newPlayerEntity);
-      // });
     });
 
     socket.on('player:delete', (data) => {
@@ -262,8 +260,6 @@ class PlayerSystem extends ExtendedSystem {
     // Loop through entities to find player entity
     for (let i: number = 0; i < entities.length; i += 1) {
       const entity = entities[i];
-
-      // console.log(entity);
 
       const playerComponent = entity.getComponent<PlayerComponent>(
         COMPONENT_NAMES.Player,

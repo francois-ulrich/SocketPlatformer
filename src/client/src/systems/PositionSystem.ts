@@ -83,32 +83,12 @@ class PositionSystem extends ExtendedSystem {
         if (spriteComponent && positionComponent) {
           const { object } = spriteComponent;
 
-          // object.position.set(
-          //   Math.round(positionComponent.x),
-          //   Math.round(positionComponent.y),
-          // );
-
           object.position.set(
             positionComponent.x,
             positionComponent.y,
           );
         }
       });
-
-    // this.disposeBag
-    //   .completable$(
-    //     world.entityRemoved$([
-    //       COMPONENT_NAMES.Position,
-    //       COMPONENT_NAMES.Sprite,
-    //     ]),
-    //   )
-    //   .subscribe((entity) => {
-    //     const sprite = entity.getComponent(COMPONENT_NAMES.Sprite);
-
-    //     if (sprite) {
-    //       this.app.stage.removeChild(sprite.object);
-    //     }
-    //   });
   }
 }
 

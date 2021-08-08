@@ -9,7 +9,6 @@ import MapComponent from './components/MapComponent';
 // ECS System
 import SpriteSystem from './systems/SpriteSystem';
 import PositionSystem from './systems/PositionSystem';
-import VelocitySystem from './systems/VelocitySystem';
 import MapSystem from './systems/MapSystem';
 import PlayerSystem from './systems/PlayerSystem';
 import CharacterSystem from './systems/CharacterSystem';
@@ -47,7 +46,7 @@ PIXI.settings.RENDER_OPTIONS.antialias = true; // Enable antialiasing
 // Client initialization
 
 // Socket stuff
-const socket = io('ws://localhost:5000/');
+const socket: Socket = io('ws://localhost:5000/');
 
 // Instanciate ECS World
 socket.on('gameRoom:init', (data: GameRoomMetadata) => {
@@ -58,8 +57,6 @@ socket.on('gameRoom:init', (data: GameRoomMetadata) => {
 
   // Instanciate world
   world
-  // .addSystem(new CollisionSystem({ app }))
-    .addSystem(new VelocitySystem({ app }))
     .addSystem(new PositionSystem({ app }))
     .addSystem(new MapSystem({ app }))
     .addSystem(new CharacterSystem({ app }))

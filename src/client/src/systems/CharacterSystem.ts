@@ -162,8 +162,6 @@ class CharacterSystem extends ExtendedSystem {
           }
         }
 
-        const { onFloor } = characterComponent;
-
         // Fall if no floor under entity
         if (
           mapComponent
@@ -198,28 +196,6 @@ class CharacterSystem extends ExtendedSystem {
           if (characterComponent.onFloor && gravityComponent) {
             entity.removeComponent(COMPONENT_NAMES.Gravity);
           }
-        }
-
-        // Sprite update
-        if (spriteComponent
-          && velocityComponent) {
-          // switch (characterComponent.state) {
-          //   default:
-          //     if (onFloor) {
-          //       if (Math.abs(velocityComponent.xSpeed) > 0) {
-          //         spriteComponent.setAnimation('walk');
-          //         spriteComponent.setScale({ x: Math.sign(velocityComponent.xSpeed) });
-          //       } else {
-          //         spriteComponent.setAnimation('idle');
-          //       }
-          //     } else {
-          //       // spriteComponent.setAnimation('jump');
-          //       spriteComponent.setAnimation('idle');
-          //       spriteComponent.setScale({ x: Math.sign(characterComponent.direction) });
-          //     }
-
-          //     break;
-          // }
         }
       }
     });

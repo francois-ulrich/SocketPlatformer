@@ -38,8 +38,6 @@ import map from './assets/maps/test';
 
 import { CLIENT_FPS, TICK_RATE } from './global';
 
-// import { TICK_RATE } from './global';
-
 const randomstring = require('randomstring');
 
 // ======================================================
@@ -70,10 +68,6 @@ function createPlayerEntity(socket: Socket,
 
   return hero;
 }
-
-// ======================================================
-// ======================================================
-// ======================================================
 
 // Map storing room data for each socket room
 const gameRooms: Map<string, GameRoom> = new Map<string, GameRoom>();
