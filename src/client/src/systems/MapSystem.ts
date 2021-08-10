@@ -5,9 +5,13 @@ import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
 // import MapComponent from '../components/MapComponent';
-import MapComponent from './../../../shared/src/components/MapComponent';
+import MapComponent from '../../src/components/MapComponent';
 
 import solidTile from '../assets/tilemaps/solid.png';
+import stairsATile from '../assets/tilemaps/stairsA.png';
+import stairsDTile from '../assets/tilemaps/stairsD.png';
+
+import { TILE_SIZE } from '../global';
 
 class MapSystem extends ExtendedSystem {
   constructor({ app }: ExtendedSystemMetadata) {
@@ -30,8 +34,7 @@ class MapSystem extends ExtendedSystem {
         );
 
         if (mapComponent) {
-          const { collision } = mapComponent;
-          const size = 16;
+          const { collision, stairs } = mapComponent;
 
           const tilemap = new CompositeTilemap();
 
@@ -43,22 +46,45 @@ class MapSystem extends ExtendedSystem {
 
           for (let x = 0; x < tilemapWidth; x += 1) {
             for (let y = 0; y < tilemapHeight; y += 1) {
-              const collVal = collision[y][x];
+              const collVal: number = collision[y][x];
 
               if (collVal === 1) {
                 tilemap.tile(
                   solidTile,
-                  x * size,
-                  y * size,
+                  x * TILE_SIZE,
+                  y * TILE_SIZE,
                   {
-                    tileWidth: size,
-                    tileHeight: size,
+                    tileWidth: TILE_SIZE,
+                    tileHeight: TILE_SIZE,
                   },
                 );
               }
             }
           }
+
+          // Stairs
+          if (stairs) {
+            // Place stairs tiles
+            for (let x = 0; x < tilemapWidth; x += 1) {
+              for (let y = 0; y < tilemapHeight; y += 1) {
+                const stairVal: number = stairs[y][x];
+
+                if (stairVal > 0) {
+                  tilemap.tile(
+                    stairVal === 2 ? stairsATile : stairsDTile,
+                    x * TILE_SIZE,
+                    y * TILE_SIZE,
+                    {
+                      tileWidth: TILE_SIZE,
+                      tileHeight: TILE_SIZE,
+                    },
+                  );
+                }
+              }
+            }
+          }
         }
+
       });
   }
 }

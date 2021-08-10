@@ -34,7 +34,7 @@ import getPlayerDataFromEntity from './util/getPlayerDataFromEntity';
 import GameRoom from './other/GameRoom';
 
 // Map
-import map from './assets/maps/test';
+import map from './assets/maps/test2';
 
 import { CLIENT_FPS, TICK_RATE } from './global';
 
@@ -112,7 +112,7 @@ io.of('/').adapter.on('create-room', (room: string) => {
     .addSystem(new CollisionSystem())
     .addSystem(new VelocitySystem())
     .addSystem(new UpdateSystem())
-  ;
+    ;
 
   // Add system to game room's world
   const roomEntity = new Entity();

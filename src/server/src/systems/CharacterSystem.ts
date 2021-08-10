@@ -65,7 +65,16 @@ class CharacterSystem extends ExtendedSystem {
         return;
       }
 
+      // Get map component
+      const mapComponent = mapEntity.getComponent<MapComponent>(
+        COMPONENT_NAMES.Map,
+      );
+
+      let walkDir = 0;
+
+      // Get char position
       if (characterComponent) {
+        const { maxXSpeed, onFloor, speedIncr } = characterComponent;
         // User input
         if (playerComponent) {
           characterComponent.input = playerComponent.input;
@@ -74,11 +83,50 @@ class CharacterSystem extends ExtendedSystem {
 
         // Character input
         // Player movement
-        if (velocityComponent) {
-          const { onFloor, speedIncr } = characterComponent;
+        if (velocityComponent
+          && positionComponent
+          && collisionComponent
+        ) {
+          const { x } = positionComponent;
+          const { bottom } = collisionComponent.getCollisionBox(
+            positionComponent.x,
+            positionComponent.y,
+          );
+
+          // Check for stair
+          if (mapComponent) {
+            if (characterComponent.input.up) {
+
+              if (onFloor) {
+                const nearestStairX = mapComponent.getNearestStairX(x, bottom - 1);
+
+                if (nearestStairX) {
+                  if (nearestStairX === x) {
+                    // Go to stairs mode if nearest stair's X is equal to the player's
+                    console.log("go to stairs mode");
+                  } else {
+                    console.log(Math.abs(nearestStairX - x));
+
+                    if (Math.abs(nearestStairX - x) <= maxXSpeed) {
+                      positionComponent.x = nearestStairX;
+                    } else {
+                      if (x < nearestStairX) {
+                        // velocityComponent.xSpeed += speedIncr;
+                        console.log("go right");
+                        walkDir = 1;
+                      } else {
+                        // velocityComponent.xSpeed -= speedIncr;
+                        console.log("go left");
+                        walkDir = -1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
 
           // Stops if pressing left and right / not pressing any of the two buttons
-
           // Set direction
           if (
             (characterComponent.dirChangeMidAir
@@ -126,11 +174,13 @@ class CharacterSystem extends ExtendedSystem {
             } else {
               // Moving right
               if (characterComponent.input.right) {
-                velocityComponent.xSpeed += speedIncr;
+                // velocityComponent.xSpeed += speedIncr;
+                walkDir = 1;
               }
               // Moving left
               if (characterComponent.input.left) {
-                velocityComponent.xSpeed -= speedIncr;
+                // velocityComponent.xSpeed -= speedIncr;
+                walkDir = -1;
               }
             }
           } else if (
@@ -140,13 +190,10 @@ class CharacterSystem extends ExtendedSystem {
             velocityComponent.xSpeed
               += speedIncr * characterComponent.direction;
           }
+
+          velocityComponent.xSpeed += walkDir * speedIncr;
         }
       }
-
-      // Get map component
-      const mapComponent = mapEntity.getComponent<MapComponent>(
-        COMPONENT_NAMES.Map,
-      );
 
       if (characterComponent) {
         if (velocityComponent) {
@@ -198,109 +245,8 @@ class CharacterSystem extends ExtendedSystem {
           }
         }
       }
-
-      // // Socket emit character data
-      // if (characterComponent
-      //   && playerComponent
-      //   && velocityComponent
-      //   && positionComponent
-      //   && spriteComponent) {
-      //   const { clientId } = playerComponent;
-      //   const { server, onFloor } = characterComponent;
-      //   const { x, y } = positionComponent;
-      //   const { xSpeed, ySpeed } = velocityComponent;
-      //   const { spriteName, scale } = spriteComponent;
-
-      //   // Sprite name to send to client
-      //   const spriteData: SpriteData = {};
-
-      //   let newSpriteName: string | null = null;
-      //   const newScale: SpriteScaleData = {};
-
-      //   if (onFloor) {
-      //     if (Math.abs(velocityComponent.xSpeed) > 0) {
-      //       newSpriteName = 'walk';
-      //       newScale.x = Math.sign(velocityComponent.xSpeed);
-      //     } else {
-      //       newSpriteName = 'idle';
-      //     }
-      //   } else {
-      //     newSpriteName = 'jump';
-      //     newScale.x = Math.sign(characterComponent.direction);
-      //   }
-
-      //   // Set sprite change
-      //   if (newSpriteName !== spriteName) {
-      //     spriteData.name = newSpriteName;
-      //     spriteComponent.spriteName = newSpriteName;
-      //   }
-
-      //   // Set scale change
-      //   if (Object.keys(newScale).length > 0) {
-      //     spriteData.scale = { ...newScale };
-
-      //     if (newScale.x && newScale.x != scale.x) {
-      //       spriteComponent.scale.x = newScale.x;
-      //     }
-
-      //     if (newScale.y && newScale.y != scale.y) {
-      //       spriteComponent.scale.y = newScale.y;
-      //     }
-
-      //     // Apply to spriteComponent
-      //   }
-
-      //   let emitData: any = {
-      //     x,
-      //     y,
-      //     xSpeed,
-      //     ySpeed,
-      //   };
-
-      //   // If sprite data change, send it to client
-      //   if (Object.keys(spriteData).length > 0) {
-      //     emitData = { ...emitData, sprite: spriteData };
-      //   }
-
-      //   server.emit(`characterUpdate:${clientId}`, emitData);
-      // }
     });
   }
-
-  // addedToWorld(world: World): void {
-  //   super.addedToWorld(world);
-
-  //   // Add sprite to stage
-  //   this.disposeBag
-  //     .completable$(
-  //       world.entityAdded$([
-  //         COMPONENT_NAMES.Character,
-  //         COMPONENT_NAMES.Sprite,
-  //       ]),
-  //     )
-  //     .subscribe((entity) => {
-  //       const playerComponent = entity.getComponent<PlayerComponent>(
-  //         COMPONENT_NAMES.Player,
-  //       );
-
-  //       const characterComponent = entity.getComponent<CharacterComponent>(
-  //         COMPONENT_NAMES.Character,
-  //       );
-
-  //       if (characterComponent) {
-  //         // Listen to socket events
-  //         if (playerComponent) {
-  //           const { socket, clientId } = playerComponent;
-
-  //           if (socket) {
-  //             socket.on(`characterUpdate:${clientId}`, (data) => {
-  //               console.log(data);
-  //             });
-  //           }
-  //         }
-  //       }
-  //     });
-  // }
 }
 
 export default CharacterSystem;

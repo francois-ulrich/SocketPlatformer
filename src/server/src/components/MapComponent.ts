@@ -1,9 +1,11 @@
 import { Component } from 'super-ecs';
 import COMPONENT_NAMES from './types';
-import { MapMetadata, MapGridMetadata } from '../../../shared/src/types/mapMetadata';
+import { MapMetadata, MapGridMetadata } from '../types/mapMetadata';
 import { PositionMetadata } from '../types/positionMetadata';
 
-import { TILE_SIZE } from '../../../shared/src/global';
+import { TILE_SIZE } from '../global';
+import { TILE_STAIR_ASC } from '../global';
+import { TILE_STAIR_DESC } from '../global';
 
 type collisionMetadata = {
   x: number,
@@ -11,16 +13,21 @@ type collisionMetadata = {
   collision: number,
 }
 
+type StairX = number | null;
+
 class MapComponent implements Component {
   public name: symbol = COMPONENT_NAMES.Map;
 
   public collision: MapGridMetadata;
 
-  public tiles: MapGridMetadata | undefined;
+  public tiles?: MapGridMetadata;
 
-  constructor({ collision, tiles }: MapMetadata) {
+  public stairs?: MapGridMetadata;
+
+  constructor({ collision, tiles, stairs }: MapMetadata) {
     this.collision = collision;
     this.tiles = tiles;
+    this.stairs = stairs;
   }
 
   getWidth(): number {
@@ -107,57 +114,6 @@ class MapComponent implements Component {
 
     return collData.filter((el) => el.collision > 0).length > 0;
   }
-
-  // getMapCollisionRect(
-  //   x: number,
-  //   y: number,
-  //   width: number,
-  //   height: number,
-  // ): PositionMetadata | null {
-  //   console.log({
-  //     x1: x,
-  //     y1: y,
-  //     x2: x + width,
-  //     y2: y + height,
-  //   });
-
-  //   const horColls = this.getMapCollisionLineData(x, y, width, true);
-
-  //   console.log("horColls");
-  //   console.log(horColls);
-
-  //   for (let i = 0; i < horColls.length; i += 1) {
-  //     const coll = horColls[i];
-
-  //     const verColls = this.getMapCollisionLineData(
-  //       coll.x,
-  //       coll.y,
-  //       height,
-  //       false,
-  //     );
-
-  //     const verSolidColls = verColls.filter((el) => el.collision > 0);
-
-  //     if (verSolidColls.length > 0) {
-  //       // console.log(x, y);
-  //       // console.log(MapComponent.getTilePosition(x), MapComponent.getTilePosition(y));
-  //       const result = {
-  //         x: MapComponent.getTilePosition(verSolidColls[0].x),
-  //         y: MapComponent.getTilePosition(verSolidColls[0].y),
-  //       };
-
-  //       // console.log("colliding");
-
-  //       return result;
-  //     }
-
-  //     // verColls.forEach((verColl) => {
-  //     //   if(vercoll)
-  //     // });
-  //   }
-
-  //   return null;
-  // }
 
   getMapCollisionRectData(
     x: number,
@@ -259,9 +215,74 @@ class MapComponent implements Component {
       y: collResult.y,
     } : null;
 
-    // console.log(res);
-
     return res;
+  }
+
+  getStairVal(x: number, y: number): number {
+    if (!this.stairs)
+      return 0;
+
+    return this.stairs
+    [MapComponent.getTilePosition(y)]
+    [MapComponent.getTilePosition(x)];
+  }
+
+  getStairX(x: number, y: number): StairX {
+    const stairVal: number = this.getStairVal(x, y);
+
+    switch (stairVal) {
+      case TILE_STAIR_ASC:
+        return MapComponent.getTilePosition(x) * TILE_SIZE;
+
+      case TILE_STAIR_DESC:
+        return MapComponent.getTilePosition(x) * TILE_SIZE + TILE_SIZE;
+
+      default:
+        return null;
+    }
+  }
+
+
+  getNearestStairsX(x: number, y: number): Array<number> {
+    const checkTileXStart = MapComponent.getTilePosition(x) - 1;
+    const checkTileXEnd = checkTileXStart + 3;
+
+    const checkTileY = MapComponent.getTilePosition(y);
+
+    const posList: Array<number> = [];
+
+    for (let checkX = checkTileXStart;
+      checkX < checkTileXEnd;
+      checkX += 1) {
+      const checkPos: PositionMetadata = {
+        x: checkX,
+        y: checkTileY
+      }
+
+      // Skip check if X is out of bounds
+      if (!this.getPositionInBound(checkPos.x, checkPos.y)) {
+        continue;
+      }
+
+      const currentStairX: StairX = this.getStairX(
+        checkPos.x * TILE_SIZE,
+        checkPos.y * TILE_SIZE
+      );
+
+      if (currentStairX) {
+        posList.push(currentStairX);
+      }
+    }
+
+    return posList;
+  }
+
+  getNearestStairX(x: number, y: number): StairX {
+    const stairsX: Array<number> = this.getNearestStairsX(x, y);
+
+    return stairsX.length === 0 ? null : stairsX.reduce((a, b) => {
+      return Math.abs(b - x) < Math.abs(a - x) ? b : a;
+    });
   }
 }
 

@@ -109,6 +109,14 @@ class PlayerSystem extends ExtendedSystem {
                 playerComponent.input.left = true;
                 playerComponent.inputPressed.left = playerComponent.input.left;
                 break;
+              case 'ArrowUp':
+                playerComponent.input.up = true;
+                playerComponent.inputPressed.up = playerComponent.input.up;
+                break;
+              case 'ArrowDown':
+                playerComponent.input.down = true;
+                playerComponent.inputPressed.down = playerComponent.input.down;
+                break;
               case 'Space':
                 playerComponent.input.jump = true;
                 playerComponent.inputPressed.jump = playerComponent.input.jump;
@@ -132,6 +140,14 @@ class PlayerSystem extends ExtendedSystem {
 
             if (playerComponent.input.left && e.code === 'ArrowLeft') {
               playerComponent.input.left = false;
+            }
+
+            if (playerComponent.input.up && e.code === 'ArrowUp') {
+              playerComponent.input.up = false;
+            }
+
+            if (playerComponent.input.down && e.code === 'ArrowDown') {
+              playerComponent.input.down = false;
             }
 
             if (playerComponent.input.jump && e.code === 'Space') {
