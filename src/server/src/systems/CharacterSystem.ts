@@ -22,8 +22,8 @@ import PlayerComponent from '../components/PlayerComponent';
 // }
 
 class CharacterSystem extends ExtendedSystem {
-  // update(delta: number): void {
-  update(): void {
+  update(delta: number): void {
+  // update(): void {
     // Get entities under this system
     const entities = this.world.getEntities([COMPONENT_NAMES.Character]);
 
@@ -96,29 +96,26 @@ class CharacterSystem extends ExtendedSystem {
           // Check for stair
           if (mapComponent) {
             if (characterComponent.input.up) {
-
               if (onFloor) {
                 const nearestStairX = mapComponent.getNearestStairX(x, bottom - 1);
 
                 if (nearestStairX) {
                   if (nearestStairX === x) {
                     // Go to stairs mode if nearest stair's X is equal to the player's
-                    console.log("go to stairs mode");
+                    console.log('go to stairs mode');
                   } else {
                     console.log(Math.abs(nearestStairX - x));
 
-                    if (Math.abs(nearestStairX - x) <= maxXSpeed) {
+                    if (Math.abs(nearestStairX - x) <= maxXSpeed * delta) {
                       positionComponent.x = nearestStairX;
+                    } else if (x < nearestStairX) {
+                      // velocityComponent.xSpeed += speedIncr;
+                      console.log('go right');
+                      walkDir = 1;
                     } else {
-                      if (x < nearestStairX) {
-                        // velocityComponent.xSpeed += speedIncr;
-                        console.log("go right");
-                        walkDir = 1;
-                      } else {
-                        // velocityComponent.xSpeed -= speedIncr;
-                        console.log("go left");
-                        walkDir = -1;
-                      }
+                      // velocityComponent.xSpeed -= speedIncr;
+                      console.log('go left');
+                      walkDir = -1;
                     }
                   }
                 }
