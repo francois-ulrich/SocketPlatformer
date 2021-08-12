@@ -7,4 +7,9 @@ export const TILE_STAIR_DESC: number = 1;
 export const TICK_RATE: number = 20;
 export const KEYS: Array<string> = ['ArrowUp', 'ArrowDown', 'ArrowRight', 'ArrowLeft', 'Space'];
 
+export const enum CHAR_STATES {
+    Normal,
+    OnStairs,
+}
+
 export default {};

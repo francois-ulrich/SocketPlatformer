@@ -52,11 +52,15 @@ class CharacterComponent implements Component {
       left: false,
       right: false,
       up: false,
-      down: false,
+      down: false, 
       jump: false,
     };
 
     this.inputPressed = { ...this.input };
+  }
+
+  setState(state: number):void {
+    this.state = state;
   }
 }
 
