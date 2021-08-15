@@ -26,19 +26,19 @@ const spriteData: SpriteMetadata = {
       loop: false,
       frameTime: 0.5,
     },
-    stairsWalkAsc: {
+    stairsAsc: {
       y: 96,
       width: 16,
       height: 32,
       frames: 2,
-      frameTime: 0.15,
+      frameTime: 0,
     },
-    stairsWalkDesc: {
+    stairsDesc: {
       y: 128,
       width: 16,
       height: 32,
       frames: 2,
-      frameTime: 0.15,
+      frameTime: 0,
     },
   },
 };

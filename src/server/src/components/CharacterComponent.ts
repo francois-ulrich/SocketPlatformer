@@ -52,7 +52,7 @@ class CharacterComponent implements Component {
       left: false,
       right: false,
       up: false,
-      down: false, 
+      down: false,
       jump: false,
     };
 

@@ -3,9 +3,7 @@ import COMPONENT_NAMES from './types';
 import { MapMetadata, MapGridMetadata } from '../types/mapMetadata';
 import { PositionMetadata } from '../types/positionMetadata';
 
-import { TILE_SIZE } from '../global';
-import { TILE_STAIR_ASC } from '../global';
-import { TILE_STAIR_DESC } from '../global';
+import { TILE_SIZE, TILE_STAIR_ASC, TILE_STAIR_DESC } from '../global';
 
 type collisionMetadata = {
   x: number,
@@ -121,13 +119,6 @@ class MapComponent implements Component {
     width: number,
     height: number,
   ): Array<collisionMetadata> {
-    // console.log({
-    //   x,
-    //   y,
-    //   width,
-    //   height,
-    // });
-
     const res: Array<collisionMetadata> = [];
 
     // Get number of collisions needed to be checked
@@ -219,12 +210,9 @@ class MapComponent implements Component {
   }
 
   getStairVal(x: number, y: number): number {
-    if (!this.stairs)
-      return 0;
+    if (!this.stairs) { return 0; }
 
-    return this.stairs
-    [MapComponent.getTilePosition(y)]
-    [MapComponent.getTilePosition(x)];
+    return this.stairs[MapComponent.getTilePosition(y)][MapComponent.getTilePosition(x)];
   }
 
   getStairX(x: number, y: number): StairX {
@@ -242,7 +230,6 @@ class MapComponent implements Component {
     }
   }
 
-
   getNearestStairsX(x: number, y: number): Array<number> {
     const checkTileXStart = MapComponent.getTilePosition(x) - 1;
     const checkTileXEnd = checkTileXStart + 3;
@@ -256,17 +243,18 @@ class MapComponent implements Component {
       checkX += 1) {
       const checkPos: PositionMetadata = {
         x: checkX,
-        y: checkTileY
-      }
+        y: checkTileY,
+      };
 
       // Skip check if X is out of bounds
       if (!this.getPositionInBound(checkPos.x, checkPos.y)) {
-        continue;
+        // continue;
+        checkX += 1;
       }
 
       const currentStairX: StairX = this.getStairX(
         checkPos.x * TILE_SIZE,
-        checkPos.y * TILE_SIZE
+        checkPos.y * TILE_SIZE,
       );
 
       if (currentStairX) {
@@ -280,9 +268,9 @@ class MapComponent implements Component {
   getNearestStairX(x: number, y: number): StairX {
     const stairsX: Array<number> = this.getNearestStairsX(x, y);
 
-    return stairsX.length === 0 ? null : stairsX.reduce((a, b) => {
-      return Math.abs(b - x) < Math.abs(a - x) ? b : a;
-    });
+    return stairsX.length === 0
+      ? null
+      : stairsX.reduce((a, b) => (Math.abs(b - x) < Math.abs(a - x) ? b : a));
   }
 }
 

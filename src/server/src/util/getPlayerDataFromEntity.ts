@@ -9,6 +9,7 @@ import VelocityComponent from '../components/VelocityComponent';
 import PositionComponent from '../components/PositionComponent';
 import PlayerComponent from '../components/PlayerComponent';
 import SpriteComponent from '../components/SpriteComponent';
+import StairsComponent from '../components/StairsComponent';
 
 // Types
 import { PlayerData } from '../types/player';
@@ -45,6 +46,10 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
     COMPONENT_NAMES.Sprite,
   );
 
+  const stairsComponent = entity.getComponent<StairsComponent>(
+    COMPONENT_NAMES.Stairs,
+  );
+
   let result: PlayerData | null = null;
 
   if (
@@ -71,14 +76,17 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
 
     let newSpriteName: string | null = null;
 
-    if (onFloor) {
+    if (stairsComponent) { // Sprite if on stairs
+      newSpriteName = stairsComponent.stairType === characterComponent.direction ? 'stairsAsc' : 'stairsDesc';
+      newScale.x = Math.sign(velocityComponent.xSpeed);
+    } else if (onFloor) { // Sprites when on floor
       if (Math.abs(velocityComponent.xSpeed) > 0) {
         newSpriteName = 'walk';
         newScale.x = Math.sign(velocityComponent.xSpeed);
       } else {
         newSpriteName = 'idle';
       }
-    } else {
+    } else { // Sprite when jumping
       newSpriteName = 'jump';
       newScale.x = Math.sign(characterComponent.direction);
     }

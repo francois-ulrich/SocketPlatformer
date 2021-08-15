@@ -48,10 +48,7 @@ function normalState(
 
     // Character input
     // Player movement
-    if (velocityComponent
-            && positionComponent
-            && collisionComponent
-    ) {
+    if (velocityComponent && positionComponent && collisionComponent) {
       const { x } = positionComponent;
       const { bottom } = collisionComponent.getCollisionBox(
         positionComponent.x,
@@ -83,8 +80,8 @@ function normalState(
       // Set direction
       if (
         (characterComponent.dirChangeMidAir
-                    || velocityComponent.xSpeed === 0)
-                && !(characterComponent.input.right && characterComponent.input.left)
+          || velocityComponent.xSpeed === 0)
+        && !(characterComponent.input.right && characterComponent.input.left)
       ) {
         // Moving right
         if (characterComponent.input.right) {
@@ -109,9 +106,8 @@ function normalState(
 
       if (onFloor) {
         if (
-          (!characterComponent.input.right
-                        && !characterComponent.input.left)
-                    || (characterComponent.input.right && characterComponent.input.left)
+          (!characterComponent.input.right && !characterComponent.input.left)
+          || (characterComponent.input.right && characterComponent.input.left)
         ) {
           if (velocityComponent.xSpeed > 0) {
             velocityComponent.xSpeed -= speedIncr;
@@ -138,10 +134,9 @@ function normalState(
         }
       } else if (
         characterComponent.input.right
-                || characterComponent.input.left
+        || characterComponent.input.left
       ) {
-        velocityComponent.xSpeed
-                    += speedIncr * characterComponent.direction;
+        velocityComponent.xSpeed += speedIncr * characterComponent.direction;
       }
 
       velocityComponent.xSpeed += walkDir * speedIncr;
@@ -162,9 +157,9 @@ function normalState(
     // Fall if no floor under entity
     if (
       mapComponent
-            && velocityComponent
-            && collisionComponent
-            && positionComponent
+      && velocityComponent
+      && collisionComponent
+      && positionComponent
     ) {
       const { bottom, left } = collisionComponent.getCollisionBox(
         positionComponent.x,
@@ -180,12 +175,8 @@ function normalState(
       const length: number = width;
       const horizontal: boolean = true;
 
-      const floorColl = ySpeed >= 0 && mapComponent.getMapCollisionLine(
-        xStart,
-        yStart,
-        length,
-        horizontal,
-      );
+      const floorColl = ySpeed >= 0
+        && mapComponent.getMapCollisionLine(xStart, yStart, length, horizontal);
 
       const gravityComponent = entity.getComponent<GravityComponent>(
         COMPONENT_NAMES.Gravity,

@@ -33,7 +33,7 @@ const container = new PIXI.Container();
 app.stage.addChild(container);
 
 // Rescale PIXI stage
-const stageScale: number = 1;
+const stageScale: number = 2;
 app.stage.scale.x = stageScale;
 app.stage.scale.y = stageScale;
 
