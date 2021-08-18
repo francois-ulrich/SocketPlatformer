@@ -1,8 +1,7 @@
 import { Component } from 'super-ecs';
 
+import { Socket } from 'socket.io';
 import COMPONENT_NAMES from './types';
-
-import { Socket } from "socket.io";
 
 type InputMap = {
   [key: string]: boolean

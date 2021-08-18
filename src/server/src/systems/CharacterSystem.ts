@@ -3,7 +3,7 @@ import { ExtendedSystem } from './ExtendedSystem';
 import COMPONENT_NAMES from '../components/types';
 
 import CharacterComponent from '../components/CharacterComponent';
-import CollisionComponent from '../components/CollisionComponent';
+import CollBoxComponent from '../components/CollBoxComponent';
 import VelocityComponent from '../components/VelocityComponent';
 import GravityComponent from '../components/GravityComponent';
 import MapComponent from '../components/MapComponent';
@@ -45,8 +45,8 @@ class CharacterSystem extends ExtendedSystem {
         COMPONENT_NAMES.Character,
       );
 
-      const collisionComponent = entity.getComponent<CollisionComponent>(
-        COMPONENT_NAMES.Collision,
+      const collBoxComponent = entity.getComponent<CollBoxComponent>(
+        COMPONENT_NAMES.CollBox,
       );
 
       const velocityComponent = entity.getComponent<VelocityComponent>(
@@ -82,9 +82,9 @@ class CharacterSystem extends ExtendedSystem {
 
         // Character input
         // Player movement
-        if (velocityComponent && positionComponent && collisionComponent) {
+        if (velocityComponent && positionComponent && collBoxComponent) {
           const { x } = positionComponent;
-          const { bottom } = collisionComponent.getCollisionBox(
+          const { bottom } = collBoxComponent.getRect(
             positionComponent.x,
             positionComponent.y,
           );
@@ -110,14 +110,20 @@ class CharacterSystem extends ExtendedSystem {
                       ? STAIR_TYPE.Asc
                       : STAIR_TYPE.Desc;
 
+                    // Add stairs component
                     entity.addComponent(newStairsComponent);
-                    entity.removeComponent(COMPONENT_NAMES.Position);
+
+                    // Remove gravity component
+                    entity.removeComponent(COMPONENT_NAMES.Gravity);
+                    entity.removeComponent(COMPONENT_NAMES.Collision);
+
+                    console.log('entering stairs mode');
 
                     return;
                   } else if (x < nearestStairX) {
-                    walkDir = 1;
+                    walkDir = 1; // Set character to walk right
                   } else {
-                    walkDir = -1;
+                    walkDir = -1; // Set character to walk left
                   }
                 }
               }
@@ -128,8 +134,8 @@ class CharacterSystem extends ExtendedSystem {
           // Set direction
           if (
             (characterComponent.dirChangeMidAir
-          || velocityComponent.xSpeed === 0)
-        && !(characterComponent.input.right && characterComponent.input.left)
+            || velocityComponent.xSpeed === 0)
+            && !(characterComponent.input.right && characterComponent.input.left)
           ) {
             // Moving right
             if (characterComponent.input.right) {
@@ -169,69 +175,64 @@ class CharacterSystem extends ExtendedSystem {
             } else {
               // Moving right
               if (characterComponent.input.right) {
-                // velocityComponent.xSpeed += speedIncr;
                 walkDir = 1;
               }
               // Moving left
               if (characterComponent.input.left) {
-                // velocityComponent.xSpeed -= speedIncr;
                 walkDir = -1;
               }
             }
           } else if (
             characterComponent.input.right
-        || characterComponent.input.left
+            || characterComponent.input.left
           ) {
             velocityComponent.xSpeed += speedIncr * characterComponent.direction;
           }
 
           velocityComponent.xSpeed += walkDir * speedIncr;
         }
-      }
 
-      if (characterComponent) {
         if (velocityComponent) {
           const { xSpeed } = velocityComponent;
-          const { maxXSpeed } = characterComponent;
 
           // Limit xSpeed
           if (Math.abs(xSpeed) > maxXSpeed) {
             velocityComponent.xSpeed = maxXSpeed * Math.sign(xSpeed);
           }
-        }
 
-        // Fall if no floor under entity
-        if (
-          mapComponent
-      && velocityComponent
-      && collisionComponent
-      && positionComponent
-        ) {
-          const { bottom, left } = collisionComponent.getCollisionBox(
-            positionComponent.x,
-            positionComponent.y,
-          );
+          // Fall if no floor under entity
+          if (mapComponent && collBoxComponent && positionComponent) {
+            const { bottom, left } = collBoxComponent.getRect(
+              positionComponent.x,
+              positionComponent.y,
+            );
 
-          const { width } = collisionComponent;
+            const { width } = collBoxComponent;
 
-          const { ySpeed } = velocityComponent;
+            const { ySpeed } = velocityComponent;
 
-          const xStart: number = left;
-          const yStart: number = bottom;
-          const length: number = width;
-          const horizontal: boolean = true;
+            const xStart: number = left;
+            const yStart: number = bottom;
+            const length: number = width;
+            const horizontal: boolean = true;
 
-          const floorColl = ySpeed >= 0
-        && mapComponent.getMapCollisionLine(xStart, yStart, length, horizontal);
+            const floorColl = ySpeed >= 0
+            && mapComponent.getMapCollisionLine(
+              xStart,
+              yStart,
+              length,
+              horizontal,
+            );
 
-          const gravityComponent = entity.getComponent<GravityComponent>(
-            COMPONENT_NAMES.Gravity,
-          );
+            const gravityComponent = entity.getComponent<GravityComponent>(
+              COMPONENT_NAMES.Gravity,
+            );
 
-          // If not on floor, make the entity fall
-          if (!floorColl && !gravityComponent) {
-            entity.addComponent(new GravityComponent());
-            characterComponent.onFloor = false;
+            // If not on floor, make the entity fall
+            if (!floorColl && !gravityComponent) {
+              entity.addComponent(new GravityComponent());
+              characterComponent.onFloor = false;
+            }
           }
         }
       }

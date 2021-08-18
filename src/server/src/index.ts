@@ -10,6 +10,7 @@ import PositionComponent from './components/PositionComponent';
 import VelocityComponent from './components/VelocityComponent';
 import MapComponent from './components/MapComponent';
 import CollisionComponent from './components/CollisionComponent';
+import CollBoxComponent from './components/CollBoxComponent';
 import PlayerComponent from './components/PlayerComponent';
 import CharacterComponent from './components/CharacterComponent';
 import GravityComponent from './components/GravityComponent';
@@ -23,6 +24,7 @@ import PlayerSystem from './systems/PlayerSystem';
 import CharacterSystem from './systems/CharacterSystem';
 import CollisionSystem from './systems/CollisionSystem';
 import UpdateSystem from './systems/UpdateSystem';
+import StairsSystem from './systems/StairsSystem';
 
 // Types
 import { PlayersList } from './types/player';
@@ -59,7 +61,8 @@ function createPlayerEntity(socket: Socket,
 
   hero
     .addComponent(new GravityComponent())
-    .addComponent(new CollisionComponent({ width: 16, height: 32 }))
+    .addComponent(new CollisionComponent())
+    .addComponent(new CollBoxComponent({ width: 16, height: 32 }))
     .addComponent(new VelocityComponent())
     .addComponent(new PositionComponent({ x: 0, y: 0 }))
     .addComponent(new CharacterComponent(io))
@@ -108,11 +111,11 @@ io.of('/').adapter.on('create-room', (room: string) => {
   gameRoom.world
     .addSystem(new PlayerSystem())
     .addSystem(new CharacterSystem())
+    .addSystem(new StairsSystem())
     .addSystem(new GravitySystem())
     .addSystem(new CollisionSystem())
     .addSystem(new VelocitySystem())
-    .addSystem(new UpdateSystem())
-    ;
+    .addSystem(new UpdateSystem());
 
   // Add system to game room's world
   const roomEntity = new Entity();

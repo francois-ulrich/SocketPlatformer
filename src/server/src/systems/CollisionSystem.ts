@@ -3,7 +3,8 @@ import { ExtendedSystem } from './ExtendedSystem';
 import COMPONENT_NAMES from '../components/types';
 import MapComponent from '../components/MapComponent';
 import VelocityComponent from '../components/VelocityComponent';
-import CollisionComponent from '../components/CollisionComponent';
+// import CollisionComponent from '../components/CollisionComponent';
+import CollBoxComponent from '../components/CollBoxComponent';
 import PositionComponent from '../components/PositionComponent';
 import CharacterComponent from '../components/CharacterComponent';
 
@@ -18,6 +19,7 @@ class CollisionSystem extends ExtendedSystem {
       COMPONENT_NAMES.Velocity,
       COMPONENT_NAMES.Position,
       COMPONENT_NAMES.Collision,
+      COMPONENT_NAMES.CollBox,
     ]);
 
     // Loop through all entities
@@ -30,8 +32,8 @@ class CollisionSystem extends ExtendedSystem {
         COMPONENT_NAMES.Position,
       );
 
-      const collisionComponent = entity.getComponent<CollisionComponent>(
-        COMPONENT_NAMES.Collision,
+      const collBoxComponent = entity.getComponent<CollBoxComponent>(
+        COMPONENT_NAMES.CollBox,
       );
 
       const characterComponent = entity.getComponent<CharacterComponent>(
@@ -55,10 +57,10 @@ class CollisionSystem extends ExtendedSystem {
       if (
         mapComponent
         && positionComponent
-        && collisionComponent
+        && collBoxComponent
         && velocityComponent
       ) {
-        const { width, height } = collisionComponent;
+        const { width, height } = collBoxComponent;
 
         const { xSpeed, ySpeed } = velocityComponent;
 
@@ -68,7 +70,7 @@ class CollisionSystem extends ExtendedSystem {
         //   console.log('====================');
         // }
 
-        let collisionBox = collisionComponent.getCollisionBox(
+        let collisionBox = collBoxComponent.getRect(
           positionComponent.x,
           positionComponent.y,
         );
@@ -116,7 +118,7 @@ class CollisionSystem extends ExtendedSystem {
         const newPositionX = positionComponent.x + velocityComponent.xSpeed * delta;
 
         // Update collision box values
-        collisionBox = collisionComponent.getCollisionBox(
+        collisionBox = collBoxComponent.getRect(
           newPositionX,
           positionComponent.y,
         );

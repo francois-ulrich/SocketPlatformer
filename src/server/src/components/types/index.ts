@@ -5,6 +5,7 @@ const COMPONENT_NAMES = {
   Velocity: Symbol('Velocity'),
   Gravity: Symbol('Gravity'),
   Collision: Symbol('Collision'),
+  CollBox: Symbol('CollBox'),
   Character: Symbol('Character'),
   Player: Symbol('Player'),
   Update: Symbol('Update'),
