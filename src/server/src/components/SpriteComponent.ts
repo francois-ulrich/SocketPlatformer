@@ -7,9 +7,13 @@ type Scale = {
 }
 
 class SpriteComponent implements Component {
-  public name = COMPONENT_NAMES.Sprite;
+  name = COMPONENT_NAMES.Sprite;
 
   spriteName: string | null;
+
+  frame: number;
+
+  frameSpeed: number | null;
 
   scale: Scale;
 
@@ -20,6 +24,10 @@ class SpriteComponent implements Component {
       x: 1,
       y: 1,
     };
+
+    this.frame = 0;
+
+    this.frameSpeed = 0;
   }
 }
 

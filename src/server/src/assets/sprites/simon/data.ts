@@ -1,8 +1,8 @@
-import src from './sheet.png';
+// import src from './sheet.png';
 import { SpriteMetadata } from '../../../types/spriteMetadata';
 
 const spriteData: SpriteMetadata = {
-  src,
+  // src,
   defaultAnimation: 'idle',
   animations: {
     idle: {

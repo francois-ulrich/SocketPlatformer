@@ -14,6 +14,9 @@ import StairsComponent from '../components/StairsComponent';
 // Types
 import { PlayerData } from '../types/player';
 
+// Sprite
+import sheetData from '../assets/sprites/simon/data';
+
 // Custom types
 type SpriteScaleData = {
   x?: number,
@@ -22,7 +25,8 @@ type SpriteScaleData = {
 
 type SpriteData = {
   name?: string,
-  scale?: SpriteScaleData
+  scale?: SpriteScaleData,
+  frameSpeed?: number | null
 }
 
 function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
@@ -61,8 +65,9 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
   ) {
     const { x, y } = positionComponent;
     const { clientId } = playerComponent;
-    const { onFloor } = characterComponent;
-    const { spriteName, scale } = spriteComponent;
+    const { onFloor, direction } = characterComponent;
+    const { spriteName, scale, frameSpeed } = spriteComponent;
+    const { xSpeed } = velocityComponent;
 
     result = {
       clientId,
@@ -74,27 +79,42 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
     const spriteData: SpriteData = {};
     const newScale: SpriteScaleData = {};
 
-    let newSpriteName: string | null = null;
+    let newSpriteName: string | undefined;
+    let newFrameSpeed: number | undefined | null;
 
-    if (stairsComponent) { // Sprite if on stairs
-      newSpriteName = stairsComponent.stairType === characterComponent.direction ? 'stairsAsc' : 'stairsDesc';
+    if (stairsComponent) {
+      // Sprite if on stairs
+      const { stairType } = stairsComponent;
+      newSpriteName = (stairType === direction) ? 'stairsAsc' : 'stairsDesc';
+
       newScale.x = Math.sign(velocityComponent.xSpeed);
-    } else if (onFloor) { // Sprites when on floor
+      newFrameSpeed = xSpeed === 0
+        ? 0
+        : sheetData.animations[newSpriteName].frameTime;
+    } else if (onFloor) {
+      // Sprites when on floor
       if (Math.abs(velocityComponent.xSpeed) > 0) {
         newSpriteName = 'walk';
         newScale.x = Math.sign(velocityComponent.xSpeed);
       } else {
         newSpriteName = 'idle';
       }
-    } else { // Sprite when jumping
+    } else {
+      // Sprite when jumping
       newSpriteName = 'jump';
       newScale.x = Math.sign(characterComponent.direction);
     }
 
     // Set sprite change
-    if (newSpriteName !== spriteName) {
+    if (newSpriteName !== undefined && newSpriteName !== spriteName) {
       spriteData.name = newSpriteName;
       spriteComponent.spriteName = newSpriteName;
+    }
+
+    // Set frame speed change
+    if (newFrameSpeed !== undefined && newFrameSpeed !== frameSpeed) {
+      spriteData.frameSpeed = newFrameSpeed;
+      spriteComponent.frameSpeed = newFrameSpeed;
     }
 
     // Set scale change

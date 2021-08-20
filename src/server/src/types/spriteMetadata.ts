@@ -8,7 +8,6 @@ type AnimationMetadata = {
 };
 
 type SpriteMetadata = {
-  src: string;
   defaultAnimation: string;
   animations: Record<string, AnimationMetadata>;
 };

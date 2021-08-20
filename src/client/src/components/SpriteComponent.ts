@@ -7,10 +7,10 @@ type SheetMetadata = {
   [index: string]: Array<PIXI.Texture>,
 }
 
-type setScaleMetadata = {
-  x?: number | null,
-  y?: number | null,
-}
+// type setScaleMetadata = {
+//   x?: number | null,
+//   y?: number | null,
+// }
 
 class SpriteComponent implements Component {
   public name = COMPONENT_NAMES.Sprite;
@@ -27,6 +27,8 @@ class SpriteComponent implements Component {
 
   public currentAnimationName: string;
 
+  public frameSpeed: number | null;
+
   constructor(sprite: SpriteMetadata) {
     this.sprite = sprite;
 
@@ -38,6 +40,7 @@ class SpriteComponent implements Component {
 
     // Disable interpolation when scaling, will make texture be pixelated
     this.frame = 1;
+    this.frameSpeed = null;
 
     this.sheet = {};
 
@@ -98,6 +101,11 @@ class SpriteComponent implements Component {
 
   setYScale(value: number): void {
     this.object.scale.y = value;
+  }
+
+  setFrameSpeed(value: number|null): void {
+    this.object.animationSpeed = value || 0;
+    this.frameSpeed = value;
   }
 }
 

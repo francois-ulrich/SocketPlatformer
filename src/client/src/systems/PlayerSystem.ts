@@ -223,6 +223,15 @@ class PlayerSystem extends ExtendedSystem {
               if (sprite.scale.x) {
                 spriteComponent.setXScale(sprite.scale.x);
               }
+
+              if (sprite.scale.y) {
+                spriteComponent.setYScale(sprite.scale.y);
+              }
+            }
+
+            if (sprite.frameSpeed !== undefined) {
+              // console.log(sprite.frameSpeed);
+              spriteComponent.setFrameSpeed(sprite.frameSpeed);
             }
           }
         }
@@ -250,6 +259,8 @@ class PlayerSystem extends ExtendedSystem {
   }
 
   // Static methods
+
+  // TODO: Move createPlayerEntity function
   static createPlayerEntity(data: PlayerData, socket?: Socket): Entity {
     const { clientId, x, y } = data;
 
@@ -266,6 +277,7 @@ class PlayerSystem extends ExtendedSystem {
     return playerEntity;
   }
 
+  // TODO: Move getPlayerEntityFromClientId function
   static getPlayerEntityFromClientId(
     world: World,
     clientId: string,

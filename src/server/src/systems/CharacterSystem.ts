@@ -65,14 +65,31 @@ class CharacterSystem extends ExtendedSystem {
         COMPONENT_NAMES.Stairs,
       );
 
-      if (stairsComponent) {
-        return;
-      }
-
-      let walkDir = 0;
-
       // Get char position
       if (characterComponent) {
+        // Stops if pressing left and right / not pressing any of the two buttons
+        // Set direction
+        if (velocityComponent
+          && (characterComponent.dirChangeMidAir
+            || velocityComponent.xSpeed === 0)
+          && !(characterComponent.input.right && characterComponent.input.left)
+        ) {
+          // Moving right
+          if (characterComponent.input.right) {
+            characterComponent.direction = 1;
+          }
+          // Moving left
+          if (characterComponent.input.left) {
+            characterComponent.direction = -1;
+          }
+        }
+
+        if (stairsComponent) {
+          return;
+        }
+
+        let walkDir = 0;
+
         const { maxXSpeed, onFloor, speedIncr } = characterComponent;
         // User input
         if (playerComponent) {
@@ -93,7 +110,10 @@ class CharacterSystem extends ExtendedSystem {
           if (mapComponent) {
             if (characterComponent.input.up) {
               if (onFloor) {
-                const nearestStairX = mapComponent.getNearestStairX(x, bottom - 1);
+                const nearestStairX = mapComponent.getNearestStairX(
+                  x,
+                  bottom - 1,
+                );
 
                 if (nearestStairX) {
                   if (nearestStairX === x) {
@@ -113,11 +133,12 @@ class CharacterSystem extends ExtendedSystem {
                     // Add stairs component
                     entity.addComponent(newStairsComponent);
 
+                    velocityComponent.xSpeed = 0;
+                    velocityComponent.ySpeed = 0;
+
                     // Remove gravity component
                     entity.removeComponent(COMPONENT_NAMES.Gravity);
                     entity.removeComponent(COMPONENT_NAMES.Collision);
-
-                    console.log('entering stairs mode');
 
                     return;
                   } else if (x < nearestStairX) {
@@ -127,23 +148,6 @@ class CharacterSystem extends ExtendedSystem {
                   }
                 }
               }
-            }
-          }
-
-          // Stops if pressing left and right / not pressing any of the two buttons
-          // Set direction
-          if (
-            (characterComponent.dirChangeMidAir
-            || velocityComponent.xSpeed === 0)
-            && !(characterComponent.input.right && characterComponent.input.left)
-          ) {
-            // Moving right
-            if (characterComponent.input.right) {
-              characterComponent.direction = 1;
-            }
-            // Moving left
-            if (characterComponent.input.left) {
-              characterComponent.direction = -1;
             }
           }
 
@@ -158,8 +162,9 @@ class CharacterSystem extends ExtendedSystem {
 
           if (onFloor) {
             if (
-              (!characterComponent.input.right && !characterComponent.input.left)
-          || (characterComponent.input.right && characterComponent.input.left)
+              (!characterComponent.input.right
+                && !characterComponent.input.left)
+              || (characterComponent.input.right && characterComponent.input.left)
             ) {
               if (velocityComponent.xSpeed > 0) {
                 velocityComponent.xSpeed -= speedIncr;
@@ -186,7 +191,8 @@ class CharacterSystem extends ExtendedSystem {
             characterComponent.input.right
             || characterComponent.input.left
           ) {
-            velocityComponent.xSpeed += speedIncr * characterComponent.direction;
+            velocityComponent.xSpeed
+              += speedIncr * characterComponent.direction;
           }
 
           velocityComponent.xSpeed += walkDir * speedIncr;
@@ -217,12 +223,12 @@ class CharacterSystem extends ExtendedSystem {
             const horizontal: boolean = true;
 
             const floorColl = ySpeed >= 0
-            && mapComponent.getMapCollisionLine(
-              xStart,
-              yStart,
-              length,
-              horizontal,
-            );
+              && mapComponent.getMapCollisionLine(
+                xStart,
+                yStart,
+                length,
+                horizontal,
+              );
 
             const gravityComponent = entity.getComponent<GravityComponent>(
               COMPONENT_NAMES.Gravity,

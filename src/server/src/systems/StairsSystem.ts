@@ -74,11 +74,12 @@ class StairsSystem extends ExtendedSystem {
       ) {
         const { x, y } = positionComponent;
         const { stairType } = stairsComponent;
-        const { maxXSpeed } = characterComponent;
+        const { stairsSpeed } = characterComponent;
         const { bottom } = collBoxComponent.getRect(x, y);
 
         // Get user input
         let walkDir: number = 0;
+        let ySpeed: number = 0;
 
         // Set walk direction
         if (characterComponent.input.up) {
@@ -93,10 +94,10 @@ class StairsSystem extends ExtendedSystem {
 
         // If character is going somewhere, check stairs and move
         if (walkDir !== 0) {
-          let ySpeed: number = -maxXSpeed * walkDir * stairType;
+          ySpeed = -stairsSpeed * walkDir * stairType;
 
           // Check if getting off the stairs
-          const actualWalkSpeed: number = maxXSpeed * delta;
+          const actualWalkSpeed: number = stairsSpeed * delta;
           const verDir: number = Math.sign(ySpeed);
 
           const stairsCheckPos = {
@@ -110,24 +111,21 @@ class StairsSystem extends ExtendedSystem {
             stairsCheckPos.y,
           );
 
+          // console.log(stairsCheck);
+
           // If one of these conditions are met, character gets off the stairs
           if (stairsCheck === 0) {
-            ySpeed = 0;
-
             // Remove stairs component cuz left stars & s'all good
             entity.removeComponent(COMPONENT_NAMES.Stairs);
 
             // Add components
             entity.addComponent(new GravityComponent());
             entity.addComponent(new CollisionComponent());
-
-            // If all good, set movement
-            velocityComponent.xSpeed = maxXSpeed * walkDir;
-            velocityComponent.ySpeed = ySpeed;
-
-            console.log('leaving stairs mode');
           }
         }
+
+        velocityComponent.xSpeed = stairsSpeed * walkDir;
+        velocityComponent.ySpeed = ySpeed;
       }
     });
   }

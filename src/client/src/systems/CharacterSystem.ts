@@ -225,43 +225,41 @@ class CharacterSystem extends ExtendedSystem {
           COMPONENT_NAMES.Position,
         );
 
-        const velocityComponent = entity.getComponent<VelocityComponent>(
-          COMPONENT_NAMES.Velocity,
-        );
-
         const spriteComponent = entity.getComponent<SpriteComponent>(
           COMPONENT_NAMES.Sprite,
         );
 
-        if (characterComponent) {
-          // Listen to socket events
-          if (playerComponent) {
-            const { socket, clientId } = playerComponent;
+        // TODO: Create type for sprite data received
 
-            if (socket) {
-              socket.on(`characterUpdate:${clientId}`, (data) => {
-                const {
-                  x, y, sprite,
-                } = data;
+        // Listen to socket events
+        if (characterComponent && playerComponent) {
+          const { socket, clientId } = playerComponent;
 
-                if (positionComponent) {
-                  positionComponent.x = x;
-                  positionComponent.y = y;
+          if (socket) {
+            socket.on(`characterUpdate:${clientId}`, (data) => {
+              const { x, y, sprite } = data;
+
+              if (positionComponent) {
+                positionComponent.x = x;
+                positionComponent.y = y;
+              }
+
+              if (spriteComponent && sprite) {
+                if (sprite.name) {
+                  spriteComponent.setAnimation(sprite.name);
                 }
 
-                if (spriteComponent && sprite) {
-                  if (sprite.name) {
-                    spriteComponent.setAnimation(sprite.name);
-                  }
-
-                  if (sprite.scale) {
-                    if (sprite.scale.x) {
-                      spriteComponent.setXScale(sprite.scale.x);
-                    }
+                if (sprite.scale) {
+                  if (sprite.scale.x) {
+                    spriteComponent.setXScale(sprite.scale.x);
                   }
                 }
-              });
-            }
+
+                if (sprite.frameSpeed) {
+                  spriteComponent.setFrameSpeed(sprite.frameSpeed);
+                }
+              }
+            });
           }
 
           // Set initial sprite
