@@ -12,6 +12,7 @@ import StairsComponent from '../components/StairsComponent';
 import CollBoxComponent from '../components/CollBoxComponent';
 import CollisionComponent from '../components/CollisionComponent';
 import GravityComponent from '../components/GravityComponent';
+import { TILE_SIZE } from '../global';
 
 // import { STAIR_TYPE } from "../global";
 
@@ -111,8 +112,6 @@ class StairsSystem extends ExtendedSystem {
             stairsCheckPos.y,
           );
 
-          // console.log(stairsCheck);
-
           // If one of these conditions are met, character gets off the stairs
           if (stairsCheck === 0) {
             // Remove stairs component cuz left stars & s'all good
@@ -121,6 +120,10 @@ class StairsSystem extends ExtendedSystem {
             // Add components
             entity.addComponent(new GravityComponent());
             entity.addComponent(new CollisionComponent());
+
+            // Set right X / Y pos
+            positionComponent.x = Math.round(x / TILE_SIZE) * TILE_SIZE;
+            positionComponent.y = Math.round(y / TILE_SIZE) * TILE_SIZE;
           }
         }
 
@@ -129,28 +132,6 @@ class StairsSystem extends ExtendedSystem {
       }
     });
   }
-
-  // addedToWorld(world: World): void {
-  //   super.addedToWorld(world);
-
-  //   // Add sprite to stage
-  //   this.disposeBag
-  //     .completable$(world.entityAdded$([COMPONENT_NAMES.Character]))
-  //     .subscribe((entity: Entity) => {
-  //       // Remove gravity component
-  //       entity.removeComponent(COMPONENT_NAMES.Gravity);
-  //       entity.removeComponent(COMPONENT_NAMES.Collision);
-  //     });
-  // }
-
-  // removedFromWorld(world: World): void {
-  //   this.disposeBag
-  //     .completable$(world.entityRemoved$([COMPONENT_NAMES.Character]))
-  //     .subscribe((entity) => {
-  //       entity.addComponent(new GravityComponent());
-  //       entity.addComponent(new CollisionComponent({ width: 16, height: 32 }));
-  //     });
-  // }
 }
 
 export default StairsSystem;

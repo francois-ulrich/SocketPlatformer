@@ -108,21 +108,29 @@ class CharacterSystem extends ExtendedSystem {
 
           // Check for stair
           if (mapComponent) {
-            if (characterComponent.input.up) {
-              if (onFloor) {
+            // if (characterComponent.input.up) {
+            if (onFloor) {
+              if (
+                characterComponent.input.up || characterComponent.input.down
+              ) {
+                const stairsCheckY = bottom - (characterComponent.input.up ? 1 : 0);
+
                 const nearestStairX = mapComponent.getNearestStairX(
                   x,
-                  bottom - 1,
+                  stairsCheckY,
+                  characterComponent.input.down,
                 );
 
-                if (nearestStairX) {
-                  if (nearestStairX === x) {
-                    // Go to stairs mode if nearest stair's X is equal to the player's
-                  } else if (Math.abs(nearestStairX - x) <= maxXSpeed * delta) {
+                if (nearestStairX !== null) {
+                  if (Math.abs(nearestStairX - x) <= maxXSpeed * delta) {
                     positionComponent.x = nearestStairX;
 
                     // Get stair value
-                    const stairVal = mapComponent.getStairVal(x, bottom - 1);
+                    const stairVal = mapComponent.getStairVal(
+                      positionComponent.x
+                        - (characterComponent.input.down ? 1 : 0),
+                      stairsCheckY,
+                    );
 
                     // Add stairs component
                     const newStairsComponent = new StairsComponent();
@@ -140,8 +148,13 @@ class CharacterSystem extends ExtendedSystem {
                     entity.removeComponent(COMPONENT_NAMES.Gravity);
                     entity.removeComponent(COMPONENT_NAMES.Collision);
 
+                    console.log({ stairVal });
+
                     return;
-                  } else if (x < nearestStairX) {
+                  }
+
+                  // Walk toward stairs if none encountered yet
+                  if (x < nearestStairX) {
                     walkDir = 1; // Set character to walk right
                   } else {
                     walkDir = -1; // Set character to walk left

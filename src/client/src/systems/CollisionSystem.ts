@@ -145,27 +145,6 @@ class CollisionSystem extends ExtendedSystem {
       }
     });
   }
-
-  // addedToWorld(world: World): void {
-  //   super.addedToWorld(world);
-
-  //   // Add sprite to stage
-  //   this.disposeBag
-  //     .completable$(
-  //       world.entityAdded$([
-  //         COMPONENT_NAMES.Collision,
-  //       ]),
-  //     )
-  //     .subscribe((entity) => {
-  //       const collisionComponent = entity.getComponent<CollisionComponent>(
-  //         COMPONENT_NAMES.Collision,
-  //       );
-
-  //       if (collisionComponent) {
-  //         this.app.stage.addChild(collisionComponent.debugRect);
-  //       }
-  //     });
-  // }
 }
 
 export default CollisionSystem;
