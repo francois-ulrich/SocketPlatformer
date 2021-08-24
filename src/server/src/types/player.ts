@@ -15,7 +15,9 @@ type PlayersList = {
   [key: string]: PlayerData;
 };
 
-export {
-  PlayerData,
-  PlayersList,
+type PlayerInitMetadata = {
+  clientId: string;
+  players: PlayersList;
 };
+
+export { PlayerData, PlayersList, PlayerInitMetadata };

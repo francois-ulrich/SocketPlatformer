@@ -13,7 +13,7 @@ import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 // ECS Systems
 
 // Types
-import { PlayerData } from '../../../server/src/types/player';
+import { PlayerData, PlayerInitMetadata } from '../../../server/src/types/player';
 import { SpriteMetadata } from '../types/spriteMetadata';
 
 // Assets
@@ -164,17 +164,18 @@ class PlayerSystem extends ExtendedSystem {
     const { socket, world } = this;
 
     // =============
-    socket.on('players:init', (data) => {
+    socket.on('players:init', (data: PlayerInitMetadata) => {
       console.log('Init player');
 
       const { clientId, players } = data;
+
+      console.log(data);
 
       // Add all entities
       Object.entries(players).forEach(([id, playerData]) => {
         const newPlayerEntity = PlayerSystem.createPlayerEntity(
           playerData,
-          // TODO: Argument of type 'unknown' is not assignable to parameter of type 'PlayerData'
-          id === clientId ? socket : null,
+          id === clientId ? socket : undefined,
         );
 
         world.addEntity(newPlayerEntity);
@@ -182,7 +183,7 @@ class PlayerSystem extends ExtendedSystem {
     });
 
     socket.on('player:add', (data) => {
-      console.log(data);
+      // console.log(data);
       const newPlayerEntity = PlayerSystem.createPlayerEntity(data);
 
       world.addEntity(newPlayerEntity);
