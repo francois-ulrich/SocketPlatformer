@@ -15,8 +15,6 @@ import GravityComponent from '../components/GravityComponent';
 
 import { TILE_SIZE } from '../global';
 
-// import { STAIR_TYPE } from "../global";
-
 class StairsSystem extends ExtendedSystem {
   update(delta: number): void {
   // update(): void {
@@ -93,6 +91,9 @@ class StairsSystem extends ExtendedSystem {
         } else if (characterComponent.input.left) {
           walkDir = -1;
         }
+
+        // Adjust character direction
+        characterComponent.direction = walkDir;
 
         // If character is going somewhere, check stairs and move
         if (walkDir !== 0) {

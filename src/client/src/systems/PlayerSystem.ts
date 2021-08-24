@@ -173,6 +173,7 @@ class PlayerSystem extends ExtendedSystem {
       Object.entries(players).forEach(([id, playerData]) => {
         const newPlayerEntity = PlayerSystem.createPlayerEntity(
           playerData,
+          // TODO: Argument of type 'unknown' is not assignable to parameter of type 'PlayerData'
           id === clientId ? socket : null,
         );
 

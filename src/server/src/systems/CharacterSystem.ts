@@ -41,6 +41,15 @@ class CharacterSystem extends ExtendedSystem {
 
     // Loop through all entities
     entities.forEach((entity) => {
+      const stairsComponent = entity.getComponent<StairsComponent>(
+        COMPONENT_NAMES.Stairs,
+      );
+
+      // Stairs component overrides character system logic
+      if (stairsComponent) {
+        return;
+      }
+
       const characterComponent = entity.getComponent<CharacterComponent>(
         COMPONENT_NAMES.Character,
       );
@@ -61,10 +70,6 @@ class CharacterSystem extends ExtendedSystem {
         COMPONENT_NAMES.Player,
       );
 
-      const stairsComponent = entity.getComponent<StairsComponent>(
-        COMPONENT_NAMES.Stairs,
-      );
-
       // Get char position
       if (characterComponent) {
         // Stops if pressing left and right / not pressing any of the two buttons
@@ -82,10 +87,6 @@ class CharacterSystem extends ExtendedSystem {
           if (characterComponent.input.left) {
             characterComponent.direction = -1;
           }
-        }
-
-        if (stairsComponent) {
-          return;
         }
 
         let walkDir = 0;
