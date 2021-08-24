@@ -229,8 +229,7 @@ class PlayerSystem extends ExtendedSystem {
               }
             }
 
-            if (sprite.frameSpeed !== undefined) {
-              // console.log(sprite.frameSpeed);
+            if (typeof sprite.frameSpeed === 'number') {
               spriteComponent.setFrameSpeed(sprite.frameSpeed);
             }
           }
@@ -261,6 +260,7 @@ class PlayerSystem extends ExtendedSystem {
   // Static methods
 
   // TODO: Move createPlayerEntity function
+  // TODO: Fix x,y that may be undefined
   static createPlayerEntity(data: PlayerData, socket?: Socket): Entity {
     const { clientId, x, y } = data;
 

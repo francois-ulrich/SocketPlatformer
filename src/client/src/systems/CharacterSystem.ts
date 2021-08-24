@@ -213,58 +213,12 @@ class CharacterSystem extends ExtendedSystem {
         ]),
       )
       .subscribe((entity) => {
-        const playerComponent = entity.getComponent<PlayerComponent>(
-          COMPONENT_NAMES.Player,
-        );
-
-        const characterComponent = entity.getComponent<CharacterComponent>(
-          COMPONENT_NAMES.Character,
-        );
-
-        const positionComponent = entity.getComponent<PositionComponent>(
-          COMPONENT_NAMES.Position,
-        );
-
         const spriteComponent = entity.getComponent<SpriteComponent>(
           COMPONENT_NAMES.Sprite,
         );
 
-        // TODO: Create type for sprite data received
-
-        // Listen to socket events
-        if (characterComponent && playerComponent) {
-          const { socket, clientId } = playerComponent;
-
-          if (socket) {
-            socket.on(`characterUpdate:${clientId}`, (data) => {
-              const { x, y, sprite } = data;
-
-              if (positionComponent) {
-                positionComponent.x = x;
-                positionComponent.y = y;
-              }
-
-              if (spriteComponent && sprite) {
-                if (sprite.name) {
-                  spriteComponent.setAnimation(sprite.name);
-                }
-
-                if (sprite.scale) {
-                  if (sprite.scale.x) {
-                    spriteComponent.setXScale(sprite.scale.x);
-                  }
-                }
-
-                if (sprite.frameSpeed) {
-                  spriteComponent.setFrameSpeed(sprite.frameSpeed);
-                }
-              }
-            });
-          }
-
-          // Set initial sprite
-          spriteComponent?.setAnimation('idle');
-        }
+        // Set initial sprite
+        spriteComponent?.setAnimation('idle');
       });
   }
 }

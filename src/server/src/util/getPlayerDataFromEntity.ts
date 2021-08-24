@@ -14,9 +14,6 @@ import StairsComponent from '../components/StairsComponent';
 // Types
 import { PlayerData } from '../types/player';
 
-// Sprite
-import sheetData from '../assets/sprites/simon/data';
-
 // Custom types
 type SpriteScaleData = {
   x?: number,
@@ -88,13 +85,12 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
       newSpriteName = (stairType === direction) ? 'stairsAsc' : 'stairsDesc';
 
       newScale.x = Math.sign(velocityComponent.xSpeed);
-      newFrameSpeed = xSpeed === 0
-        ? 0
-        : sheetData.animations[newSpriteName].frameTime;
+      newFrameSpeed = Math.abs(xSpeed) > 0 ? 0.1 : 0;
     } else if (onFloor) {
       // Sprites when on floor
       if (Math.abs(velocityComponent.xSpeed) > 0) {
         newSpriteName = 'walk';
+        newFrameSpeed = 0.15;
         newScale.x = Math.sign(velocityComponent.xSpeed);
       } else {
         newSpriteName = 'idle';

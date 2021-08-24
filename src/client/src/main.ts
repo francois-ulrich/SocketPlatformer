@@ -50,7 +50,7 @@ const socket: Socket = io('ws://localhost:5000/');
 
 // Instanciate ECS World
 socket.on('gameRoom:init', (data: GameRoomMetadata) => {
-  console.log('Initializing client game room...');
+  console.log("Initializing client game room...");
 
   // Map instanciation
   const world = new World();
@@ -64,6 +64,7 @@ socket.on('gameRoom:init', (data: GameRoomMetadata) => {
     .addSystem(new PlayerSystem({ app, socket, world }));
 
   // Initialize map
+  // TODO: Property 'map' does not exist on type 'GameRoomMetadata'.
   const mapData: MapMetadata = data.map;
 
   const mapEntity: Entity = new Entity();

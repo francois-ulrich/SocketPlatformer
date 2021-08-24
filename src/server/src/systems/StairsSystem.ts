@@ -12,6 +12,7 @@ import StairsComponent from '../components/StairsComponent';
 import CollBoxComponent from '../components/CollBoxComponent';
 import CollisionComponent from '../components/CollisionComponent';
 import GravityComponent from '../components/GravityComponent';
+
 import { TILE_SIZE } from '../global';
 
 // import { STAIR_TYPE } from "../global";

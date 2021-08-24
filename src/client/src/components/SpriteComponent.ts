@@ -84,17 +84,6 @@ class SpriteComponent implements Component {
     }
   }
 
-  // setScale(x:number|undefined,): void {
-  //   console.log("setScale");
-  //   if (x) {
-  //     this.object.scale.x = x;
-  //   }
-
-  //   if (y) {
-  //     this.object.scale.y = y;
-  //   }
-  // }
-
   setXScale(value: number): void {
     this.object.scale.x = value;
   }
@@ -103,7 +92,7 @@ class SpriteComponent implements Component {
     this.object.scale.y = value;
   }
 
-  setFrameSpeed(value: number|null): void {
+  setFrameSpeed(value: number): void {
     this.object.animationSpeed = value || 0;
     this.frameSpeed = value;
   }
