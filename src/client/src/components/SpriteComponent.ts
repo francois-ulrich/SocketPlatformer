@@ -66,7 +66,7 @@ class SpriteComponent implements Component {
   }
 
   setAnimation(animationName: string): void {
-    const { frameTime, loop } = this.sprite.animations[animationName];
+    const { loop } = this.sprite.animations[animationName];
 
     // Update sprite anchor point
     this.object.anchor.set(0.5, 0.5);
@@ -76,7 +76,6 @@ class SpriteComponent implements Component {
 
       this.object.textures = this.sheet[animationName];
 
-      this.object.animationSpeed = frameTime || 1;
       this.object.play();
 
       // Set loop
