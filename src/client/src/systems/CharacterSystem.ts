@@ -35,10 +35,6 @@ class CharacterSystem extends ExtendedSystem {
         COMPONENT_NAMES.Character,
       );
 
-      const spriteComponent = entity.getComponent<SpriteComponent>(
-        COMPONENT_NAMES.Sprite,
-      );
-
       const collisionComponent = entity.getComponent<CollisionComponent>(
         COMPONENT_NAMES.Collision,
       );

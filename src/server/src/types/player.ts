@@ -1,7 +1,7 @@
 type PlayerData = {
   clientId: string;
-  x?: number;
-  y?: number;
+  x: number;
+  y: number;
   sprite?: {
     name?:string,
     scale?: {

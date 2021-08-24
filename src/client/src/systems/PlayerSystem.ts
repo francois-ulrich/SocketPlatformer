@@ -163,13 +163,8 @@ class PlayerSystem extends ExtendedSystem {
   addSocketListeners(): void {
     const { socket, world } = this;
 
-    // =============
     socket.on('players:init', (data: PlayerInitMetadata) => {
-      console.log('Init player');
-
       const { clientId, players } = data;
-
-      console.log(data);
 
       // Add all entities
       Object.entries(players).forEach(([id, playerData]) => {
@@ -183,7 +178,6 @@ class PlayerSystem extends ExtendedSystem {
     });
 
     socket.on('player:add', (data) => {
-      // console.log(data);
       const newPlayerEntity = PlayerSystem.createPlayerEntity(data);
 
       world.addEntity(newPlayerEntity);
@@ -262,7 +256,6 @@ class PlayerSystem extends ExtendedSystem {
   // Static methods
 
   // TODO: Move createPlayerEntity function
-  // TODO: Fix x,y that may be undefined
   static createPlayerEntity(data: PlayerData, socket?: Socket): Entity {
     const { clientId, x, y } = data;
 
@@ -270,8 +263,7 @@ class PlayerSystem extends ExtendedSystem {
     const sprite: SpriteMetadata = spriteData;
 
     playerEntity
-      // .addComponent(new VelocityComponent())
-      .addComponent(new PositionComponent({ x, y }))
+      .addComponent(new PositionComponent(x, y))
       .addComponent(new CharacterComponent())
       .addComponent(new SpriteComponent(sprite))
       .addComponent(new PlayerComponent(clientId, socket));

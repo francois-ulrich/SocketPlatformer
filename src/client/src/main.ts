@@ -49,8 +49,10 @@ PIXI.settings.RENDER_OPTIONS.antialias = true; // Enable antialiasing
 const socket: Socket = io('ws://localhost:5000/');
 
 // Instanciate ECS World
-socket.on('gameRoom:init', (data: GameRoomMetadata) => {
+socket.on('gameRoom:init', (data: MapMetadata) => {
   console.log('Initializing client game room...');
+
+  console.log(data);
 
   // Map instanciation
   const world = new World();
@@ -64,8 +66,7 @@ socket.on('gameRoom:init', (data: GameRoomMetadata) => {
     .addSystem(new PlayerSystem({ app, socket, world }));
 
   // Initialize map
-  // TODO: Property 'map' does not exist on type 'GameRoomMetadata'.
-  const mapData: MapMetadata = data.map;
+  const mapData: MapMetadata = data;
 
   const mapEntity: Entity = new Entity();
   mapEntity.addComponent(new MapComponent(mapData));

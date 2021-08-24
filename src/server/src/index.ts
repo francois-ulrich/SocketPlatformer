@@ -34,6 +34,7 @@ import getPlayerDataFromEntity from './util/getPlayerDataFromEntity';
 
 // Other
 import GameRoom from './other/GameRoom';
+import { MapMetadata } from './types/mapMetadata';
 
 // Map
 import map from './assets/maps/test2';
@@ -64,7 +65,7 @@ function createPlayerEntity(socket: Socket,
     .addComponent(new CollisionComponent())
     .addComponent(new CollBoxComponent({ width: 16, height: 32 }))
     .addComponent(new VelocityComponent())
-    .addComponent(new PositionComponent({ x: 0, y: 0 }))
+    .addComponent(new PositionComponent(0, 0))
     .addComponent(new CharacterComponent(io))
     .addComponent(new SpriteComponent())
     .addComponent(new PlayerComponent(socket, clientId, roomName));
@@ -169,10 +170,12 @@ io.of('/').adapter.on('join-room', (room, socketId) => {
     return;
   }
 
-  // Client side game init
-  socket.emit('gameRoom:init', {
-    map: gameRoom.map,
-  });
+  const mapData: MapMetadata | null = gameRoom.map;
+
+  if (mapData) {
+    // Client side game init
+    socket.emit('gameRoom:init', mapData);
+  }
 
   // Add client to gameroom client list
   const newClientId = randomstring.generate();

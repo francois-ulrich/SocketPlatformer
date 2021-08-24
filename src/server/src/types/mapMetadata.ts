@@ -7,6 +7,6 @@ type MapMetadata = {
 }
 
 export {
-    MapGridMetadata,
-    MapMetadata
+  MapGridMetadata,
+  MapMetadata,
 };
