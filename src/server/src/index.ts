@@ -89,8 +89,8 @@ io.on('connection', (socket: Socket) => {
   socket.on('disconnect', () => {
     console.log('A user disconnected!');
 
-    // Tell the client to create a player instance
-    socket.broadcast.emit('createPlayer');
+    // // Tell the client to create a player instance
+    // socket.broadcast.emit('createPlayer');
   });
 });
 
@@ -255,3 +255,5 @@ io.of('/').adapter.on('leave-room', (room, socketId) => {
 
 const port = process.env.PORT || 5000;
 httpServer.listen(port);
+
+// TODO: Remove player from server on tab / window close

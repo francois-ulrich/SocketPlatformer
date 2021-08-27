@@ -19,6 +19,9 @@ import { SpriteMetadata } from '../types/spriteMetadata';
 // Assets
 import spriteData from '../assets/sprites/simon/data';
 
+// Factories
+import playersEntitiesFactory from '../factories/PlayerEntitiesFactory';
+
 type PlayerSystemMetadata = ExtendedSystemMetadata & {
   socket: Socket;
   world: World;
@@ -168,7 +171,7 @@ class PlayerSystem extends ExtendedSystem {
 
       // Add all entities
       Object.entries(players).forEach(([id, playerData]) => {
-        const newPlayerEntity = PlayerSystem.createPlayerEntity(
+        const newPlayerEntity = playersEntitiesFactory(
           playerData,
           id === clientId ? socket : undefined,
         );
@@ -178,7 +181,7 @@ class PlayerSystem extends ExtendedSystem {
     });
 
     socket.on('player:add', (data) => {
-      const newPlayerEntity = PlayerSystem.createPlayerEntity(data);
+      const newPlayerEntity = playersEntitiesFactory(data);
 
       world.addEntity(newPlayerEntity);
     });
@@ -251,24 +254,6 @@ class PlayerSystem extends ExtendedSystem {
         }
       }
     });
-  }
-
-  // Static methods
-
-  // TODO: Move createPlayerEntity function
-  static createPlayerEntity(data: PlayerData, socket?: Socket): Entity {
-    const { clientId, x, y } = data;
-
-    const playerEntity: Entity = new Entity();
-    const sprite: SpriteMetadata = spriteData;
-
-    playerEntity
-      .addComponent(new PositionComponent(x, y))
-      .addComponent(new CharacterComponent())
-      .addComponent(new SpriteComponent(sprite))
-      .addComponent(new PlayerComponent(clientId, socket));
-
-    return playerEntity;
   }
 
   // TODO: Move getPlayerEntityFromClientId function

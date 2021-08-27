@@ -52,8 +52,6 @@ const socket: Socket = io('ws://localhost:5000/');
 socket.on('gameRoom:init', (data: MapMetadata) => {
   console.log('Initializing client game room...');
 
-  console.log(data);
-
   // Map instanciation
   const world = new World();
 
