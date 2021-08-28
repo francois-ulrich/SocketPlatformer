@@ -15,7 +15,7 @@ import CharacterSystem from './systems/CharacterSystem';
 
 // Types
 import { MapMetadata } from '../../server/src/types/mapMetadata';
-import GameRoomMetadata from '../../server/src/types/gameRoomMetadata';
+// import GameRoomMetadata from '../../server/src/types/gameRoomMetadata';
 
 // Create a Pixi Application
 const app = new PIXI.Application({

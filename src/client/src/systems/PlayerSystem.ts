@@ -169,6 +169,8 @@ class PlayerSystem extends ExtendedSystem {
     socket.on('players:init', (data: PlayerInitMetadata) => {
       const { clientId, players } = data;
 
+      // console.log(players);
+
       // Add all entities
       Object.entries(players).forEach(([id, playerData]) => {
         const newPlayerEntity = playersEntitiesFactory(

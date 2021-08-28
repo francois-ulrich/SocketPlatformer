@@ -238,6 +238,9 @@ io.of('/').adapter.on('leave-room', (room, socketId) => {
       if (socket.id === socketId) {
         console.log(`Socket ${socketId} leaves room ${gameRoom.name}`);
 
+        // Remove client from server list
+        delete gameRoom.clients[clientId];
+
         io.in(gameRoom.name).emit('player:delete', {
           clientId,
         });
