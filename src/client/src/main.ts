@@ -58,7 +58,7 @@ socket.on('gameRoom:init', (data: MapMetadata) => {
 
   // Instanciate world
   world
-    .addSystem(new PositionSystem({ app }))
+    .addSystem(new PositionSystem({ app })) // TODO: change argument from object to app instance
     .addSystem(new VelocitySystem({ app }))
     .addSystem(new StairsSystem({ app }))
     .addSystem(new MapSystem({ app }))

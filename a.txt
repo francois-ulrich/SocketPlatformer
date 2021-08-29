@@ -1,0 +1,21 @@
+Client 
+- ExtendedSystem:({app: PIXI.Application})
+Systems using app: 
+MapSystem
+SpriteSystem
+
+- PlayerComponent(clientId: string, socket?: Socket)
+
+- PlayerSystem({ app, socket, world })
+Adds listeners for key presses stream to server
+Adds listeners to listen to server for player updates
+
+Server
+- ExtendedSystem - no arguments
+- CharacterComponent(io)
+- PlayerComponent(socket, clientId, roomName)
+- UpdateComponent(io, roomName)
+
+- PlayerSystem
+Update playerComponent input value
+When entity removed from world, send player:delete
