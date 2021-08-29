@@ -2,7 +2,18 @@ import { Component } from 'super-ecs';
 import COMPONENT_NAMES from './types';
 import { MapMetadata, MapGridMetadata } from '../../../server/src/types/mapMetadata';
 
-import { TILE_SIZE } from '../global';
+import {
+  TILE_SIZE,
+  TILE_STAIR_ASC,
+  TILE_STAIR_DESC,
+} from '../../../server/src/global';
+
+// Types
+// TODO: streamline types casing
+import collisionMetadata from '../../../server/src/types/collisionMetadata';
+import { PositionMetadata } from '../../../server/src/types/positionMetadata';
+
+type StairX = number | null;
 
 class MapComponent implements Component {
   name = COMPONENT_NAMES.Map;
@@ -27,37 +38,37 @@ class MapComponent implements Component {
     return this.collision.length;
   }
 
-  getCollision(x: number, y: number): number {
-    const tileX = MapComponent.getTilePosition(x);
-    const tileY = MapComponent.getTilePosition(y);
+  getPositionInBound(x: number, y: number): boolean {
+    return x >= 0 && y >= 0 && x < this.getWidth() && y < this.getHeight();
+  }
 
-    if (
-      tileX < 0
-      || tileY < 0
-      || tileX > this.getWidth() - 1
-      || tileY > this.getHeight() - 1
-    ) {
+  getCollision(x: number, y: number): number {
+    if (!this.getPositionInBound(x, y)) {
       return 0;
     }
 
-    return this.collision[tileY][tileX];
+    return this.collision[y][x];
   }
 
   static getTilePosition(val: number): number {
     return Math.floor(val / TILE_SIZE);
   }
 
-  getMapCollisionLine(
+  getMapCollisionLineData(
     xStart: number,
     yStart: number,
     length: number,
     horizontal: boolean,
-  ): boolean {
+  ): Array<collisionMetadata> {
+    if (length <= 0) {
+      return [];
+    }
+
     // Get number of collisions needed to be checked
     const collsNb: number = Math.max(2, Math.floor(length / TILE_SIZE) + 1);
-    const gap = length / Math.ceil(length / TILE_SIZE);
+    const gap: number = length / Math.ceil(length / TILE_SIZE);
 
-    const colls: Array<number> = [];
+    const colls: Array<collisionMetadata> = [];
 
     // Check every collisions
     for (let i = 0; i < collsNb; i += 1) {
@@ -73,11 +84,220 @@ class MapComponent implements Component {
         checkY = yStart + i * gap - (i === collsNb - 1 ? 1 : 0);
       }
 
-      colls.push(this.getCollision(checkX, checkY));
+      colls.push({
+        x: checkX,
+        y: checkY,
+        collision: this.getCollision(
+          MapComponent.getTilePosition(checkX),
+          MapComponent.getTilePosition(checkY),
+        ),
+      });
     }
 
     // If no collision found, just return false
-    return colls.includes(1);
+    return colls;
+  }
+
+  getMapCollisionLine(
+    xStart: number,
+    yStart: number,
+    length: number,
+    horizontal: boolean,
+  ): boolean {
+    const collData = this.getMapCollisionLineData(
+      xStart,
+      yStart,
+      length,
+      horizontal,
+    );
+
+    return collData.filter((el) => el.collision > 0).length > 0;
+  }
+
+  getMapCollisionRectData(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  ): Array<collisionMetadata> {
+    const res: Array<collisionMetadata> = [];
+
+    // Get number of collisions needed to be checked
+    const collsNbHor: number = Math.max(
+      1,
+      Math.ceil(width / TILE_SIZE) + (x % TILE_SIZE === 0 ? 0 : 1),
+    );
+    const collsNbVer: number = Math.max(
+      1,
+      Math.ceil(height / TILE_SIZE) + (y % TILE_SIZE === 0 ? 0 : 1),
+    );
+
+    // console.log({ collsNbHor, collsNbVer });
+
+    const gap = {
+      width: width / Math.ceil(width / TILE_SIZE),
+      height: height / Math.ceil(height / TILE_SIZE),
+    };
+
+    for (let yy = 0; yy < collsNbVer; yy += 1) {
+      for (let xx = 0; xx < collsNbHor; xx += 1) {
+        const check: PositionMetadata = {
+          x: MapComponent.getTilePosition(x + gap.width * xx),
+          y: MapComponent.getTilePosition(y + gap.height * yy),
+        };
+
+        const collValue = this.getCollision(check.x, check.y);
+
+        if (this.getPositionInBound(check.x, check.y) && collValue > 0) {
+          const newColl = { ...check, collision: collValue };
+
+          res.push(newColl);
+        }
+      }
+    }
+
+    // console.log(res);
+
+    return res;
+  }
+
+  getMapCollisionRect(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    dir: string,
+  ): PositionMetadata | null {
+    const collData = this.getMapCollisionRectData(x, y, width, height);
+
+    if (collData.length === 0) {
+      return null;
+    }
+
+    if (collData.length > 1) {
+      switch (dir) {
+        case 'up':
+          collData.sort((a, b) => b.y - a.y);
+
+          break;
+        case 'down':
+          collData.sort((a, b) => a.y - b.y);
+
+          break;
+        case 'left':
+          collData.sort((a, b) => b.x - a.x);
+
+          break;
+        case 'right':
+          collData.sort((a, b) => a.x - b.x);
+
+          break;
+        default:
+          break;
+      }
+    }
+
+    const collResult = collData[0];
+
+    const res = collResult
+      ? {
+        x: collResult.x,
+        y: collResult.y,
+      }
+      : null;
+
+    return res;
+  }
+
+  getStairVal(x: number, y: number): number {
+    if (!this.stairs) {
+      return 0;
+    }
+
+    return this.stairs[MapComponent.getTilePosition(y)][
+      MapComponent.getTilePosition(x)
+    ];
+  }
+
+  // getStairVal(x: number, y: number): number {
+  //   if (!this.stairs) {
+  //     return 0;
+  //   }
+
+  //   let res =
+  //     this.stairs[MapComponent.getTilePosition(y)][
+  //       MapComponent.getTilePosition(x)
+  //     ];
+
+  //   if (res === 0) {
+  //     const prevX = MapComponent.getTilePosition(x) - 1;
+
+  //     if (prevX >= 0) {
+  //       res = this.stairs[MapComponent.getTilePosition(y)][prevX];
+  //     }
+  //   }
+
+  //   return res;
+  // }
+
+  getStairX(x: number, y: number, top?: boolean): StairX {
+    const stairVal: number = this.getStairVal(x, y);
+
+    switch (stairVal) {
+      case TILE_STAIR_ASC:
+        return (
+          MapComponent.getTilePosition(x) * TILE_SIZE + (top ? TILE_SIZE : 0)
+        );
+
+      case TILE_STAIR_DESC:
+        return (
+          MapComponent.getTilePosition(x) * TILE_SIZE + (top ? 0 : TILE_SIZE)
+        );
+
+      default:
+        return null;
+    }
+  }
+
+  getNearestStairsX(x: number, y: number, top?: boolean): Array<number> {
+    const checkTileXStart = MapComponent.getTilePosition(x) - 1;
+    const checkTileXEnd = checkTileXStart + 3;
+    const checkTileY = MapComponent.getTilePosition(y);
+
+    const posList: Array<number> = [];
+
+    for (let checkX = checkTileXStart; checkX < checkTileXEnd; checkX += 1) {
+      const checkPos: PositionMetadata = {
+        x: checkX,
+        y: checkTileY,
+      };
+
+      // Skip check if X is out of bounds
+      if (!this.getPositionInBound(checkPos.x, checkPos.y)) {
+        // continue;
+        checkX += 1;
+      }
+
+      const currentStairX: StairX = this.getStairX(
+        checkPos.x * TILE_SIZE,
+        checkPos.y * TILE_SIZE,
+        top,
+      );
+
+      if (currentStairX) {
+        posList.push(currentStairX);
+      }
+    }
+
+    return posList;
+  }
+
+  getNearestStairX(x: number, y: number, top: boolean): StairX {
+    const stairsX: Array<number> = this.getNearestStairsX(x, y, top);
+
+    return stairsX.length === 0
+      ? null
+      : stairsX.reduce((a, b) => (Math.abs(b - x) < Math.abs(a - x) ? b : a));
   }
 }
 

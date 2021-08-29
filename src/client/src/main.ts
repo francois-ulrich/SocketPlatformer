@@ -12,10 +12,11 @@ import PositionSystem from './systems/PositionSystem';
 import MapSystem from './systems/MapSystem';
 import PlayerSystem from './systems/PlayerSystem';
 import CharacterSystem from './systems/CharacterSystem';
+import VelocitySystem from './systems/VelocitySystem';
+import StairsSystem from './systems/StairsSystem';
 
 // Types
 import { MapMetadata } from '../../server/src/types/mapMetadata';
-// import GameRoomMetadata from '../../server/src/types/gameRoomMetadata';
 
 // Create a Pixi Application
 const app = new PIXI.Application({
@@ -58,6 +59,8 @@ socket.on('gameRoom:init', (data: MapMetadata) => {
   // Instanciate world
   world
     .addSystem(new PositionSystem({ app }))
+    .addSystem(new VelocitySystem({ app }))
+    .addSystem(new StairsSystem({ app }))
     .addSystem(new MapSystem({ app }))
     .addSystem(new CharacterSystem({ app }))
     .addSystem(new SpriteSystem({ app }))

@@ -9,6 +9,8 @@ import PlayerComponent from '../components/PlayerComponent';
 
 import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
+import { PlayerInitMetadata } from '../../../server/src/types/player';
+
 // Factories
 import playersEntitiesFactory from '../factories/PlayerEntitiesFactory';
 

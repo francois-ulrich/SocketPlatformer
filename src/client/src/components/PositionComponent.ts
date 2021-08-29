@@ -9,9 +9,21 @@ class PositionComponent implements Component {
 
   y: number;
 
-  constructor(x:number, y:number) {
+  xStart: number;
+
+  yStart: number;
+
+  xEnd: number;
+
+  yEnd: number;
+
+  constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
+    this.xStart = x;
+    this.yStart = y;
+    this.xEnd = x;
+    this.yEnd = y;
   }
 }
 

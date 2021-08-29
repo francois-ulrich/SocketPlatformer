@@ -13,6 +13,9 @@ import StairsComponent from '../components/StairsComponent';
 
 // Types
 import { PlayerData } from '../types/player';
+import { PositionMetadata } from '../types/positionMetadata';
+
+import { CLIENT_FPS, TICK_RATE } from '../global';
 
 // Custom types
 type SpriteScaleData = {
@@ -64,15 +67,26 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
     const { clientId } = playerComponent;
     const { onFloor, direction } = characterComponent;
     const { spriteName, scale, frameSpeed } = spriteComponent;
-    const { xSpeed } = velocityComponent;
+    const { xSpeed, ySpeed } = velocityComponent;
 
+    // Calculate next x & y pos for interpolation
+    const shiftRatio = CLIENT_FPS / TICK_RATE;
+
+    const nextPos: PositionMetadata = {
+      x: x + xSpeed * shiftRatio,
+      y: y + ySpeed * shiftRatio,
+    };
+
+    // Create result object
     result = {
       clientId,
       x,
       y,
+      xNext: nextPos.x,
+      yNext: nextPos.y,
     };
 
-    // Sprite name to send to client
+    // Sprite data to send to client
     const spriteData: SpriteData = {};
     const newScale: SpriteScaleData = {};
 

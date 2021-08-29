@@ -5,7 +5,7 @@ import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
 // import MapComponent from '../components/MapComponent';
-import MapComponent from '../../src/components/MapComponent';
+import MapComponent from '../components/MapComponent';
 
 import solidTile from '../assets/tilemaps/solid.png';
 import stairsATile from '../assets/tilemaps/stairsA.png';
@@ -84,7 +84,6 @@ class MapSystem extends ExtendedSystem {
             }
           }
         }
-
       });
   }
 }

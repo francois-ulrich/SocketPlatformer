@@ -1,5 +1,6 @@
 import { World } from 'super-ecs';
 // import * as PIXI from 'pixi.js';
+import lerp from 'lerp';
 
 import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
@@ -41,6 +42,16 @@ class PositionSystem extends ExtendedSystem {
       );
 
       if (positionComponent) {
+        const {
+          // x, y, xStart, yStart, xEnd, yEnd,
+          x, y,
+        } = positionComponent;
+
+        // // Lerp position
+        // positionComponent.x = lerp(xStart, xEnd, 0);
+        // positionComponent.y = lerp(yStart, yEnd, 0);
+
+        // Update sprite position
         if (spriteComponent) {
           const { object } = spriteComponent;
           object.position.set(
@@ -48,8 +59,6 @@ class PositionSystem extends ExtendedSystem {
             Math.round(positionComponent.y),
           );
         }
-
-        const { x, y } = positionComponent;
 
         if (collisionComponent) {
           // Update debug rectangle position

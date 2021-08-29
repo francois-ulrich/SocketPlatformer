@@ -4,6 +4,12 @@ import InputMap from '../types/inputMap';
 
 import COMPONENT_NAMES from './types';
 
+import {
+  CHARACTER_MAX_XSPEED,
+  CHARACTER_JUMP_FORCE,
+  CHARACTER_STAIRS_SPEED,
+} from '../../../server/src/global';
+
 class CharacterComponent implements Component {
   name = COMPONENT_NAMES.Character;
 
@@ -23,6 +29,8 @@ class CharacterComponent implements Component {
 
   speedIncr: number;
 
+  stairsSpeed: number;
+
   dirChangeMidAir: boolean;
 
   input: InputMap;
@@ -34,9 +42,10 @@ class CharacterComponent implements Component {
 
     this.inputRight = false;
     this.inputLeft = false;
-    this.maxXSpeed = 1;
+    this.maxXSpeed = CHARACTER_MAX_XSPEED;
     this.onFloor = true;
-    this.jumpForce = 3.8;
+    this.jumpForce = CHARACTER_JUMP_FORCE;
+    this.stairsSpeed = CHARACTER_STAIRS_SPEED;
     this.direction = 1;
     this.speedIncr = 1;
     this.dirChangeMidAir = true;

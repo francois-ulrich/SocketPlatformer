@@ -6,10 +6,10 @@ export const TILE_STAIR_DESC: number = 1;
 export const TICK_RATE: number = 20;
 export const KEYS: Array<string> = ['ArrowUp', 'ArrowDown', 'ArrowRight', 'ArrowLeft', 'Space'];
 
-// export const enum CHAR_STATES {
-//     Normal,
-//     OnStairs,
-// }
+// Character data
+export const CHARACTER_MAX_XSPEED: number = 1;
+export const CHARACTER_JUMP_FORCE: number = 3.8;
+export const CHARACTER_STAIRS_SPEED: number = 0.5;
 
 export const enum STAIR_TYPE {
   Asc = 1,

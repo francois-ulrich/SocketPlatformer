@@ -5,11 +5,7 @@ import { PositionMetadata } from '../types/positionMetadata';
 
 import { TILE_SIZE, TILE_STAIR_ASC, TILE_STAIR_DESC } from '../global';
 
-type collisionMetadata = {
-  x: number,
-  y: number,
-  collision: number,
-}
+import collisionMetadata from '../types/collisionMetadata';
 
 type StairX = number | null;
 

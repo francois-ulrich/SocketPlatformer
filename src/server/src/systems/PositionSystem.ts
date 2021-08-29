@@ -5,7 +5,9 @@ import { ExtendedSystem } from './ExtendedSystem';
 import COMPONENT_NAMES from '../components/types';
 import PositionComponent from '../components/PositionComponent';
 import CollisionComponent from '../components/CollisionComponent';
+import SpriteComponent from '../components/SpriteComponent';
 
+// TODO: see what's wrong with warning messages
 class PositionSystem extends ExtendedSystem {
   // update(delta: number): void {
   update(): void {
