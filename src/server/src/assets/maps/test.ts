@@ -1,4 +1,4 @@
-import { MapGridMetadata } from '../../../../shared/src/types/mapMetadata';
+import { MapGridMetadata } from '../../types/mapMetadata';
 
 const collision: MapGridMetadata = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
