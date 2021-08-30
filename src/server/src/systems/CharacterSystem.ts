@@ -129,7 +129,7 @@ class CharacterSystem extends ExtendedSystem {
                     // Get stair value
                     const stairVal = mapComponent.getStairVal(
                       positionComponent.x
-                        - (characterComponent.input.down ? 1 : 0),
+                      - (characterComponent.input.down ? 1 : 0),
                       stairsCheckY,
                     );
 
@@ -148,8 +148,6 @@ class CharacterSystem extends ExtendedSystem {
                     // Remove gravity component
                     entity.removeComponent(COMPONENT_NAMES.Gravity);
                     entity.removeComponent(COMPONENT_NAMES.Collision);
-
-                    console.log({ stairVal });
 
                     return;
                   }

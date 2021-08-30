@@ -21,7 +21,7 @@ class MapSystem extends ExtendedSystem {
   addedToWorld(world: World): void {
     super.addedToWorld(world);
 
-    // Add sprite to stage
+    // Add map tiles to stage
     this.disposeBag
       .completable$(
         world.entityAdded$([
@@ -62,7 +62,7 @@ class MapSystem extends ExtendedSystem {
             }
           }
 
-          // Stairs
+          // Stairs layer
           if (stairs) {
             // Place stairs tiles
             for (let x = 0; x < tilemapWidth; x += 1) {

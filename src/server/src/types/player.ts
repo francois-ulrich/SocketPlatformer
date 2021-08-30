@@ -1,14 +1,15 @@
 type PlayerData = {
   clientId: string;
-  x: number;
-  y: number;
-  xNext: number;
-  yNext: number;
+  x?: number;
+  y?: number;
+  xSpeed?: number;
+  ySpeed?: number;
+  // onStairs?: boolean,
   sprite?: {
-    name?:string,
+    name?: string,
     scale?: {
-      x?:number
-      y?:number
+      x?: number
+      y?: number
     }
   }
 };

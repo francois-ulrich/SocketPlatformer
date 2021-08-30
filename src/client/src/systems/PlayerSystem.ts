@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 
 // ECS Components
 import COMPONENT_NAMES from '../components/types';
+import VelocityComponent from '../components/VelocityComponent';
 import PositionComponent from '../components/PositionComponent';
 import SpriteComponent from '../components/SpriteComponent';
 import PlayerComponent from '../components/PlayerComponent';
@@ -86,12 +87,11 @@ class PlayerSystem extends ExtendedSystem {
           'KeyX',
         ];
 
-        if (playerComponent) {
+        if (playerComponent && playerComponent.socket) {
           // Event listener for key press
           document.addEventListener('keydown', (e: KeyboardEvent) => {
             // Prevent default browser behavior for key press
             if (usedKeys.includes(e.code)) {
-              // Prevent default browser behavior for key press
               e.preventDefault();
             }
 
@@ -125,7 +125,6 @@ class PlayerSystem extends ExtendedSystem {
           document.addEventListener('keyup', (e: KeyboardEvent) => {
             // Prevent default browser behavior for key press
             if (usedKeys.includes(e.code)) {
-              // Prevent default browser behavior for key press
               e.preventDefault();
             }
 
@@ -185,7 +184,7 @@ class PlayerSystem extends ExtendedSystem {
       Object.keys(playersData).forEach((clientId) => {
         const playerData = playersData[clientId];
 
-        const { x, y, sprite } = playerData;
+        const { x, y, xSpeed, ySpeed, sprite } = playerData;
 
         const entity = PlayerSystem.getPlayerEntityFromClientId(
           this.world,
@@ -202,9 +201,18 @@ class PlayerSystem extends ExtendedSystem {
             COMPONENT_NAMES.Position,
           );
 
+          const velocityComponent = entity.getComponent<VelocityComponent>(
+            COMPONENT_NAMES.Velocity,
+          );
+
           if (positionComponent) {
             positionComponent.x = x;
             positionComponent.y = y;
+          }
+
+          if (velocityComponent) {
+            velocityComponent.xSpeed = xSpeed;
+            velocityComponent.ySpeed = ySpeed;
           }
 
           if (spriteComponent && sprite) {

@@ -14,6 +14,8 @@ import PlayerSystem from './systems/PlayerSystem';
 import CharacterSystem from './systems/CharacterSystem';
 import VelocitySystem from './systems/VelocitySystem';
 import StairsSystem from './systems/StairsSystem';
+import GravitySystem from './systems/GravitySystem';
+import CollisionSystem from './systems/CollisionSystem';
 
 // Types
 import { MapMetadata } from '../../server/src/types/mapMetadata';
@@ -34,7 +36,7 @@ const container = new PIXI.Container();
 app.stage.addChild(container);
 
 // Rescale PIXI stage
-const stageScale: number = 2;
+const stageScale: number = 1;
 app.stage.scale.x = stageScale;
 app.stage.scale.y = stageScale;
 
@@ -58,13 +60,16 @@ socket.on('gameRoom:init', (data: MapMetadata) => {
 
   // Instanciate world
   world
-    .addSystem(new PositionSystem({ app })) // TODO: change argument from object to app instance
-    .addSystem(new VelocitySystem({ app }))
-    .addSystem(new StairsSystem({ app }))
-    .addSystem(new MapSystem({ app }))
+    .addSystem(new PlayerSystem({ app, socket, world }))
     .addSystem(new CharacterSystem({ app }))
+    .addSystem(new StairsSystem({ app }))
+    .addSystem(new GravitySystem({ app })) // TODO: Not all systems need PIXI app as parameter
+    .addSystem(new CollisionSystem({ app }))
+    .addSystem(new VelocitySystem({ app }))
+    .addSystem(new PositionSystem({ app })) // TODO: change argument from object to app instance
+    .addSystem(new MapSystem({ app }))
     .addSystem(new SpriteSystem({ app }))
-    .addSystem(new PlayerSystem({ app, socket, world }));
+    ;
 
   // Initialize map
   const mapData: MapMetadata = data;

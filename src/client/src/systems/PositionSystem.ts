@@ -42,15 +42,6 @@ class PositionSystem extends ExtendedSystem {
       );
 
       if (positionComponent) {
-        const {
-          // x, y, xStart, yStart, xEnd, yEnd,
-          x, y,
-        } = positionComponent;
-
-        // // Lerp position
-        // positionComponent.x = lerp(xStart, xEnd, 0);
-        // positionComponent.y = lerp(yStart, yEnd, 0);
-
         // Update sprite position
         if (spriteComponent) {
           const { object } = spriteComponent;
@@ -58,12 +49,6 @@ class PositionSystem extends ExtendedSystem {
             Math.round(positionComponent.x),
             Math.round(positionComponent.y),
           );
-        }
-
-        if (collisionComponent) {
-          // Update debug rectangle position
-          collisionComponent.debugRect.x = collisionComponent.getCollisionBox(x, y).left;
-          collisionComponent.debugRect.y = collisionComponent.getCollisionBox(x, y).top;
         }
       }
     });

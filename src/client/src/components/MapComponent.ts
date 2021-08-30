@@ -16,7 +16,7 @@ import { PositionMetadata } from '../../../server/src/types/positionMetadata';
 type StairX = number | null;
 
 class MapComponent implements Component {
-  name = COMPONENT_NAMES.Map;
+  public name: symbol = COMPONENT_NAMES.Map;
 
   public collision: MapGridMetadata;
 
@@ -218,27 +218,6 @@ class MapComponent implements Component {
       MapComponent.getTilePosition(x)
     ];
   }
-
-  // getStairVal(x: number, y: number): number {
-  //   if (!this.stairs) {
-  //     return 0;
-  //   }
-
-  //   let res =
-  //     this.stairs[MapComponent.getTilePosition(y)][
-  //       MapComponent.getTilePosition(x)
-  //     ];
-
-  //   if (res === 0) {
-  //     const prevX = MapComponent.getTilePosition(x) - 1;
-
-  //     if (prevX >= 0) {
-  //       res = this.stairs[MapComponent.getTilePosition(y)][prevX];
-  //     }
-  //   }
-
-  //   return res;
-  // }
 
   getStairX(x: number, y: number, top?: boolean): StairX {
     const stairVal: number = this.getStairVal(x, y);

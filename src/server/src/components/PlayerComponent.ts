@@ -36,8 +36,6 @@ class PlayerComponent implements Component {
     this.clientId = clientId;
 
     this.roomName = roomName;
-
-    console.log(`User socket: ${this.socket.id}`);
   }
 }
 

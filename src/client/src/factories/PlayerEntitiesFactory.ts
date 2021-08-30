@@ -6,6 +6,10 @@ import PositionComponent from '../components/PositionComponent';
 import CharacterComponent from '../components/CharacterComponent';
 import SpriteComponent from '../components/SpriteComponent';
 import PlayerComponent from '../components/PlayerComponent';
+import GravityComponent from '../components/GravityComponent';
+import VelocityComponent from '../components/VelocityComponent';
+import CollBoxComponent from '../components/CollBoxComponent';
+import CollisionComponent from '../components/CollisionComponent';
 
 // Types
 import { PlayerData } from '../../../server/src/types/player';
@@ -22,9 +26,13 @@ function playersEntitiesFactory(data: PlayerData, socket?: Socket): Entity {
 
   playerEntity
     .addComponent(new PositionComponent(x, y))
+    .addComponent(new GravityComponent())
+    .addComponent(new VelocityComponent())
     .addComponent(new CharacterComponent())
     .addComponent(new SpriteComponent(sprite))
-    .addComponent(new PlayerComponent(clientId, socket));
+    .addComponent(new PlayerComponent(clientId, socket))
+    .addComponent(new CollBoxComponent({ width: 16, height: 32 }))
+    .addComponent(new CollisionComponent());
 
   return playerEntity;
 }

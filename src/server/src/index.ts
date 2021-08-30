@@ -47,6 +47,8 @@ const randomstring = require('randomstring');
 // ======================================================
 // ======================================================
 
+// TODO: See how to share game logic between server and client
+
 // Socket.IO server instanciation
 const httpServer = createServer();
 const io = new Server(httpServer, {

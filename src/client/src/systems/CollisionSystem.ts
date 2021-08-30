@@ -1,20 +1,24 @@
-import { ExtendedSystem } from './ExtendedSystem';
+// import {World} from 'super-ecs'
 
 import COMPONENT_NAMES from '../components/types';
 
-// Components
 import MapComponent from '../components/MapComponent';
 import VelocityComponent from '../components/VelocityComponent';
 import CollBoxComponent from '../components/CollBoxComponent';
 import PositionComponent from '../components/PositionComponent';
 import CharacterComponent from '../components/CharacterComponent';
 
+import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
+
 // Types
-import { PositionMetadata } from '../types/positionMetadata';
+import { PositionMetadata } from '../../../server/src/types/positionMetadata';
 
 import { TILE_SIZE } from '../global';
 
 class CollisionSystem extends ExtendedSystem {
+  constructor({ app }: ExtendedSystemMetadata) {
+    super({ app });
+  }
   update(delta: number): void {
     const entities = this.world.getEntities([
       COMPONENT_NAMES.Velocity,
@@ -137,6 +141,8 @@ class CollisionSystem extends ExtendedSystem {
 
           // If one of them is a solid, stops
           if (solidCollision) {
+
+
             if (ySpeed > 0) {
               positionComponent.y = solidCollision.y * TILE_SIZE - height / 2;
 
