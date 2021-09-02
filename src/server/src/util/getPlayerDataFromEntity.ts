@@ -12,7 +12,7 @@ import SpriteComponent from '../components/SpriteComponent';
 import StairsComponent from '../components/StairsComponent';
 
 // Types
-import { PlayerData } from '../types/player';
+import { PlayerData, PlayerStairsData } from '../types/player';
 
 // Custom types
 type SpriteScaleData = {
@@ -62,7 +62,7 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
   ) {
     const { x, y } = positionComponent;
     const { clientId } = playerComponent;
-    const { onFloor, direction } = characterComponent;
+    const { onFloor, direction, onStairs } = characterComponent;
     const { spriteName, scale, frameSpeed } = spriteComponent;
     const { xSpeed, ySpeed } = velocityComponent;
 
@@ -76,6 +76,26 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
 
     // const onStairs = stairsComponent !== undefined;
 
+    // Send stairs data
+    let stairs: PlayerStairsData | undefined;
+
+    if (onStairs !== Boolean(stairsComponent)) {
+      characterComponent.onStairs = Boolean(stairsComponent);
+
+      stairs = {
+        onStairs: Boolean(stairsComponent),
+      }
+
+      if (stairsComponent) {
+        stairs = {
+          ...stairs,
+          stairsType: stairsComponent.stairType
+        };
+
+        stairs["stairsType"] = stairsComponent.stairType;
+      }
+    }
+
     // Create result object
     result = {
       clientId,
@@ -83,7 +103,6 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
       y,
       xSpeed,
       ySpeed,
-      // onStairs,
     };
 
     // Sprite data to send to client
@@ -92,6 +111,7 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
 
     let newSpriteName: string | undefined;
     let newFrameSpeed: number | undefined | null;
+
 
     if (stairsComponent) {
       // Sprite if on stairs
@@ -141,6 +161,11 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
     // If sprite data change, send it to client
     if (Object.keys(spriteData).length > 0) {
       result = { ...result, sprite: spriteData };
+    }
+
+    // If stairs state change
+    if (stairs !== undefined) {
+      result = { ...result, stairs };
     }
   }
 

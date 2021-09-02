@@ -1,5 +1,6 @@
 import { World, Entity } from 'super-ecs';
 import { Socket } from 'socket.io-client';
+import randomstring from 'randomstring';
 
 // ECS Components
 import COMPONENT_NAMES from '../components/types';
@@ -14,6 +15,9 @@ import { PlayerInitMetadata } from '../../../server/src/types/player';
 
 // Factories
 import playersEntitiesFactory from '../factories/PlayerEntitiesFactory';
+
+// Util
+import setPlayerEntityOnStairs from '../util/setPlayerEntityOnStairs';
 
 type PlayerSystemMetadata = ExtendedSystemMetadata & {
   socket: Socket;
@@ -57,7 +61,9 @@ class PlayerSystem extends ExtendedSystem {
             if (playerComponent.inputPrev[key] !== playerComponent.input[key]) {
               const type: string = keyDown ? 'Down' : 'Up';
 
-              socket.emit(`input${type}`, key);
+              socket.emit(`input${type}`, {
+                req: randomstring.generate({ length: 16 }),
+              });
             }
           });
         }
@@ -184,7 +190,9 @@ class PlayerSystem extends ExtendedSystem {
       Object.keys(playersData).forEach((clientId) => {
         const playerData = playersData[clientId];
 
-        const { x, y, xSpeed, ySpeed, sprite } = playerData;
+        const {
+          x, y, xSpeed, ySpeed, sprite, stairs,
+        } = playerData;
 
         const entity = PlayerSystem.getPlayerEntityFromClientId(
           this.world,
@@ -233,6 +241,13 @@ class PlayerSystem extends ExtendedSystem {
             if (typeof sprite.frameSpeed === 'number') {
               spriteComponent.setFrameSpeed(sprite.frameSpeed);
             }
+          }
+
+          if (stairs !== undefined) {
+            const { onStairs, stairsType } = stairs;
+
+            // Set stairs component
+            setPlayerEntityOnStairs(entity, onStairs, stairsType);
           }
         }
       });

@@ -1,10 +1,15 @@
+type PlayerStairsData = {
+  onStairs: boolean,
+  stairsType?: number
+}
+
 type PlayerData = {
   clientId: string;
   x?: number;
   y?: number;
   xSpeed?: number;
   ySpeed?: number;
-  // onStairs?: boolean,
+  stairs?: PlayerStairsData
   sprite?: {
     name?: string,
     scale?: {
@@ -23,4 +28,4 @@ type PlayerInitMetadata = {
   players: PlayersList;
 };
 
-export { PlayerData, PlayersList, PlayerInitMetadata };
+export { PlayerData, PlayersList, PlayerInitMetadata, PlayerStairsData };

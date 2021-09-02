@@ -26,6 +26,8 @@ class CharacterComponent implements Component {
 
   onFloor: boolean;
 
+  onStairs: boolean;
+
   jumpForce: number;
 
   state: number;
@@ -50,6 +52,7 @@ class CharacterComponent implements Component {
     this.inputLeft = false;
     this.maxXSpeed = CHARACTER_MAX_XSPEED;
     this.stairsSpeed = CHARACTER_STAIRS_SPEED;
+    this.onStairs = false;
     this.onFloor = true;
     this.jumpForce = CHARACTER_JUMP_FORCE;
     this.direction = 1;

@@ -4,6 +4,7 @@ import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
 
+// Components
 import CharacterComponent from '../components/CharacterComponent';
 import CollBoxComponent from '../components/CollBoxComponent';
 import VelocityComponent from '../components/VelocityComponent';
@@ -13,10 +14,14 @@ import PositionComponent from '../components/PositionComponent';
 import PlayerComponent from '../components/PlayerComponent';
 import StairsComponent from '../components/StairsComponent';
 
+// Globals
 import { STAIR_TYPE } from '../../../server/src/global';
 
 // Components
 import SpriteComponent from '../components/SpriteComponent';
+
+// Util
+import setPlayerEntityOnStairs from '../util/setPlayerEntityOnStairs';
 
 class CharacterSystem extends ExtendedSystem {
   constructor({ app }: ExtendedSystemMetadata) {
@@ -142,21 +147,27 @@ class CharacterSystem extends ExtendedSystem {
                       stairsCheckY,
                     );
 
-                    // Add stairs component
-                    const newStairsComponent = new StairsComponent();
-                    newStairsComponent.stairType = stairVal === 2
+                    // // Add stairs component
+                    // const newStairsComponent = new StairsComponent();
+                    // newStairsComponent.stairType = stairVal === 2
+                    //   ? STAIR_TYPE.Asc
+                    //   : STAIR_TYPE.Desc;
+
+                    const stairType = stairVal === 2
                       ? STAIR_TYPE.Asc
                       : STAIR_TYPE.Desc;
 
-                    // Add stairs component
-                    entity.addComponent(newStairsComponent);
+                    // // Add stairs component
+                    // entity.addComponent(newStairsComponent);
 
-                    velocityComponent.xSpeed = 0;
-                    velocityComponent.ySpeed = 0;
+                    // velocityComponent.xSpeed = 0;
+                    // velocityComponent.ySpeed = 0;
 
-                    // Remove gravity component
-                    entity.removeComponent(COMPONENT_NAMES.Gravity);
-                    entity.removeComponent(COMPONENT_NAMES.Collision);
+                    // // Remove gravity component
+                    // entity.removeComponent(COMPONENT_NAMES.Gravity);
+                    // entity.removeComponent(COMPONENT_NAMES.Collision);
+
+                    setPlayerEntityOnStairs(entity, true, stairType);
 
                     return;
                   }

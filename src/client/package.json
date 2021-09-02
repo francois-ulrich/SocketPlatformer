@@ -9,6 +9,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^16.7.6",
+		"@types/randomstring": "^1.1.7",
 		"@types/socket.io-client": "^3.0.0",
 		"@typescript-eslint/eslint-plugin": "^4.26.0",
 		"@typescript-eslint/parser": "^4.26.0",
@@ -22,6 +23,7 @@
 		"@pixi/tilemap": "^3.2.1",
 		"lerp": "^1.0.3",
 		"pixi.js": "^6.0.4",
+		"randomstring": "^1.2.1",
 		"socket.io-client": "^4.1.2",
 		"super-ecs": "^1.4.0"
 	}

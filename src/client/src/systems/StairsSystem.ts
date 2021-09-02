@@ -1,8 +1,10 @@
 // import { Entity, World } from 'super-ecs';
+import { World } from 'super-ecs';
 import { ExtendedSystem } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
 
+// Components
 import CharacterComponent from '../components/CharacterComponent';
 import VelocityComponent from '../components/VelocityComponent';
 import MapComponent from '../components/MapComponent';
@@ -10,10 +12,13 @@ import PositionComponent from '../components/PositionComponent';
 import PlayerComponent from '../components/PlayerComponent';
 import StairsComponent from '../components/StairsComponent';
 import CollBoxComponent from '../components/CollBoxComponent';
-import CollisionComponent from '../components/CollisionComponent';
-import GravityComponent from '../components/GravityComponent';
+// import CollisionComponent from '../components/CollisionComponent';
+// import GravityComponent from '../components/GravityComponent';
 
 import { TILE_SIZE } from '../global';
+
+// Util
+import setPlayerEntityOnStairs from '../util/setPlayerEntityOnStairs';
 
 class StairsSystem extends ExtendedSystem {
   update(delta: number): void {
@@ -116,12 +121,14 @@ class StairsSystem extends ExtendedSystem {
 
           // If one of these conditions are met, character gets off the stairs
           if (stairsCheck === 0) {
-            // Remove stairs component cuz left stars & s'all good
-            entity.removeComponent(COMPONENT_NAMES.Stairs);
+            // // Remove stairs component cuz left stars & s'all good
+            // entity.removeComponent(COMPONENT_NAMES.Stairs);
 
-            // Add components
-            entity.addComponent(new GravityComponent());
-            entity.addComponent(new CollisionComponent());
+            // // Add components
+            // entity.addComponent(new GravityComponent());
+            // entity.addComponent(new CollisionComponent());
+
+            setPlayerEntityOnStairs(entity, false);
 
             // Set right X / Y pos
             positionComponent.x = Math.round(x / TILE_SIZE) * TILE_SIZE;
@@ -133,6 +140,38 @@ class StairsSystem extends ExtendedSystem {
         velocityComponent.ySpeed = ySpeed;
       }
     });
+  }
+
+
+  addedToWorld(world: World): void {
+    super.addedToWorld(world);
+
+    // Add sprite to stage
+    this.disposeBag
+      .completable$(
+        world.entityAdded$([
+          COMPONENT_NAMES.Stairs,
+        ]),
+      )
+      .subscribe((entity) => {
+        const stairsComponent = entity.getComponent<StairsComponent>(
+          COMPONENT_NAMES.Stairs,
+        );
+
+        if (stairsComponent) {
+          console.log('StairsComponent ADDED');
+        }
+      });
+
+    this.disposeBag
+      .completable$(
+        world.entityRemoved$([
+          COMPONENT_NAMES.Stairs,
+        ]),
+      )
+      .subscribe(() => {
+        console.log('StairsComponent REMOVED');
+      });
   }
 }
 
