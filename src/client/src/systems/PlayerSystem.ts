@@ -1,6 +1,5 @@
 import { World, Entity } from 'super-ecs';
 import { Socket } from 'socket.io-client';
-import randomstring from 'randomstring';
 
 // ECS Components
 import COMPONENT_NAMES from '../components/types';
@@ -61,9 +60,7 @@ class PlayerSystem extends ExtendedSystem {
             if (playerComponent.inputPrev[key] !== playerComponent.input[key]) {
               const type: string = keyDown ? 'Down' : 'Up';
 
-              socket.emit(`input${type}`, {
-                req: randomstring.generate({ length: 16 }),
-              });
+              socket.emit(`input${type}`, key);
             }
           });
         }
