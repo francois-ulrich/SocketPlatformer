@@ -2,9 +2,16 @@ import { Component } from 'super-ecs';
 import { Socket } from 'socket.io-client';
 import COMPONENT_NAMES from './types';
 
+import { PlayerData } from '../../../server/src/types/player';
+
 type InputMap = {
-  [key: string]: boolean
-}
+  [key: string]: boolean;
+};
+
+type PlayerState = {
+  timestamp: number;
+  input: InputMap
+} & PlayerData;
 
 class PlayerComponent implements Component {
   name = COMPONENT_NAMES.Player;
@@ -18,6 +25,8 @@ class PlayerComponent implements Component {
   public socket?: Socket;
 
   public clientId: string;
+
+  public pastStates: Array<PlayerState>;
 
   constructor(clientId: string, socket?: Socket) {
     this.input = {
@@ -35,6 +44,8 @@ class PlayerComponent implements Component {
     this.socket = socket;
 
     this.clientId = clientId;
+
+    this.pastStates = [];
   }
 }
 

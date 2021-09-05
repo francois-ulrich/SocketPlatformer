@@ -28,4 +28,6 @@ type PlayerInitMetadata = {
   players: PlayersList;
 };
 
-export { PlayerData, PlayersList, PlayerInitMetadata, PlayerStairsData };
+export {
+  PlayerData, PlayersList, PlayerInitMetadata, PlayerStairsData,
+};

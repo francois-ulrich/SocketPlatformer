@@ -7,6 +7,8 @@ import VelocityComponent from '../components/VelocityComponent';
 import PositionComponent from '../components/PositionComponent';
 import SpriteComponent from '../components/SpriteComponent';
 import PlayerComponent from '../components/PlayerComponent';
+import CharacterComponent from '../components/CharacterComponent';
+import StairsComponent from '../components/StairsComponent';
 
 import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
@@ -67,6 +69,68 @@ class PlayerSystem extends ExtendedSystem {
 
         // Set object of previous inputs
         playerComponent.inputPrev = { ...playerComponent.input };
+      }
+
+      // Save state
+
+      // Send stairs data
+      const positionComponent = entity.getComponent<PositionComponent>(
+        COMPONENT_NAMES.Position,
+      );
+
+      const characterComponent = entity.getComponent<CharacterComponent>(
+        COMPONENT_NAMES.Character,
+      );
+
+      const velocityComponent = entity.getComponent<VelocityComponent>(
+        COMPONENT_NAMES.Velocity,
+      );
+
+      const stairsComponent = entity.getComponent<StairsComponent>(
+        COMPONENT_NAMES.Stairs,
+      );
+
+      if (
+        playerComponent
+        && positionComponent
+        && characterComponent
+        && velocityComponent
+      ) {
+        const { x, y } = positionComponent;
+        const { clientId } = playerComponent;
+        const { onFloor, direction, onStairs } = characterComponent;
+        const { xSpeed, ySpeed } = velocityComponent;
+
+        let stairs: PlayerStairsData | undefined;
+
+        if (onStairs !== Boolean(stairsComponent)) {
+          characterComponent.onStairs = Boolean(stairsComponent);
+
+          stairs = {
+            onStairs: Boolean(stairsComponent),
+          };
+
+          if (stairsComponent) {
+            stairs = {
+              ...stairs,
+              stairsType: stairsComponent.stairType,
+            };
+          }
+        }
+
+        // Create result object
+        const result = {
+          timestamp: new Date().getTime(),
+          input: { ...playerComponent.input },
+          clientId,
+          x,
+          y,
+          xSpeed,
+          ySpeed,
+          stairs,
+        };
+
+        playerComponent.pastStates.push(result);
       }
     });
   }
@@ -202,6 +266,10 @@ class PlayerSystem extends ExtendedSystem {
             COMPONENT_NAMES.Sprite,
           );
 
+          const playerComponent = entity.getComponent<PlayerComponent>(
+            COMPONENT_NAMES.Player,
+          );
+
           const positionComponent = entity.getComponent<PositionComponent>(
             COMPONENT_NAMES.Position,
           );
@@ -209,6 +277,19 @@ class PlayerSystem extends ExtendedSystem {
           const velocityComponent = entity.getComponent<VelocityComponent>(
             COMPONENT_NAMES.Velocity,
           );
+
+          // Update past state buffer
+          if (playerComponent) {
+            const { pastStates } = playerComponent;
+
+            // Discard any buffered state older than the corrected state from the server
+            playerComponent.pastStates = pastStates.filter(
+              (state) => state.timestamp >= new Date().getTime(),
+            );
+
+            // Replays the state starting from the corrected state
+            // back to the present “predicted” time
+          }
 
           if (positionComponent) {
             positionComponent.x = x;

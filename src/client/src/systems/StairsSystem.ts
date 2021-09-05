@@ -142,37 +142,36 @@ class StairsSystem extends ExtendedSystem {
     });
   }
 
+  // addedToWorld(world: World): void {
+  //   super.addedToWorld(world);
 
-  addedToWorld(world: World): void {
-    super.addedToWorld(world);
+  //   // Add sprite to stage
+  //   this.disposeBag
+  //     .completable$(
+  //       world.entityAdded$([
+  //         COMPONENT_NAMES.Stairs,
+  //       ]),
+  //     )
+  //     .subscribe((entity) => {
+  //       const stairsComponent = entity.getComponent<StairsComponent>(
+  //         COMPONENT_NAMES.Stairs,
+  //       );
 
-    // Add sprite to stage
-    this.disposeBag
-      .completable$(
-        world.entityAdded$([
-          COMPONENT_NAMES.Stairs,
-        ]),
-      )
-      .subscribe((entity) => {
-        const stairsComponent = entity.getComponent<StairsComponent>(
-          COMPONENT_NAMES.Stairs,
-        );
+  //       if (stairsComponent) {
+  //         console.log('StairsComponent ADDED');
+  //       }
+  //     });
 
-        if (stairsComponent) {
-          console.log('StairsComponent ADDED');
-        }
-      });
-
-    this.disposeBag
-      .completable$(
-        world.entityRemoved$([
-          COMPONENT_NAMES.Stairs,
-        ]),
-      )
-      .subscribe(() => {
-        console.log('StairsComponent REMOVED');
-      });
-  }
+  //   this.disposeBag
+  //     .completable$(
+  //       world.entityRemoved$([
+  //         COMPONENT_NAMES.Stairs,
+  //       ]),
+  //     )
+  //     .subscribe(() => {
+  //       console.log('StairsComponent REMOVED');
+  //     });
+  // }
 }
 
 export default StairsSystem;

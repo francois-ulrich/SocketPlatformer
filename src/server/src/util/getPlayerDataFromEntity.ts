@@ -66,16 +66,6 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
     const { spriteName, scale, frameSpeed } = spriteComponent;
     const { xSpeed, ySpeed } = velocityComponent;
 
-    // Calculate next x & y pos for interpolation
-    // const shiftRatio = CLIENT_FPS / TICK_RATE;
-
-    // const nextPos: PositionMetadata = {
-    //   x: x + xSpeed * shiftRatio,
-    //   y: y + ySpeed * shiftRatio,
-    // };
-
-    // const onStairs = stairsComponent !== undefined;
-
     // Send stairs data
     let stairs: PlayerStairsData | undefined;
 
@@ -84,15 +74,13 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
 
       stairs = {
         onStairs: Boolean(stairsComponent),
-      }
+      };
 
       if (stairsComponent) {
         stairs = {
           ...stairs,
-          stairsType: stairsComponent.stairType
+          stairsType: stairsComponent.stairType,
         };
-
-        stairs["stairsType"] = stairsComponent.stairType;
       }
     }
 
@@ -111,7 +99,6 @@ function getPlayerDataFromEntity(entity: Entity): PlayerData | null {
 
     let newSpriteName: string | undefined;
     let newFrameSpeed: number | undefined | null;
-
 
     if (stairsComponent) {
       // Sprite if on stairs
