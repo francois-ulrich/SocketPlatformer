@@ -34,8 +34,7 @@ class PlayerSystem extends ExtendedSystem {
     this.socket = socket;
   }
 
-  // update(delta: number): void {
-  update(): void {
+  update(delta: number): void {
     // Get entities under this system
     const entities = this.world.getEntities([COMPONENT_NAMES.Player]);
 
@@ -46,93 +45,98 @@ class PlayerSystem extends ExtendedSystem {
 
     // Loop through all entities
     entities.forEach((entity) => {
-      const playerComponent = entity.getComponent<PlayerComponent>(
-        COMPONENT_NAMES.Player,
-      );
+      PlayerSystem.updateEntity(entity, delta);
+    });
+  }
 
-      // Player movement
-      if (playerComponent) {
-        const { socket } = playerComponent;
+  static updateEntity(entity:Entity, delta: number): void {
+    const playerComponent = entity.getComponent<PlayerComponent>(
+      COMPONENT_NAMES.Player,
+    );
 
-        if (socket) {
-          // Reset all input pressed values
-          Object.keys(playerComponent.input).forEach((key) => {
-            const keyDown: boolean = playerComponent.input[key] === true;
+    // Player movement
+    if (playerComponent) {
+      const { socket } = playerComponent;
 
-            if (playerComponent.inputPrev[key] !== playerComponent.input[key]) {
-              const type: string = keyDown ? 'Down' : 'Up';
+      if (socket) {
+        // Reset all input pressed values
+        Object.keys(playerComponent.input).forEach((key) => {
+          const keyDown: boolean = playerComponent.input[key] === true;
 
-              socket.emit(`input${type}`, key);
-            }
-          });
-        }
+          if (playerComponent.inputPrev[key] !== playerComponent.input[key]) {
+            const type: string = keyDown ? 'Down' : 'Up';
 
-        // Set object of previous inputs
-        playerComponent.inputPrev = { ...playerComponent.input };
+            socket.emit(`input${type}`, key);
+          }
+        });
       }
 
-      // Save state
+      // Set object of previous inputs
+      playerComponent.inputPrev = { ...playerComponent.input };
+    }
 
-      // Send stairs data
-      const positionComponent = entity.getComponent<PositionComponent>(
-        COMPONENT_NAMES.Position,
-      );
+    // Save state
 
-      const characterComponent = entity.getComponent<CharacterComponent>(
-        COMPONENT_NAMES.Character,
-      );
+    // Send stairs data
+    const positionComponent = entity.getComponent<PositionComponent>(
+      COMPONENT_NAMES.Position,
+    );
 
-      const velocityComponent = entity.getComponent<VelocityComponent>(
-        COMPONENT_NAMES.Velocity,
-      );
+    const characterComponent = entity.getComponent<CharacterComponent>(
+      COMPONENT_NAMES.Character,
+    );
 
-      const stairsComponent = entity.getComponent<StairsComponent>(
-        COMPONENT_NAMES.Stairs,
-      );
+    const velocityComponent = entity.getComponent<VelocityComponent>(
+      COMPONENT_NAMES.Velocity,
+    );
 
-      if (
-        playerComponent
-        && positionComponent
-        && characterComponent
-        && velocityComponent
-      ) {
-        const { x, y } = positionComponent;
-        const { clientId } = playerComponent;
-        const { onFloor, direction, onStairs } = characterComponent;
-        const { xSpeed, ySpeed } = velocityComponent;
+    const stairsComponent = entity.getComponent<StairsComponent>(
+      COMPONENT_NAMES.Stairs,
+    );
 
-        let stairs: PlayerStairsData | undefined;
+    if (
+      playerComponent
+      && positionComponent
+      && characterComponent
+      && velocityComponent
+    ) {
+      const { x, y } = positionComponent;
+      const { clientId } = playerComponent;
+      const { onFloor, direction, onStairs } = characterComponent;
+      const { xSpeed, ySpeed } = velocityComponent;
 
-        if (onStairs !== Boolean(stairsComponent)) {
-          characterComponent.onStairs = Boolean(stairsComponent);
+      let stairs: PlayerStairsData | undefined;
 
-          stairs = {
-            onStairs: Boolean(stairsComponent),
-          };
+      if (onStairs !== Boolean(stairsComponent)) {
+        characterComponent.onStairs = Boolean(stairsComponent);
 
-          if (stairsComponent) {
-            stairs = {
-              ...stairs,
-              stairsType: stairsComponent.stairType,
-            };
-          }
-        }
-
-        // Create result object
-        const result = {
-          timestamp: new Date().getTime(),
-          input: { ...playerComponent.input },
-          clientId,
-          x,
-          y,
-          xSpeed,
-          ySpeed,
-          stairs,
+        stairs = {
+          onStairs: Boolean(stairsComponent),
         };
 
-        playerComponent.pastStates.push(result);
+        if (stairsComponent) {
+          stairs = {
+            ...stairs,
+            stairsType: stairsComponent.stairType,
+          };
+        }
       }
-    });
+
+      // Create result object
+      const result = {
+        timestamp: new Date().getTime(),
+        delta,
+        input: { ...playerComponent.input },
+        clientId,
+        x,
+        y,
+        xSpeed,
+        ySpeed,
+        stairs,
+      };
+
+      playerComponent.pastStates.push(result);
+    }
   }
 
   addedToWorld(world: World): void {
@@ -289,6 +293,38 @@ class PlayerSystem extends ExtendedSystem {
 
             // Replays the state starting from the corrected state
             // back to the present “predicted” time
+
+            if (pastStates.length > 0) {
+              pastStates.forEach((state) => {
+              // Reset position
+                if (positionComponent && state.x && state.y) {
+                  positionComponent.x = state.x;
+                  positionComponent.y = state.y;
+                }
+
+                // Reset velocity
+                if (velocityComponent && state.xSpeed && state.ySpeed) {
+                  velocityComponent.xSpeed = state.xSpeed;
+                  velocityComponent.ySpeed = state.ySpeed;
+                }
+              });
+            }
+
+            /*
+              world
+                .addSystem(new PlayerSystem({ app, socket, world }))
+                .addSystem(new CharacterSystem({ app }))
+                .addSystem(new StairsSystem({ app }))
+                .addSystem(new GravitySystem({ app }))
+                .addSystem(new CollisionSystem({ app }))
+                .addSystem(new VelocitySystem({ app }))
+                .addSystem(new PositionSystem({ app }))
+                .addSystem(new MapSystem({ app }))
+                .addSystem(new SpriteSystem({ app }))
+              ;
+            */
+
+            // Set value from first buffered player state
           }
 
           if (positionComponent) {

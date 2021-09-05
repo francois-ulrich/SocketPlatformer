@@ -1,3 +1,4 @@
+import { Entity } from 'super-ecs';
 import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
@@ -23,18 +24,22 @@ class GravitySystem extends ExtendedSystem {
 
     // Loop through all entities
     entities.forEach((entity) => {
-      const gravityComponent = entity.getComponent<GravityComponent>(
-        COMPONENT_NAMES.Gravity,
-      );
-
-      const velocityComponent = entity.getComponent<VelocityComponent>(
-        COMPONENT_NAMES.Velocity,
-      );
-
-      if (gravityComponent && velocityComponent) {
-        velocityComponent.ySpeed += gravityComponent.force;
-      }
+      GravitySystem.updateEntity(entity);
     });
+  }
+
+  static updateEntity(entity:Entity): void {
+    const gravityComponent = entity.getComponent<GravityComponent>(
+      COMPONENT_NAMES.Gravity,
+    );
+
+    const velocityComponent = entity.getComponent<VelocityComponent>(
+      COMPONENT_NAMES.Velocity,
+    );
+
+    if (gravityComponent && velocityComponent) {
+      velocityComponent.ySpeed += gravityComponent.force;
+    }
   }
 }
 

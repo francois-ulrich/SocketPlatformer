@@ -10,6 +10,7 @@ type InputMap = {
 
 type PlayerState = {
   timestamp: number;
+  delta: number;
   input: InputMap
 } & PlayerData;
 

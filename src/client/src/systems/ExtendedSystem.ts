@@ -5,7 +5,7 @@ type ExtendedSystemMetadata = {
   app: PIXI.Application;
 };
 
-class ExtendedSystem extends System {
+abstract class ExtendedSystem extends System {
   disposeBag: DisposeBag;
 
   app: PIXI.Application;

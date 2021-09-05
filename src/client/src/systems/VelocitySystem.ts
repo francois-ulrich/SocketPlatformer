@@ -1,3 +1,4 @@
+import { Entity } from 'super-ecs';
 import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
 import COMPONENT_NAMES from '../components/types';
@@ -23,20 +24,23 @@ class VelocitySystem extends ExtendedSystem {
 
     // Loop through all entities
     entities.forEach((entity) => {
-      const velocityComponent = entity.getComponent<VelocityComponent>(
-        COMPONENT_NAMES.Velocity,
-      );
-
-      const positionComponent = entity.getComponent<PositionComponent>(
-        COMPONENT_NAMES.Position,
-      );
-
-      if (positionComponent
-        && velocityComponent) {
-        positionComponent.x += velocityComponent.xSpeed * delta;
-        positionComponent.y += velocityComponent.ySpeed * delta;
-      }
+      VelocitySystem.updateEntity(entity, delta);
     });
+  }
+
+  static updateEntity(entity:Entity, delta: number): void {
+    const velocityComponent = entity.getComponent<VelocityComponent>(
+      COMPONENT_NAMES.Velocity,
+    );
+
+    const positionComponent = entity.getComponent<PositionComponent>(
+      COMPONENT_NAMES.Position,
+    );
+
+    if (positionComponent && velocityComponent) {
+      positionComponent.x += velocityComponent.xSpeed * delta;
+      positionComponent.y += velocityComponent.ySpeed * delta;
+    }
   }
 }
 
