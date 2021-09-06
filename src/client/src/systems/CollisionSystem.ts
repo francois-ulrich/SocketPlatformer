@@ -94,7 +94,9 @@ class CollisionSystem extends ExtendedSystem {
         const checkWidth = Math.abs(xSpeed) * delta;
 
         // Get coll check X
-        const checkXStart: number = xSpeed > 0 ? collisionBox.right : collisionBox.left - checkWidth;
+        const checkXStart: number = xSpeed > 0
+          ? collisionBox.right
+          : collisionBox.left - checkWidth;
 
         const checkYStart: number = collisionBox.top;
 
@@ -133,7 +135,9 @@ class CollisionSystem extends ExtendedSystem {
         const collCheckHeight = Math.abs(ySpeed) * delta;
 
         const checkXStart: number = collisionBox.left;
-        const checkYStart: number = ySpeed > 0 ? collisionBox.bottom : collisionBox.top - collCheckHeight;
+        const checkYStart: number = ySpeed > 0
+          ? collisionBox.bottom
+          : collisionBox.top - collCheckHeight;
 
         const dir = ySpeed > 0 ? 'down' : 'up';
 

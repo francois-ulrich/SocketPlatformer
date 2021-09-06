@@ -10,6 +10,13 @@ import PlayerComponent from '../components/PlayerComponent';
 import CharacterComponent from '../components/CharacterComponent';
 import StairsComponent from '../components/StairsComponent';
 
+// Systems
+import PositionSystem from './PositionSystem';
+import VelocitySystem from './VelocitySystem';
+import CharacterSystem from './CharacterSystem';
+import CollisionSystem from './CollisionSystem';
+// import MapComponent from './MapComponent';
+
 import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
 
 import { PlayerInitMetadata } from '../../../server/src/types/player';
@@ -19,6 +26,7 @@ import playersEntitiesFactory from '../factories/PlayerEntitiesFactory';
 
 // Util
 import setPlayerEntityOnStairs from '../util/setPlayerEntityOnStairs';
+import getMapComponent from '../util/getMapComponent';
 
 type PlayerSystemMetadata = ExtendedSystemMetadata & {
   socket: Socket;
@@ -282,51 +290,6 @@ class PlayerSystem extends ExtendedSystem {
             COMPONENT_NAMES.Velocity,
           );
 
-          // Update past state buffer
-          if (playerComponent) {
-            const { pastStates } = playerComponent;
-
-            // Discard any buffered state older than the corrected state from the server
-            playerComponent.pastStates = pastStates.filter(
-              (state) => state.timestamp >= new Date().getTime(),
-            );
-
-            // Replays the state starting from the corrected state
-            // back to the present “predicted” time
-
-            if (pastStates.length > 0) {
-              pastStates.forEach((state) => {
-              // Reset position
-                if (positionComponent && state.x && state.y) {
-                  positionComponent.x = state.x;
-                  positionComponent.y = state.y;
-                }
-
-                // Reset velocity
-                if (velocityComponent && state.xSpeed && state.ySpeed) {
-                  velocityComponent.xSpeed = state.xSpeed;
-                  velocityComponent.ySpeed = state.ySpeed;
-                }
-              });
-            }
-
-            /*
-              world
-                .addSystem(new PlayerSystem({ app, socket, world }))
-                .addSystem(new CharacterSystem({ app }))
-                .addSystem(new StairsSystem({ app }))
-                .addSystem(new GravitySystem({ app }))
-                .addSystem(new CollisionSystem({ app }))
-                .addSystem(new VelocitySystem({ app }))
-                .addSystem(new PositionSystem({ app }))
-                .addSystem(new MapSystem({ app }))
-                .addSystem(new SpriteSystem({ app }))
-              ;
-            */
-
-            // Set value from first buffered player state
-          }
-
           if (positionComponent) {
             positionComponent.x = x;
             positionComponent.y = y;
@@ -363,6 +326,83 @@ class PlayerSystem extends ExtendedSystem {
             // Set stairs component
             setPlayerEntityOnStairs(entity, onStairs, stairsType);
           }
+
+          // // Update past state buffer
+          // if (playerComponent
+          //   && positionComponent
+          //   && velocityComponent) {
+          //   const { pastStates, input } = playerComponent;
+
+          //   const { x, y } = positionComponent;
+          //   const { xSpeed, ySpeed } = velocityComponent;
+
+          //   // Discard any buffered state older than the corrected state from the server
+          //   playerComponent.pastStates = pastStates.filter(
+          //     (state) => state.timestamp >= new Date().getTime(),
+          //   );
+
+          //   // Replays the state starting from the corrected state
+          //   // back to the present “predicted” time
+
+          //   if (pastStates.length > 0) {
+          //     const firstState = pastStates[0];
+
+          //     if (firstState.x && firstState.y) {
+          //       positionComponent.x = firstState.x;
+          //       positionComponent.y = firstState.y;
+          //     }
+
+          //     if (firstState.xSpeed && firstState.ySpeed) {
+          //       velocityComponent.xSpeed = firstState.xSpeed;
+          //       velocityComponent.ySpeed = firstState.ySpeed;
+          //     }
+
+          //     pastStates.forEach((state) => {
+          //       // Get map entity
+          //       const mapComponent = getMapComponent(this.world);
+
+          //       if (mapComponent) {
+          //         PlayerSystem.updateEntity(entity, state.delta);
+          //         CharacterSystem.updateEntity(
+          //           entity,
+          //           mapComponent,
+          //           state.delta,
+          //         );
+          //         CollisionSystem.updateEntity(
+          //           entity,
+          //           mapComponent,
+          //           state.delta,
+          //         );
+          //         VelocitySystem.updateEntity(entity, state.delta);
+          //         PositionSystem.updateEntity(entity);
+          //       }
+          //     });
+          //   }
+
+          //   playerComponent.input = input;
+
+          //   positionComponent.x = x;
+          //   positionComponent.y = y;
+
+          //   velocityComponent.xSpeed = xSpeed;
+          //   velocityComponent.ySpeed = ySpeed;
+
+          //   /*
+          //     world
+          //       .addSystem(new PlayerSystem({ app, socket, world }))
+          //       .addSystem(new CharacterSystem({ app }))
+          //       .addSystem(new StairsSystem({ app }))
+          //       .addSystem(new GravitySystem({ app }))
+          //       .addSystem(new CollisionSystem({ app }))
+          //       .addSystem(new VelocitySystem({ app }))
+          //       .addSystem(new PositionSystem({ app }))
+          //       .addSystem(new MapSystem({ app }))
+          //       .addSystem(new SpriteSystem({ app }))
+          //     ;
+          //   */
+
+          //   // Set value from first buffered player state
+          // }
         }
       });
     });

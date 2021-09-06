@@ -10,31 +10,31 @@ class GameLoop {
     updateFn: Function | undefined;
 
     constructor(updateFn?: Function) {
-        this.updateFn = updateFn;
-        this.previous = this.hrtimeMs();
+      this.updateFn = updateFn;
+      this.previous = this.hrtimeMs();
     }
 
     setUpdateFunction(updateFn: Function): void {
-        this.updateFn = updateFn;
+      this.updateFn = updateFn;
     }
 
     hrtimeMs(): number {
-        const time = process.hrtime();
-        return time[0] * 1000 + time[1] / 1000000
+      const time = process.hrtime();
+      return time[0] * 1000 + time[1] / 1000000;
     }
 
     loop(): void {
-        if (this.updateFn !== undefined) {
-            setTimeout(() => { this.loop() }, this.tickLengthMs);
+      if (this.updateFn !== undefined) {
+        setTimeout(() => { this.loop(); }, this.tickLengthMs);
 
-            const now: number = this.hrtimeMs();
-            const delta: number = (now - this.previous) / 1000;
+        const now: number = this.hrtimeMs();
+        const delta: number = (now - this.previous) / 1000;
 
-            this.updateFn(delta, this.tick);
+        this.updateFn(delta, this.tick);
 
-            this.previous = now
-            this.tick++
-        }
+        this.previous = now;
+        this.tick++;
+      }
     }
 }
 
