@@ -7,6 +7,7 @@ import { io, Socket } from 'socket.io-client';
 import MapComponent from './components/MapComponent';
 
 // ECS System
+import ReconciliationSystem from './systems/ReconciliationSystem';
 import SpriteSystem from './systems/SpriteSystem';
 import PositionSystem from './systems/PositionSystem';
 import MapSystem from './systems/MapSystem';
@@ -36,7 +37,7 @@ const container = new PIXI.Container();
 app.stage.addChild(container);
 
 // Rescale PIXI stage
-const stageScale: number = 3;
+const stageScale: number = 2;
 app.stage.scale.x = stageScale;
 app.stage.scale.y = stageScale;
 
@@ -62,6 +63,7 @@ socket.on('gameRoom:init', (data: MapMetadata) => {
   world
     .addSystem(new PlayerSystem({ app, socket, world }))
     .addSystem(new CharacterSystem({ app }))
+    .addSystem(new ReconciliationSystem({ app }))
     .addSystem(new StairsSystem({ app }))
     .addSystem(new GravitySystem({ app })) // TODO: Not all systems need PIXI app as parameter
     .addSystem(new CollisionSystem({ app }))

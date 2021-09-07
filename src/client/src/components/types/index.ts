@@ -9,6 +9,7 @@ const COMPONENT_NAMES = {
   Player: Symbol('Player'),
   CollBox: Symbol('CollBox'),
   Stairs: Symbol('Stairs'),
+  Reconciliation: Symbol('Reconciliation'),
 };
 
 export default COMPONENT_NAMES;

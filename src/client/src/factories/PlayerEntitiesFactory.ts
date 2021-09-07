@@ -10,6 +10,7 @@ import GravityComponent from '../components/GravityComponent';
 import VelocityComponent from '../components/VelocityComponent';
 import CollBoxComponent from '../components/CollBoxComponent';
 import CollisionComponent from '../components/CollisionComponent';
+import ReconciliationComponent from '../components/ReconciliationComponent';
 
 // Types
 import { PlayerData } from '../../../server/src/types/player';
@@ -32,7 +33,8 @@ function playersEntitiesFactory(data: PlayerData, socket?: Socket): Entity {
     .addComponent(new SpriteComponent(sprite))
     .addComponent(new PlayerComponent(clientId, socket))
     .addComponent(new CollBoxComponent({ width: 16, height: 32 }))
-    .addComponent(new CollisionComponent());
+    .addComponent(new CollisionComponent())
+    .addComponent(new ReconciliationComponent());
 
   return playerEntity;
 }

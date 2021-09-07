@@ -9,12 +9,14 @@ import SpriteComponent from '../components/SpriteComponent';
 import PlayerComponent from '../components/PlayerComponent';
 import CharacterComponent from '../components/CharacterComponent';
 import StairsComponent from '../components/StairsComponent';
+import ReconciliationComponent from '../components/ReconciliationComponent';
 
 // Systems
 import PositionSystem from './PositionSystem';
 import VelocitySystem from './VelocitySystem';
 import CharacterSystem from './CharacterSystem';
 import CollisionSystem from './CollisionSystem';
+import ReconciliationSystem from './ReconciliationSystem';
 // import MapComponent from './MapComponent';
 
 import { ExtendedSystem, ExtendedSystemMetadata } from './ExtendedSystem';
@@ -83,68 +85,68 @@ class PlayerSystem extends ExtendedSystem {
       playerComponent.inputPrev = { ...playerComponent.input };
     }
 
-    // Save state
+    // // Save state
 
-    // Send stairs data
-    const positionComponent = entity.getComponent<PositionComponent>(
-      COMPONENT_NAMES.Position,
-    );
+    // // Send stairs data
+    // const positionComponent = entity.getComponent<PositionComponent>(
+    //   COMPONENT_NAMES.Position,
+    // );
 
-    const characterComponent = entity.getComponent<CharacterComponent>(
-      COMPONENT_NAMES.Character,
-    );
+    // const characterComponent = entity.getComponent<CharacterComponent>(
+    //   COMPONENT_NAMES.Character,
+    // );
 
-    const velocityComponent = entity.getComponent<VelocityComponent>(
-      COMPONENT_NAMES.Velocity,
-    );
+    // const velocityComponent = entity.getComponent<VelocityComponent>(
+    //   COMPONENT_NAMES.Velocity,
+    // );
 
-    const stairsComponent = entity.getComponent<StairsComponent>(
-      COMPONENT_NAMES.Stairs,
-    );
+    // const stairsComponent = entity.getComponent<StairsComponent>(
+    //   COMPONENT_NAMES.Stairs,
+    // );
 
-    if (
-      playerComponent
-      && positionComponent
-      && characterComponent
-      && velocityComponent
-    ) {
-      const { x, y } = positionComponent;
-      const { clientId } = playerComponent;
-      const { onFloor, direction, onStairs } = characterComponent;
-      const { xSpeed, ySpeed } = velocityComponent;
+    // if (
+    //   playerComponent
+    //   && positionComponent
+    //   && characterComponent
+    //   && velocityComponent
+    // ) {
+    //   const { x, y } = positionComponent;
+    //   const { clientId } = playerComponent;
+    //   const { onStairs } = characterComponent;
+    //   const { xSpeed, ySpeed } = velocityComponent;
 
-      let stairs: PlayerStairsData | undefined;
+    //   let stairs;
 
-      if (onStairs !== Boolean(stairsComponent)) {
-        characterComponent.onStairs = Boolean(stairsComponent);
+    //   if (onStairs !== Boolean(stairsComponent)) {
+    //     characterComponent.onStairs = Boolean(stairsComponent);
 
-        stairs = {
-          onStairs: Boolean(stairsComponent),
-        };
+    //     stairs = {
+    //       onStairs: Boolean(stairsComponent),
+    //     };
 
-        if (stairsComponent) {
-          stairs = {
-            ...stairs,
-            stairsType: stairsComponent.stairType,
-          };
-        }
-      }
+    //     if (stairsComponent) {
+    //       stairs = {
+    //         ...stairs,
+    //         stairsType: stairsComponent.stairType,
+    //       };
+    //     }
+    //   }
 
-      // Create result object
-      const result = {
-        timestamp: new Date().getTime(),
-        delta,
-        input: { ...playerComponent.input },
-        clientId,
-        x,
-        y,
-        xSpeed,
-        ySpeed,
-        stairs,
-      };
+    //   // Create result object
+    //   const result = {
+    //     timestamp: new Date().getTime(),
+    //     delta,
+    //     input: { ...playerComponent.input },
+    //     clientId,
+    //     x,
+    //     y,
+    //     xSpeed,
+    //     ySpeed,
+    //     stairs,
+    //   };
 
-      playerComponent.pastStates.push(result);
-    }
+    //   playerComponent.pastStates.push(result);
+    // }
   }
 
   addedToWorld(world: World): void {
@@ -273,7 +275,10 @@ class PlayerSystem extends ExtendedSystem {
         );
 
         if (entity) {
-          // Position update
+          const reconciliationComponent = entity.getComponent<ReconciliationComponent>(
+            COMPONENT_NAMES.Reconciliation,
+          );
+
           const spriteComponent = entity.getComponent<SpriteComponent>(
             COMPONENT_NAMES.Sprite,
           );
@@ -290,119 +295,125 @@ class PlayerSystem extends ExtendedSystem {
             COMPONENT_NAMES.Velocity,
           );
 
-          if (positionComponent) {
-            positionComponent.x = x;
-            positionComponent.y = y;
-          }
-
-          if (velocityComponent) {
-            velocityComponent.xSpeed = xSpeed;
-            velocityComponent.ySpeed = ySpeed;
-          }
-
-          if (spriteComponent && sprite) {
-            if (sprite.name) {
-              spriteComponent.setAnimation(sprite.name);
+          if (reconciliationComponent) {
+            if (positionComponent) {
+              positionComponent.x = x;
+              positionComponent.y = y;
             }
 
-            if (sprite.scale) {
-              if (sprite.scale.x) {
-                spriteComponent.setXScale(sprite.scale.x);
+            if (velocityComponent) {
+              velocityComponent.xSpeed = xSpeed;
+              velocityComponent.ySpeed = ySpeed;
+            }
+
+            // if (sprite && spriteComponent) {
+            //   if (sprite.name) {
+            //     spriteComponent.setAnimation(sprite.name);
+            //   }
+
+            //   if (sprite.scale) {
+            //     if (sprite.scale.x) {
+            //       spriteComponent.setXScale(sprite.scale.x);
+            //     }
+
+            //     if (sprite.scale.y) {
+            //       spriteComponent.setYScale(sprite.scale.y);
+            //     }
+            //   }
+
+            //   if (typeof sprite.frameSpeed === 'number') {
+            //     spriteComponent.setFrameSpeed(sprite.frameSpeed);
+            //   }
+            // }
+
+            if (stairs !== undefined) {
+              const { onStairs, stairsType } = stairs;
+
+              // Set stairs component
+              setPlayerEntityOnStairs(entity, onStairs, stairsType);
+            }
+
+            // Update past state buffer
+            if (playerComponent
+              && positionComponent
+              && velocityComponent) {
+              const { pastStates } = reconciliationComponent;
+              const { input } = playerComponent;
+
+              // Discard any buffered state older than the corrected state from the server
+              playerComponent.pastStates = pastStates.filter(
+                (state) => state.timestamp >= new Date().getTime(),
+              );
+
+              // console.log(playerComponent.pastStates);
+
+              // Replays the state starting from the corrected state
+              // back to the present “predicted” time
+
+              if (pastStates.length > 0) {
+                // Reset to first state
+                const firstState = pastStates[0];
+
+                if (firstState.x && firstState.y) {
+                  positionComponent.x = firstState.x;
+                  positionComponent.y = firstState.y;
+                }
+
+                if (firstState.xSpeed && firstState.ySpeed) {
+                  velocityComponent.xSpeed = firstState.xSpeed;
+                  velocityComponent.ySpeed = firstState.ySpeed;
+                }
+
+                pastStates.forEach((state) => {
+                  // Get map entity
+                  const mapComponent = getMapComponent(this.world);
+
+                  if (mapComponent) {
+                    PlayerSystem.updateEntity(entity, state.delta);
+
+                    CharacterSystem.updateEntity(
+                      entity,
+                      mapComponent,
+                      state.delta,
+                    );
+
+                    CollisionSystem.updateEntity(
+                      entity,
+                      mapComponent,
+                      state.delta,
+                    );
+
+                    VelocitySystem.updateEntity(entity, state.delta);
+                    PositionSystem.updateEntity(entity);
+                  }
+                });
               }
 
-              if (sprite.scale.y) {
-                spriteComponent.setYScale(sprite.scale.y);
-              }
-            }
+              // playerComponent.input = input;
 
-            if (typeof sprite.frameSpeed === 'number') {
-              spriteComponent.setFrameSpeed(sprite.frameSpeed);
+              // positionComponent.x = x;
+              // positionComponent.y = y;
+
+              // velocityComponent.xSpeed = xSpeed;
+              // velocityComponent.ySpeed = ySpeed;
+
+              /*
+                world
+                  .addSystem(new PlayerSystem({ app, socket, world }))
+                  .addSystem(new CharacterSystem({ app }))
+                  .addSystem(new StairsSystem({ app }))
+                  .addSystem(new GravitySystem({ app }))
+                  .addSystem(new CollisionSystem({ app }))
+                  .addSystem(new VelocitySystem({ app }))
+                  .addSystem(new PositionSystem({ app }))
+                  .addSystem(new MapSystem({ app }))
+                  .addSystem(new SpriteSystem({ app }))
+                ;
+              */
+
+            // Set value from first buffered player state
             }
           }
-
-          if (stairs !== undefined) {
-            const { onStairs, stairsType } = stairs;
-
-            // Set stairs component
-            setPlayerEntityOnStairs(entity, onStairs, stairsType);
-          }
-
-          // // Update past state buffer
-          // if (playerComponent
-          //   && positionComponent
-          //   && velocityComponent) {
-          //   const { pastStates, input } = playerComponent;
-
-          //   const { x, y } = positionComponent;
-          //   const { xSpeed, ySpeed } = velocityComponent;
-
-          //   // Discard any buffered state older than the corrected state from the server
-          //   playerComponent.pastStates = pastStates.filter(
-          //     (state) => state.timestamp >= new Date().getTime(),
-          //   );
-
-          //   // Replays the state starting from the corrected state
-          //   // back to the present “predicted” time
-
-          //   if (pastStates.length > 0) {
-          //     const firstState = pastStates[0];
-
-          //     if (firstState.x && firstState.y) {
-          //       positionComponent.x = firstState.x;
-          //       positionComponent.y = firstState.y;
-          //     }
-
-          //     if (firstState.xSpeed && firstState.ySpeed) {
-          //       velocityComponent.xSpeed = firstState.xSpeed;
-          //       velocityComponent.ySpeed = firstState.ySpeed;
-          //     }
-
-          //     pastStates.forEach((state) => {
-          //       // Get map entity
-          //       const mapComponent = getMapComponent(this.world);
-
-          //       if (mapComponent) {
-          //         PlayerSystem.updateEntity(entity, state.delta);
-          //         CharacterSystem.updateEntity(
-          //           entity,
-          //           mapComponent,
-          //           state.delta,
-          //         );
-          //         CollisionSystem.updateEntity(
-          //           entity,
-          //           mapComponent,
-          //           state.delta,
-          //         );
-          //         VelocitySystem.updateEntity(entity, state.delta);
-          //         PositionSystem.updateEntity(entity);
-          //       }
-          //     });
-          //   }
-
-          //   playerComponent.input = input;
-
-          //   positionComponent.x = x;
-          //   positionComponent.y = y;
-
-          //   velocityComponent.xSpeed = xSpeed;
-          //   velocityComponent.ySpeed = ySpeed;
-
-          //   /*
-          //     world
-          //       .addSystem(new PlayerSystem({ app, socket, world }))
-          //       .addSystem(new CharacterSystem({ app }))
-          //       .addSystem(new StairsSystem({ app }))
-          //       .addSystem(new GravitySystem({ app }))
-          //       .addSystem(new CollisionSystem({ app }))
-          //       .addSystem(new VelocitySystem({ app }))
-          //       .addSystem(new PositionSystem({ app }))
-          //       .addSystem(new MapSystem({ app }))
-          //       .addSystem(new SpriteSystem({ app }))
-          //     ;
-          //   */
-
-          //   // Set value from first buffered player state
-          // }
         }
       });
     });
