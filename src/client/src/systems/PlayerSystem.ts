@@ -261,6 +261,8 @@ class PlayerSystem extends ExtendedSystem {
     });
 
     socket.on('players:update', (playersData) => {
+      // console.log(playersData);
+
       // Update each players
       Object.keys(playersData).forEach((clientId) => {
         const playerData = playersData[clientId];
@@ -295,99 +297,113 @@ class PlayerSystem extends ExtendedSystem {
             COMPONENT_NAMES.Velocity,
           );
 
+          // Update player
+          if (positionComponent) {
+            positionComponent.x = x;
+            positionComponent.y = y;
+          }
+
+          if (velocityComponent) {
+            velocityComponent.xSpeed = xSpeed;
+            velocityComponent.ySpeed = ySpeed;
+          }
+
+          if (sprite && spriteComponent) {
+            if (sprite.name) {
+              spriteComponent.setAnimation(sprite.name);
+            }
+
+            if (sprite.scale) {
+              if (sprite.scale.x) {
+                spriteComponent.setXScale(sprite.scale.x);
+              }
+
+              if (sprite.scale.y) {
+                spriteComponent.setYScale(sprite.scale.y);
+              }
+            }
+
+            if (typeof sprite.frameSpeed === 'number') {
+              spriteComponent.setFrameSpeed(sprite.frameSpeed);
+            }
+          }
+
+          if (stairs !== undefined) {
+            const { onStairs, stairsType } = stairs;
+
+            // Set stairs component
+            setPlayerEntityOnStairs(entity, onStairs, stairsType);
+          }
+
           if (reconciliationComponent) {
-            if (positionComponent) {
-              positionComponent.x = x;
-              positionComponent.y = y;
-            }
-
-            if (velocityComponent) {
-              velocityComponent.xSpeed = xSpeed;
-              velocityComponent.ySpeed = ySpeed;
-            }
-
-            // if (sprite && spriteComponent) {
-            //   if (sprite.name) {
-            //     spriteComponent.setAnimation(sprite.name);
-            //   }
-
-            //   if (sprite.scale) {
-            //     if (sprite.scale.x) {
-            //       spriteComponent.setXScale(sprite.scale.x);
-            //     }
-
-            //     if (sprite.scale.y) {
-            //       spriteComponent.setYScale(sprite.scale.y);
-            //     }
-            //   }
-
-            //   if (typeof sprite.frameSpeed === 'number') {
-            //     spriteComponent.setFrameSpeed(sprite.frameSpeed);
-            //   }
-            // }
-
-            if (stairs !== undefined) {
-              const { onStairs, stairsType } = stairs;
-
-              // Set stairs component
-              setPlayerEntityOnStairs(entity, onStairs, stairsType);
-            }
-
             // Update past state buffer
             if (playerComponent
               && positionComponent
               && velocityComponent) {
-              const { pastStates } = reconciliationComponent;
+              // const { pastStates } = reconciliationComponent;
               const { input } = playerComponent;
+              const { pastStates } = reconciliationComponent;
+
+              console.log(
+                { ...reconciliationComponent.pastStates },
+              );
 
               // Discard any buffered state older than the corrected state from the server
-              playerComponent.pastStates = pastStates.filter(
+              reconciliationComponent.pastStates = pastStates.filter(
                 (state) => state.timestamp >= new Date().getTime(),
               );
 
-              // console.log(playerComponent.pastStates);
+              //   reconciliationComponent.pastStates = pastStates.filter(
+              //     (state) => state.timestamp >= new Date().getTime(),
+              //   );
 
               // Replays the state starting from the corrected state
               // back to the present “predicted” time
 
-              if (pastStates.length > 0) {
-                // Reset to first state
-                const firstState = pastStates[0];
+              // if (reconciliationComponent.pastStates.length > 0) {
+              //   // console.log(reconciliationComponent.pastStates);
+              //   // Reset to first state
+              //   const firstState = pastStates[0];
 
-                if (firstState.x && firstState.y) {
-                  positionComponent.x = firstState.x;
-                  positionComponent.y = firstState.y;
-                }
+              //   if (firstState.x && firstState.y) {
+              //     positionComponent.x = firstState.x;
+              //     positionComponent.y = firstState.y;
+              //   }
 
-                if (firstState.xSpeed && firstState.ySpeed) {
-                  velocityComponent.xSpeed = firstState.xSpeed;
-                  velocityComponent.ySpeed = firstState.ySpeed;
-                }
+              //   if (firstState.xSpeed && firstState.ySpeed) {
+              //     velocityComponent.xSpeed = firstState.xSpeed;
+              //     velocityComponent.ySpeed = firstState.ySpeed;
+              //   }
 
-                pastStates.forEach((state) => {
-                  // Get map entity
-                  const mapComponent = getMapComponent(this.world);
+              //   pastStates.forEach((state) => {
+              //     // Get map entity
+              //     const mapComponent = getMapComponent(this.world);
 
-                  if (mapComponent) {
-                    PlayerSystem.updateEntity(entity, state.delta);
+              //     if (mapComponent) {
+              //       PlayerSystem.updateEntity(entity, state.delta);
 
-                    CharacterSystem.updateEntity(
-                      entity,
-                      mapComponent,
-                      state.delta,
-                    );
+              //       CharacterSystem.updateEntity(
+              //         entity,
+              //         mapComponent,
+              //         state.delta,
+              //       );
 
-                    CollisionSystem.updateEntity(
-                      entity,
-                      mapComponent,
-                      state.delta,
-                    );
+              //       CollisionSystem.updateEntity(
+              //         entity,
+              //         mapComponent,
+              //         state.delta,
+              //       );
 
-                    VelocitySystem.updateEntity(entity, state.delta);
-                    PositionSystem.updateEntity(entity);
-                  }
-                });
-              }
+              //       VelocitySystem.updateEntity(entity, state.delta);
+              //       PositionSystem.updateEntity(entity);
+              //     }
+              //   });
+
+              //   // Discard any buffered state older than the corrected state from the server
+              //   reconciliationComponent.pastStates = pastStates.filter(
+              //     (state) => state.timestamp >= new Date().getTime(),
+              //   );
+              // }
 
               // playerComponent.input = input;
 
@@ -411,7 +427,8 @@ class PlayerSystem extends ExtendedSystem {
                 ;
               */
 
-            // Set value from first buffered player state
+              // Set value from first buffered player state
+              // }
             }
           }
         }

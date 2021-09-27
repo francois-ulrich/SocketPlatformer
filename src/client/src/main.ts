@@ -61,17 +61,17 @@ socket.on('gameRoom:init', (data: MapMetadata) => {
 
   // Instanciate world
   world
+    .addSystem(new ReconciliationSystem({ app }))
     .addSystem(new PlayerSystem({ app, socket, world }))
     .addSystem(new CharacterSystem({ app }))
-    .addSystem(new ReconciliationSystem({ app }))
     .addSystem(new StairsSystem({ app }))
     .addSystem(new GravitySystem({ app })) // TODO: Not all systems need PIXI app as parameter
     .addSystem(new CollisionSystem({ app }))
     .addSystem(new VelocitySystem({ app }))
     .addSystem(new PositionSystem({ app })) // TODO: change argument from object to app instance
+
     .addSystem(new MapSystem({ app }))
-    .addSystem(new SpriteSystem({ app }))
-  ;
+    .addSystem(new SpriteSystem({ app }));
 
   // Initialize map
   const mapData: MapMetadata = data;
